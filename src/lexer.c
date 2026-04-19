@@ -146,6 +146,14 @@ Token scanToken(Lexer* lexer) {
 
         // single-character tokens
         case ';': return noDataToken(lexer, TOKEN_SEMICOLON);
+        case '(': return noDataToken(lexer, TOKEN_LEFT_PAREN);
+        case ')': return noDataToken(lexer, TOKEN_RIGHT_PAREN);
+        case '{': return noDataToken(lexer, TOKEN_LEFT_BRACE);
+        case '}': return noDataToken(lexer, TOKEN_RIGHT_BRACE);
+        case '[': return noDataToken(lexer, TOKEN_LEFT_BRACKET);
+        case ']': return noDataToken(lexer, TOKEN_RIGHT_BRACKET);
+
+        // possibly two-character-tokens
         case '+':
             switch (peek(lexer)) {
                 case '=': advance(lexer); return noDataToken(lexer, TOKEN_PLUS_EQUALS);
