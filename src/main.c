@@ -12,9 +12,9 @@ void parse_flags(int argc, char* argv[]) {
 
 int main(const int argc, char* argv[]) {
 
-    if (argc < 2) {
+    if (argc != 2) {
         fprintf(stderr, "Incorrect usage\n"
-                              "Proper Usage: grtcmp <flags> <source file>\n"
+                              "Proper Usage: grtcmp <source file>\n"
                               "Use -h for help\n");
         exit(64);
     }
