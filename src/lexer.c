@@ -8,7 +8,7 @@
 Token scanToken(Lexer* lexer);
 void skipWhitespace(Lexer *lexer);
 
-Lexer *LexerNew(const char *source) {
+Lexer *LexerNew(const char *source, ArenaAlloc *tokenData) {
     Lexer *lexer = malloc(sizeof(Lexer));
 
     // read the file into the lexer struct
@@ -39,7 +39,7 @@ Lexer *LexerNew(const char *source) {
 
     lexer->line = 1;
 
-    lexer->data = ArenaAllocNew();
+    lexer->data = tokenData;
 
     return lexer;
 }

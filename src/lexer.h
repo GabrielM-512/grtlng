@@ -55,7 +55,7 @@ typedef struct {
 } Lexer;
 
 
-Lexer *LexerNew(const char *source);
+Lexer *LexerNew(const char *source, ArenaAlloc *tokenData);
 
 void LexerFree(Lexer* lexer);
 

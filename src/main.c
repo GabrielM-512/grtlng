@@ -21,7 +21,8 @@ int main(const int argc, char* argv[]) {
 
     parse_flags(argc, argv);
 
-    Lexer *lexer = LexerNew(argv[argc - 1]); //last argument must be source file
+    ArenaAlloc *tokenData = ArenaAllocNew();
+    Lexer *lexer = LexerNew(argv[argc - 1], tokenData); //last argument must be source file
     const ArrayList *tokens = scanAll(lexer);
 
 #ifdef DEBUG_PRINT_TOKENS
