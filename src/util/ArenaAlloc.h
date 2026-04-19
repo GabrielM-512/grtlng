@@ -22,7 +22,7 @@
  */
 typedef struct ArenaAlloc {
     u16 capacity, size;
-    struct ArenaAlloc* next;
+    struct ArenaAlloc *next;
     u8 data[];
 } ArenaAlloc;
 

@@ -57,6 +57,7 @@ void populate_table() {
 
     text = ArenaAllocNew();
 
+    // transfer tokens
     for (int i = 0; i <= TOKEN_UNKNOWN; i++) {
         int tokenlength = 0;
 

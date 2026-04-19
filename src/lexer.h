@@ -44,7 +44,7 @@ typedef struct {
 
 /*
  * The construct for creating Tokens out of the source string.
- * The Lexer owns the source string as soon as it is passed. It will free the source string upon being destroyed.
+ * The Lexer owns the source string. It will free the source string upon being destroyed.
  */
 typedef struct {
     char *source;

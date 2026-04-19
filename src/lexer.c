@@ -47,7 +47,6 @@ Lexer *LexerNew(const char *source) {
 void LexerFree(Lexer* lexer) {
     free(lexer->source);
     free(lexer);
-
 }
 
 
@@ -145,6 +144,7 @@ Token scanToken(Lexer* lexer) {
 
     switch (c) {
 
+        // single-character tokens
         case ';': return noDataToken(lexer, TOKEN_SEMICOLON);
         case '+':
             switch (peek(lexer)) {
@@ -176,7 +176,9 @@ Token scanToken(Lexer* lexer) {
             break;
     }
 
-    if (isdigit(c)) return number(lexer);
+    // multi-character tokens
+
+    if (isNum(c)) return number(lexer);
     if (c == '"') return string(lexer);
 
     while (peek(lexer) != ' ' && peek(lexer) != '\n' && !isAtEnd(lexer)) {

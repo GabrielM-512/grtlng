@@ -55,6 +55,7 @@ void ArenaAllocFree(ArenaAlloc *arena) {
  * @brief Allocate some space in the given Arena or any of its children.
  *
  * @param arena pointer to the Arena
+ * @param size size
  *
  * @return Pointer to the newly allocated space
  */
