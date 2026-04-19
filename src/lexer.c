@@ -144,6 +144,24 @@ Token string(Lexer *lexer) {
     return makeToken(lexer, TOKEN_STRING, data);
 }
 
+Token identifier(Lexer *lexer) {
+
+    while (true) {
+        const char c = peek(lexer);
+        if (!isAlNum(c) || c == '_') break;
+        advance(lexer);
+    }
+
+    // check for keywords here
+
+    const size_t size = lexer->head - lexer->base + 1;
+    char *data = ArenaAllocAlloc(lexer->data, size);
+    memcpy(data, lexer->source + lexer->base, size);
+    data[size - 1] = '\0';
+    return makeToken(lexer, TOKEN_IDENTIFIER, data);
+
+}
+
 
 Token scanToken(Lexer* lexer) {
 
@@ -192,6 +210,25 @@ Token scanToken(Lexer* lexer) {
                 return noDataToken(lexer, TOKEN_SLASH_EQUALS);
             }
             return noDataToken(lexer, TOKEN_SLASH);
+
+        case '=':
+            if (peek(lexer) == '=') {
+                advance(lexer);
+                return noDataToken(lexer, TOKEN_EQUALS_EQUALS);
+            }
+            return noDataToken(lexer, TOKEN_EQUALS);
+        case '>':
+            if (peek(lexer) == '=') {
+                advance(lexer);
+                return noDataToken(lexer, TOKEN_MORE_EQUALS);
+            }
+            return noDataToken(lexer, TOKEN_MORE);
+        case '<':
+            if (peek(lexer) == '=') {
+                advance(lexer);
+                return noDataToken(lexer, TOKEN_LESS_EQUALS);
+            }
+            return noDataToken(lexer, TOKEN_LESS);
         default:
             break;
     }
@@ -201,9 +238,9 @@ Token scanToken(Lexer* lexer) {
     if (isNum(c)) return number(lexer);
     if (c == '"') return string(lexer);
 
-    while (peek(lexer) != ' ' && peek(lexer) != '\n' && !isAtEnd(lexer)) {
-        advance(lexer);
-    }
+    // check for keywords here
+
+    if (isAlpha(c) || c == '_') return identifier(lexer);
 
     return errorToken(lexer, "Unexpected character");
 }

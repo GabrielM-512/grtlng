@@ -6,15 +6,27 @@
 
 typedef enum {
     TOKEN_EOF, // End of source file
+    TOKEN_ERROR,
+
     TOKEN_NUM, // Any number literal
     TOKEN_STRING, // Any String
 
     TOKEN_SEMICOLON,
 
+    TOKEN_LEFT_PAREN, // ()
+    TOKEN_RIGHT_PAREN,
+    TOKEN_LEFT_BRACE, // {}
+    TOKEN_RIGHT_BRACE,
+    TOKEN_LEFT_BRACKET, // []
+    TOKEN_RIGHT_BRACKET,
+
     TOKEN_STAR,
     TOKEN_PLUS,
     TOKEN_MINUS,
     TOKEN_SLASH,
+
+    TOKEN_MORE,
+    TOKEN_LESS,
 
     TOKEN_PLUS_EQUALS,
     TOKEN_MINUS_EQUALS,
@@ -25,6 +37,7 @@ typedef enum {
     TOKEN_MINUS_MINUS,
 
     TOKEN_BANG, // '!'
+    TOKEN_PERIOD,
 
     TOKEN_EQUALS,
     TOKEN_EQUALS_EQUALS,
@@ -32,7 +45,8 @@ typedef enum {
     TOKEN_LESS_EQUALS,
     TOKEN_BANG_EQUALS,
 
-    TOKEN_ERROR,
+    TOKEN_IDENTIFIER,
+
     TOKEN_UNKNOWN
 } TokenType;
 
