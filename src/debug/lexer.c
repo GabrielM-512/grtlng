@@ -1,30 +1,101 @@
 #include "lexer.h"
+#include "../util/ArenaAlloc.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct {
     char *name;
 } TokenLookup;
 
-TokenLookup lookup[] = {
-    [TOKEN_EOF] = {"TOKEN_EOF"},
-    [TOKEN_NUM] = {"TOKEN_NUM"},
-    [TOKEN_STRING] = {"TOKEN_STRING"},
+ArenaAlloc *text = nullptr;
 
-    [TOKEN_SEMICOLON] = {"TOKEN_SEMICOLON"},
+TokenLookup lookup[TOKEN_UNKNOWN + 1];
 
-    [TOKEN_STAR] = {"TOKEN_STAR"},
-    [TOKEN_PLUS] = {"TOKEN_PLUS"},
-    [TOKEN_MINUS] = {"TOKEN_MINUS"},
-    [TOKEN_SLASH] = {"TOKEN_SLASH"},
+/**
+ * @brief Automatically finds the literals for the token names from 'src/lexer.h' and stores
+ * them into the lookup table as strings.
+ *
+ */
+void populate_table() {
+    size_t length = 0;
+    char* source;
+    {
+        const char* filename = "/home/gabriel/CLionProjects/language/src/lexer.h";
+        FILE* file = fopen(filename, "r");
+        fseek(file, 0L, SEEK_END);
+        length = ftell(file) + 1;
+        source = malloc(length);
 
-    [TOKEN_PLUS_EQUALS] = {"TOKEN_PLUS_EQUALS"},
+        // reset to start of file
+        rewind(file);
 
-    [TOKEN_ERROR] = {"TOKEN_ERROR"},
-    [TOKEN_UNKNOWN] ={"TOKEN_UNKNOWN"}
-};
+        //read the file
+        fread(source, sizeof(char), length, file);
+        fclose(file);
+
+        source[length] = '\0';
+    }
+
+
+
+    // look for the enum
+    int start;
+    for (int i = 0; ; i++) {
+        if (i + 9 > length) {
+            fprintf(stderr, "[DEBUG ERROR] %s: Couldnt locate enum start", __FILE__);
+            exit(1);
+        }
+
+        const char *target = "TOKEN_EOF";
+        if (memcmp(target, &source[i], 9) == 0) {
+            start = i;
+            break;
+        }
+    }
+
+    text = ArenaAllocNew();
+
+    for (int i = 0; i <= TOKEN_UNKNOWN; i++) {
+        int tokenlength = 0;
+
+        // search for token end
+        char c = source[start];
+        while (c != ',') {
+            tokenlength++;
+            c = source[start + tokenlength];
+        }
+        tokenlength++;
+
+        // store into the lookup table
+
+        char *textdata = ArenaAllocAlloc(text, tokenlength);
+
+        memcpy(textdata, &source[start], tokenlength);
+        textdata[tokenlength - 1] = '\0';
+
+        start += tokenlength;
+
+        lookup[i].name = textdata;
+
+
+        // skip whitespace
+        c = source[start];
+        while (c != 'T') {
+            start++;
+            c = source[start];
+        }
+
+    }
+
+    free(source);
+}
+
 
 void printToken(const Token token) {
+    if (text == nullptr) populate_table();
+
     printf("%04d | %s", token.line, lookup[token.type].name);
 
     switch (token.type) {
@@ -35,8 +106,6 @@ void printToken(const Token token) {
         case TOKEN_STRING:
             printf(", '%s'", (char*) token.data);
             break;
-        case TOKEN_EOF:
-        case TOKEN_UNKNOWN:
         default:
             break;
 
