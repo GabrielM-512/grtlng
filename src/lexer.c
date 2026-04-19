@@ -1,6 +1,5 @@
 #include "lexer.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -64,6 +63,19 @@ ArrayList *scanAll(Lexer* lexer) {
     return tokens;
 }
 
+bool isAlpha(const char c) {
+    return ('a' <= c && c <= 'z') ||
+        ('A' <= c && c <= 'Z');
+}
+
+bool isNum(const char c) {
+    return '0' <= c && c <= '9';
+}
+
+bool isAlNum(const char c) {
+    return isAlpha(c) || isNum(c);
+}
+
 
 bool isAtEnd(const Lexer *lexer) {
     return lexer->source[lexer->head] == '\0';
@@ -98,11 +110,11 @@ Token errorToken(const Lexer *lexer, char* message) {
 
 
 Token number(Lexer *lexer) {
-    while (isdigit(peek(lexer))) advance(lexer);
+    while (isNum(peek(lexer))) advance(lexer);
 
     if (peek(lexer) == '.') {
         advance(lexer);
-        while (isdigit(peek(lexer))) advance(lexer);
+        while (isNum(peek(lexer))) advance(lexer);
     }
 
     const double value = strtod(lexer->source + lexer->base, nullptr);
