@@ -19,7 +19,7 @@ TokenLookup lookup[TOKEN_UNKNOWN + 1];
  *
  */
 void populate_table() {
-    size_t length = 0;
+    size_t length;
     char* source;
     {
         const char* filename = "/home/gabriel/CLionProjects/language/src/lexer.h";
@@ -97,15 +97,19 @@ void populate_table() {
 void printToken(const Token token) {
     if (text == nullptr) populate_table();
 
-    printf("%04d | %s", token.line, lookup[token.type].name);
+    // print token name left aligned with a width of 20 characters
+    printf("%04d | %-20.20s", token.line, lookup[token.type].name);
 
     switch (token.type) {
         case TOKEN_NUM:
-            printf(", %lf", *(double*) token.data);
+            printf("| %lf", *(double*) token.data);
             break;
         case TOKEN_ERROR:
         case TOKEN_STRING:
-            printf(", '%s'", (char*) token.data);
+            printf("| '%s'", (char*) token.data);
+            break;
+        case TOKEN_IDENTIFIER:
+            printf("| %s", (char*) token.data);
             break;
         default:
             break;
