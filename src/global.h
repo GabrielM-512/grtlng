@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-#define INTERN_ERROR_LOCATION(file, line) (fprintf(stderr, "[ERROR] %s on line%d\n", file, line))
+#define INTERN_ERROR_LOCATION(file, line) (fprintf(stderr, "[INTERNAL ERROR] %s on line %d\n", file, line))
 
 #define DEBUG_ALL
 

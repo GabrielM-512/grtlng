@@ -31,7 +31,9 @@ void ArrayListAdd(ArrayList *list, const void *element) {
         list->elements = GROW_ARRAY(list->elementSize, list->elements, list->capacity);
 
         if (list->elements == nullptr) {
-            fprintf(stderr, "Internal error: Couldnt realloc ArrayList\n");
+            INTERN_ERROR_LOCATION(__FILE__, __LINE__);
+            fprintf(stderr, "Couldnt realloc ArrayList\n");
+            exit(1);
         }
     }
 
