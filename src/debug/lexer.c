@@ -35,7 +35,7 @@ void populate_table() {
         fread(source, sizeof(char), length, file);
         fclose(file);
 
-        source[length] = '\0';
+        source[length - 1] = '\0';
     }
 
 
