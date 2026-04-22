@@ -30,7 +30,13 @@ Lexer *LexerNew(const char *source, ArenaAlloc *tokenData) {
         fread(lexer->source, sizeof(char), lexer->length, file);
         fclose(file);
 
-        lexer->source[lexer->length] = '\0';
+        lexer->source[lexer->length - 1] = '\0'; // THE NULL TERMINATOR PLACEMENT WILL KILL ME SOME DAY
+        /*
+         * FOR CONTEXT:
+         * This is the second time where this null terminator byte was placed one byte too late
+         * Commit 6c931ed2 already fixed this, but apparently merging some other branch reverted that
+         * So fuck Git for that
+         */
     }
 
     lexer->base = 0;
