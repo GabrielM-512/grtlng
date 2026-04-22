@@ -189,6 +189,11 @@ Token scanToken(Lexer* lexer) {
         case '[': return noDataToken(lexer, TOKEN_LEFT_BRACKET);
         case ']': return noDataToken(lexer, TOKEN_RIGHT_BRACKET);
 
+        case ',': return noDataToken(lexer, TOKEN_COMMA);
+        case '.': return noDataToken(lexer, TOKEN_PERIOD);
+
+        case '~': return noDataToken(lexer, TOKEN_TILDE);
+
         // possibly two-character-tokens
         case '+':
             switch (peek(lexer)) {
@@ -224,6 +229,12 @@ Token scanToken(Lexer* lexer) {
                 return noDataToken(lexer, TOKEN_EQUALS_EQUALS);
             }
             return noDataToken(lexer, TOKEN_EQUALS);
+        case '!':
+            if (peek(lexer) == '=') {
+                advance(lexer);
+                return noDataToken(lexer, TOKEN_BANG_EQUALS);
+            }
+            return noDataToken(lexer, TOKEN_BANG);
         case '>':
             if (peek(lexer) == '=') {
                 advance(lexer);
@@ -236,6 +247,23 @@ Token scanToken(Lexer* lexer) {
                 return noDataToken(lexer, TOKEN_LESS_EQUALS);
             }
             return noDataToken(lexer, TOKEN_LESS);
+
+        case '|':
+            switch (peek(lexer)) {
+                case '=': advance(lexer); return noDataToken(lexer, TOKEN_PIPE_EQUALS);
+                case '|': advance(lexer); return noDataToken(lexer, TOKEN_PIPE_PIPE);
+
+                default: return noDataToken(lexer, TOKEN_PIPE);
+            }
+
+        case '&':
+            switch (peek(lexer)) {
+                case '=': advance(lexer); return noDataToken(lexer, TOKEN_AMP_EQUALS);
+                case '&': advance(lexer); return noDataToken(lexer, TOKEN_AMP_AMP);
+
+                default: return noDataToken(lexer, TOKEN_AMP);
+            }
+
         default:
             break;
     }
@@ -298,9 +326,8 @@ void skipWhitespace(Lexer *lexer) {
             case '/':
                 if (!comment(lexer)) return;
                 break;
-            default: {
-                    return;
-                }
+            default: return;
+
         }
     }
 

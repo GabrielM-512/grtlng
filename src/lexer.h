@@ -20,13 +20,10 @@ typedef enum {
     TOKEN_LEFT_BRACKET, // []
     TOKEN_RIGHT_BRACKET,
 
-    TOKEN_STAR,
     TOKEN_PLUS,
     TOKEN_MINUS,
+    TOKEN_STAR,
     TOKEN_SLASH,
-
-    TOKEN_MORE,
-    TOKEN_LESS,
 
     TOKEN_PLUS_EQUALS,
     TOKEN_MINUS_EQUALS,
@@ -36,8 +33,22 @@ typedef enum {
     TOKEN_PLUS_PLUS,
     TOKEN_MINUS_MINUS,
 
+    TOKEN_AMP, // '&'
+    TOKEN_PIPE, // '|'
+    TOKEN_TILDE, // '~'
+
+    TOKEN_AMP_AMP,
+    TOKEN_PIPE_PIPE,
+
+    TOKEN_AMP_EQUALS,
+    TOKEN_PIPE_EQUALS,
+
     TOKEN_BANG, // '!'
     TOKEN_PERIOD,
+    TOKEN_COMMA,
+
+    TOKEN_MORE,
+    TOKEN_LESS,
 
     TOKEN_EQUALS,
     TOKEN_EQUALS_EQUALS,
