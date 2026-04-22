@@ -192,6 +192,7 @@ Token scanToken(Lexer* lexer) {
                     return noDataToken(lexer, TOKEN_PLUS);
             }
         case '-':
+            if (isNum(peek(lexer))) return number(lexer); // handle negative numbers
             switch (peek(lexer)) {
             case '=': advance(lexer); return noDataToken(lexer, TOKEN_MINUS_EQUALS);
             case '-': advance(lexer); return noDataToken(lexer, TOKEN_MINUS_MINUS);
