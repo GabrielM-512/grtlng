@@ -183,11 +183,6 @@ Token scanToken(Lexer* lexer) {
         case '[': return noDataToken(lexer, TOKEN_LEFT_BRACKET);
         case ']': return noDataToken(lexer, TOKEN_RIGHT_BRACKET);
 
-        case ',': return noDataToken(lexer, TOKEN_COMMA);
-        case '.': return noDataToken(lexer, TOKEN_PERIOD);
-
-        case '~': return noDataToken(lexer, TOKEN_TILDE);
-
         // possibly two-character-tokens
         case '+':
             switch (peek(lexer)) {
