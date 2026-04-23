@@ -7,7 +7,7 @@
 Token scanToken(Lexer* lexer);
 void skipWhitespace(Lexer *lexer);
 
-Lexer *LexerNew(const char *source, ArenaAlloc *tokenData) {
+Lexer *LexerNew(const char *source, ArenaAllocator *tokenData) {
     Lexer *lexer = malloc(sizeof(Lexer));
 
     // read the file into the lexer struct
@@ -124,7 +124,7 @@ Token number(Lexer *lexer) {
     }
 
     const double value = strtod(lexer->source + lexer->base, nullptr);
-    double *data = ArenaAllocAlloc(lexer->data, sizeof(double));
+    double *data = ArenaAlloc(lexer->data, sizeof(double));
 
     *data = value;
 
@@ -142,7 +142,7 @@ Token string(Lexer *lexer) {
     const u32 beginning = lexer->base + 1; // skip first '"'
     const u32 size = lexer->head - beginning; // Text + 1 byte for \0
 
-    char *data = ArenaAllocAlloc(lexer->data, size);
+    char *data = ArenaAlloc(lexer->data, size);
     memcpy(data, lexer->source + lexer->base + 1, size - 1);
 
     data[size - 1] = '\0';
@@ -161,7 +161,7 @@ Token identifier(Lexer *lexer) {
     // check for keywords here
 
     const size_t size = lexer->head - lexer->base + 1;
-    char *data = ArenaAllocAlloc(lexer->data, size);
+    char *data = ArenaAlloc(lexer->data, size);
     memcpy(data, lexer->source + lexer->base, size);
     data[size - 1] = '\0';
     return makeToken(lexer, TOKEN_IDENTIFIER, data);

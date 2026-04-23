@@ -1,5 +1,5 @@
 #include "lexer.h"
-#include "../util/ArenaAlloc.h"
+#include "../util/ArenaAllocator.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +9,7 @@ typedef struct {
     char *name;
 } TokenLookup;
 
-ArenaAlloc *text = nullptr;
+ArenaAllocator *text = nullptr;
 
 TokenLookup lookup[TOKEN_UNKNOWN + 1];
 
@@ -55,7 +55,7 @@ void populate_table() {
         }
     }
 
-    text = ArenaAllocNew();
+    text = ArenaNew();
 
     // transfer tokens
     for (int i = 0; i <= TOKEN_UNKNOWN; i++) {
@@ -71,7 +71,7 @@ void populate_table() {
 
         // store into the lookup table
 
-        char *textdata = ArenaAllocAlloc(text, tokenlength);
+        char *textdata = ArenaAlloc(text, tokenlength);
 
         memcpy(textdata, &source[start], tokenlength);
         textdata[tokenlength - 1] = '\0';

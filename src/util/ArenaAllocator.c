@@ -1,4 +1,4 @@
-#include "ArenaAlloc.h"
+#include "ArenaAllocator.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,8 +14,8 @@
  * @return Pointer to the new Arena
  */
 
-ArenaAlloc *ArenaAllocNew() {
-    ArenaAlloc *arena = malloc(sizeof(ArenaAlloc) + ARENA_ALLOC_SIZE);
+ArenaAllocator *ArenaNew() {
+    ArenaAllocator *arena = malloc(sizeof(ArenaAllocator) + ARENA_ALLOC_SIZE);
 
     if (arena == nullptr) {
         INTERN_ERROR_LOCATION(__FILE__, __LINE__);
@@ -40,8 +40,8 @@ ArenaAlloc *ArenaAllocNew() {
  *
  * @param arena pointer to the Arena
  */
-void ArenaAllocFree(ArenaAlloc *arena) {
-    if (arena->next != nullptr) ArenaAllocFree(arena->next);
+void ArenaFree(ArenaAllocator *arena) {
+    if (arena->next != nullptr) ArenaFree(arena->next);
     free(arena);
 }
 
@@ -59,16 +59,16 @@ void ArenaAllocFree(ArenaAlloc *arena) {
  *
  * @return Pointer to the newly allocated space
  */
-void *ArenaAllocAlloc(ArenaAlloc *arena, const size_t size) {
+void *ArenaAlloc(ArenaAllocator *arena, const size_t size) {
     if (size > ARENA_ALLOC_SIZE) {
         fprintf(stderr, "Internal error: Allocated space bigger than Arena Allocator size.\n");
         exit(1);
     }
     if (arena->size + size > arena->capacity) {
         if (arena->next == nullptr) {
-            arena->next = ArenaAllocNew();
+            arena->next = ArenaNew();
         }
-        return ArenaAllocAlloc(arena->next, size);
+        return ArenaAlloc(arena->next, size);
     }
 
     void *data = &arena->data[arena->size];

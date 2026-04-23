@@ -21,7 +21,7 @@ int main(const int argc, char* argv[]) {
 
     parse_flags(argc, argv);
 
-    ArenaAlloc *tokenData = ArenaAllocNew();
+    ArenaAllocator *tokenData = ArenaNew();
     Lexer *lexer = LexerNew(argv[argc - 1], tokenData); //last argument must be source file
     const ArrayList *tokens = scanAll(lexer);
 

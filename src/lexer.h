@@ -2,7 +2,7 @@
 #include "global.h"
 
 #include "util/ArrayList.h"
-#include "util/ArenaAlloc.h"
+#include "util/ArenaAllocator.h"
 
 typedef enum {
     TOKEN_EOF, // End of source file
@@ -76,11 +76,11 @@ typedef struct {
     u32 length;
     u32 base, head;
     u16 line;
-    ArenaAlloc *data;
+    ArenaAllocator *data;
 } Lexer;
 
 
-Lexer *LexerNew(const char *source, ArenaAlloc *tokenData);
+Lexer *LexerNew(const char *source, ArenaAllocator *tokenData);
 
 void LexerFree(Lexer* lexer);
 
