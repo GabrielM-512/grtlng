@@ -16,4 +16,6 @@ add_executable(grtcmp src/main.c
         src/debug/lexer.h
         src/error.c
         src/error.h
+        src/util/file-io/textfile.c
+        src/util/file-io/textfile.h
 )

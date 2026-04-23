@@ -73,7 +73,6 @@ typedef struct {
  */
 typedef struct {
     char *source;
-    u32 length;
     u32 base, head;
     u16 line;
     ArenaAllocator *data;

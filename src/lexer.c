@@ -4,40 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "util/file-io/textfile.h"
+
 Token scanToken(Lexer* lexer);
 void skipWhitespace(Lexer *lexer);
 
 Lexer *LexerNew(const char *source, ArenaAllocator *tokenData) {
     Lexer *lexer = malloc(sizeof(Lexer));
 
-    // read the file into the lexer struct
-    {
-        FILE *file = fopen(source, "rb");
-
-        if (file == nullptr) {
-            fprintf(stderr, "Problem opening file %s\n", source);
-            exit(1);
-        }
-
-        fseek(file, 0L, SEEK_END);
-        lexer->length = ftell(file) + 1;
-        lexer->source = malloc(lexer->length);
-
-        // reset to start of file
-        rewind(file);
-
-        //read the file
-        fread(lexer->source, sizeof(char), lexer->length, file);
-        fclose(file);
-
-        lexer->source[lexer->length - 1] = '\0'; // THE NULL TERMINATOR PLACEMENT WILL KILL ME SOME DAY
-        /*
-         * FOR CONTEXT:
-         * This is the second time where this null terminator byte was placed one byte too late
-         * Commit 6c931ed2 already fixed this, but apparently merging some other branch reverted that
-         * So fuck Git for that
-         */
-    }
+    lexer->source = textfileRead(source).source;
 
     lexer->base = 0;
     lexer->head = 0;
