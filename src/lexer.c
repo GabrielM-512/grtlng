@@ -117,6 +117,12 @@ Token string(Lexer *lexer) {
     const u32 beginning = lexer->base + 1; // skip first '"'
     const u32 size = lexer->head - beginning; // Text + 1 byte for \0
 
+    if (size > lexer->data->capacity) {
+        fprintf(stderr, "Strings may not exceed %d characters in size.", lexer->data->capacity);
+        exit(1);
+    }
+
+
     char *data = ArenaAlloc(lexer->data, size);
     memcpy(data, lexer->source + lexer->base + 1, size - 1);
 
@@ -136,6 +142,12 @@ Token identifier(Lexer *lexer) {
     // check for keywords here
 
     const size_t size = lexer->head - lexer->base + 1;
+
+    if (size > lexer->data->capacity) {
+        fprintf(stderr, "Identifiers may not exceed %d characters in size.", lexer->data->capacity);
+        exit(1);
+    }
+
     char *data = ArenaAlloc(lexer->data, size);
     memcpy(data, lexer->source + lexer->base, size);
     data[size - 1] = '\0';
