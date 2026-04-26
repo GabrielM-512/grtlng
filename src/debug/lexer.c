@@ -13,12 +13,15 @@ ArenaAllocator *text = nullptr;
 
 TokenLookup lookup[TOKEN_UNKNOWN + 1];
 
+bool hasFailed = false;
+
 /**
  * @brief Automatically finds the literals for the token names from 'src/lexer.h' and stores
  * them into the lookup table as strings.
  *
  */
 void populate_table() {
+    if (hasFailed) return;
     size_t length;
     char* source;
     {
@@ -41,11 +44,13 @@ void populate_table() {
 
 
     // look for the enum
-    int start;
-    for (int i = 0; ; i++) {
+    u32 start;
+    for (u32 i = 0;; i++) {
         if (i + 9 > length) {
-            fprintf(stderr, "[DEBUG ERROR] %s: Couldnt locate enum start", __FILE__);
-            exit(1);
+            fprintf(stderr, "[DEBUG ERROR] %s: Couldnt locate enum start\n", __FILE__);
+            hasFailed = true;
+            free(source);
+            return;
         }
 
         const char *target = "TOKEN_EOF";
@@ -95,6 +100,7 @@ void populate_table() {
 
 
 void printToken(const Token token) {
+    if (hasFailed) return;
     if (text == nullptr) populate_table();
 
     // print token name left aligned with a width of 20 characters
