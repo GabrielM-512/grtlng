@@ -6,7 +6,7 @@
 #include "lexer.h"
 #include "debug/lexer.h"
 
-void parse_flags(int argc, char* argv[]) {
+void parseFlags(int argc, char* argv[]) {
     //IDK do that parsing
 }
 
@@ -19,7 +19,7 @@ int main(const int argc, char* argv[]) {
         exit(64);
     }
 
-    parse_flags(argc, argv);
+    parseFlags(argc, argv);
 
     ArenaAllocator *tokenData = ArenaNew();
     Lexer lexer; //last argument must be source file
