@@ -19,3 +19,10 @@ add_executable(grtcmp src/main.c
         src/util/file-io/textfile.c
         src/util/file-io/textfile.h
 )
+
+target_compile_options(grtcmp
+        PUBLIC -Wall
+        PUBLIC -Wextra
+        #PUBLIC -Werror
+        #PUBLIC -Ofast
+)
