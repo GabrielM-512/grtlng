@@ -47,7 +47,7 @@ void ArrayListAdd(ArrayList *list, const void *element) {
 void *ArrayListGet(const ArrayList *list, const u32 index) {
     if (index >= list->size) {
         INTERN_ERROR_LOCATION(__FILE__, __LINE__);
-        fprintf(stderr, "Internal error: Tried accessing list with size of %d at index %d\n", list->size, index);
+        fprintf(stderr, "Tried accessing list with size of %d at index %d\n", list->size, index);
         exit(1);
     }
 
