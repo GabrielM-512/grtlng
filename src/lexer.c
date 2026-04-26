@@ -9,8 +9,7 @@
 Token scanToken(Lexer* lexer);
 void skipWhitespace(Lexer *lexer);
 
-Lexer *LexerNew(const char *source, ArenaAllocator *tokenData) {
-    Lexer *lexer = malloc(sizeof(Lexer));
+void lexerInit(Lexer* lexer, const char *source, ArenaAllocator *tokenData) {
 
     lexer->source = textfileRead(source).source;
 
@@ -21,12 +20,6 @@ Lexer *LexerNew(const char *source, ArenaAllocator *tokenData) {
 
     lexer->data = tokenData;
 
-    return lexer;
-}
-
-void LexerFree(Lexer* lexer) {
-    free(lexer->source);
-    free(lexer);
 }
 
 

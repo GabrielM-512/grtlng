@@ -79,8 +79,6 @@ typedef struct {
 } Lexer;
 
 
-Lexer *LexerNew(const char *source, ArenaAllocator *tokenData);
-
-void LexerFree(Lexer* lexer);
+void lexerInit(Lexer* lexer, const char *source, ArenaAllocator *tokenData);
 
 ArrayList *scanAll(Lexer* lexer);

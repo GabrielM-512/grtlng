@@ -22,8 +22,10 @@ int main(const int argc, char* argv[]) {
     parse_flags(argc, argv);
 
     ArenaAllocator *tokenData = ArenaNew();
-    Lexer *lexer = LexerNew(argv[argc - 1], tokenData); //last argument must be source file
-    const ArrayList *tokens = scanAll(lexer);
+    Lexer lexer; //last argument must be source file
+    lexerInit(&lexer, argv[argc - 1], tokenData);
+    ArrayList *tokens = scanAll(&lexer);
+    free(lexer.source);
 
 #ifdef DEBUG_PRINT_TOKENS
 
