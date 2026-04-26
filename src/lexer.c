@@ -9,6 +9,8 @@
 Token scanToken(Lexer* lexer);
 void skipWhitespace(Lexer *lexer);
 
+// externally callable functions
+
 void lexerInit(Lexer* lexer, const char *source, ArenaAllocator *tokenData) {
 
     lexer->source = textfileRead(source).source;
@@ -37,6 +39,8 @@ ArrayList *scanAll(Lexer* lexer) {
     return tokens;
 }
 
+// utils
+
 bool isAlpha(const char c) {
     return ('a' <= c && c <= 'z') ||
         ('A' <= c && c <= 'Z');
@@ -55,7 +59,7 @@ bool isAtEnd(const Lexer *lexer) {
     return lexer->source[lexer->head] == '\0';
 }
 
-char advance(Lexer *lexer) {
+static char advance(Lexer *lexer) {
     lexer->head++;
     return lexer->source[lexer->head - 1];
 }
@@ -81,6 +85,8 @@ Token noDataToken(const Lexer *lexer, const TokenType type) {
 Token errorToken(const Lexer *lexer, char* message) {
     return (Token) {TOKEN_ERROR, lexer->line, message};
 }
+
+// internal functions
 
 
 Token number(Lexer *lexer) {
