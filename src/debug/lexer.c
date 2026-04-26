@@ -5,13 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct {
-    char *name;
-} TokenLookup;
 
 ArenaAllocator *text = nullptr;
 
-TokenLookup lookup[TOKEN_UNKNOWN + 1];
+char* lookup[TOKEN_UNKNOWN + 1];
 
 bool hasFailed = false;
 
@@ -83,7 +80,7 @@ void populate_table() {
 
         start += tokenlength;
 
-        lookup[i].name = textdata;
+        lookup[i] = textdata;
 
 
         // skip whitespace
@@ -104,7 +101,7 @@ void printToken(const Token token) {
     if (text == nullptr) populate_table();
 
     // print token name left aligned with a width of 20 characters
-    printf("%04d | %-20.20s", token.line, lookup[token.type].name);
+    printf("%04d | %-20.20s", token.line, lookup[token.type]);
 
     switch (token.type) {
         case TOKEN_NUM:
