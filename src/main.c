@@ -36,11 +36,12 @@ int main(const int argc, char* argv[]) {
 
 #endif
 
-
+#ifdef DEBUG_TOKEN_COUNT
     char actualpath[PATH_MAX + 1];
     realpath(argv[argc - 1], actualpath);
 
     printf("%d Tokens in %s\n", tokens->size, actualpath);
+#endif
 
     // build AST
 
