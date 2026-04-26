@@ -107,7 +107,7 @@ Token number(Lexer *lexer) {
 
 Token string(Lexer *lexer) {
     while (peek(lexer) != '"' && !isAtEnd(lexer)) {
-        advance(lexer);
+        if (advance(lexer) == '\n') lexer->line++;
     }
 
     if (isAtEnd(lexer)) return errorToken(lexer, "Unterminated string");
