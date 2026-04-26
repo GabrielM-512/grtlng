@@ -106,18 +106,19 @@ Token number(Lexer *lexer) {
 }
 
 Token string(Lexer *lexer) {
+    const u16 start = lexer->line;
     while (peek(lexer) != '"' && !isAtEnd(lexer)) {
         if (advance(lexer) == '\n') lexer->line++;
     }
 
-    if (isAtEnd(lexer)) return errorToken(lexer, "Unterminated string");
+    if (isAtEnd(lexer)) return (Token) {TOKEN_ERROR, start, "Unterminated string."};
     advance(lexer); // eat last '"'
 
     const u32 beginning = lexer->base + 1; // skip first '"'
     const u32 size = lexer->head - beginning; // Text + 1 byte for \0
 
     if (size > lexer->data->capacity) {
-        return errorToken(lexer, "Strings may not exceed 4096 characters in size.");
+        return (Token) {TOKEN_ERROR, start, "Strings may not exceed 4096 characters in size."};
     }
 
 
@@ -126,7 +127,7 @@ Token string(Lexer *lexer) {
 
     data[size - 1] = '\0';
 
-    return makeToken(lexer, TOKEN_STRING, data);
+    return (Token) {TOKEN_STRING, start, data};
 }
 
 Token identifier(Lexer *lexer) {
@@ -261,7 +262,7 @@ Token scanToken(Lexer* lexer) {
 
     if (isAlpha(c) || c == '_') return identifier(lexer);
 
-    return errorToken(lexer, "Unexpected character");
+    return errorToken(lexer, "Unexpected character.");
 }
 
 
