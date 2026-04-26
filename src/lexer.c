@@ -134,7 +134,7 @@ Token identifier(Lexer *lexer) {
 
     while (true) {
         const char c = peek(lexer);
-        if (!isAlNum(c) || c == '_') break;
+        if (!(isAlNum(c) || c == '_')) break;
         advance(lexer);
     }
 
