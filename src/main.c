@@ -30,7 +30,7 @@ int main(const int argc, char* argv[]) {
 #ifdef DEBUG_PRINT_TOKENS
 
     for (u32 i = 0; i < tokens->size; i++) {
-        const Token tok = *(Token*) ArrayListGet(tokens, i); // get data
+        const Token tok = ArrayListRead(tokens, i, Token); // get data
         printToken(tok);
     }
 
