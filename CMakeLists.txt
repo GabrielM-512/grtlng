@@ -18,6 +18,8 @@ add_executable(grtcmp src/main.c
         src/error.h
         src/util/file-io/textfile.c
         src/util/file-io/textfile.h
+        src/parser.c
+        src/parser.h
 )
 
 target_compile_options(grtcmp

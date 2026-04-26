@@ -1,7 +1,1 @@
-main() {
-    string "this is a string"; /* "If this string gets detected block comments arent working" */
-    // "And line comments for this one"
-    i16 someint = 15;
-    someint += 3;
-    return 0 + 0;
-}
+2 * 5 + 10;

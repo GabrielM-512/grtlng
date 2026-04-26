@@ -4,6 +4,7 @@
 #include <linux/limits.h>
 
 #include "lexer.h"
+#include "parser.h"
 #include "debug/lexer.h"
 
 void parseFlags(int argc, char* argv[]) {
@@ -42,6 +43,11 @@ int main(const int argc, char* argv[]) {
 
     printf("%d Tokens in %s\n", tokens->size, actualpath);
 #endif
+
+    Parser parser;
+    ParseResult ast = parseAll(&parser, tokens);
+
+    if (parser.hadError) return 1;
 
     // build AST
 
