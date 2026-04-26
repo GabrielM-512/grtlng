@@ -111,8 +111,7 @@ Token string(Lexer *lexer) {
     const u32 size = lexer->head - beginning; // Text + 1 byte for \0
 
     if (size > lexer->data->capacity) {
-        fprintf(stderr, "Strings may not exceed %d characters in size.", lexer->data->capacity);
-        exit(1);
+        return errorToken(lexer, "Strings may not exceed 4096 characters in size.");
     }
 
 
@@ -137,8 +136,7 @@ Token identifier(Lexer *lexer) {
     const size_t size = lexer->head - lexer->base + 1;
 
     if (size > lexer->data->capacity) {
-        fprintf(stderr, "Identifiers may not exceed %d characters in size.", lexer->data->capacity);
-        exit(1);
+        return errorToken(lexer, "Identifiers may not exceed 4096 characters in size.");
     }
 
     char *data = ArenaAlloc(lexer->data, size);
