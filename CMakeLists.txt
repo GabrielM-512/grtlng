@@ -20,6 +20,8 @@ add_executable(grtcmp src/main.c
         src/util/file-io/textfile.h
         src/parser.c
         src/parser.h
+        src/debug/parser.c
+        src/debug/parser.h
 )
 
 target_compile_options(grtcmp

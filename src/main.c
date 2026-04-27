@@ -6,6 +6,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "debug/lexer.h"
+#include "debug/parser.h"
 
 void parseFlags(int argc, char* argv[]) {
     //IDK do that parsing
@@ -48,6 +49,13 @@ int main(const int argc, char* argv[]) {
     ParseResult ast = parseAll(&parser, tokens);
 
     if (parser.hadError) return 1;
+#ifdef DEBUG_PRINT_AST
+
+    for (u32 i = 0; i < ast.tree->size; i++) {
+        printExpr(ArrayListRead(ast.tree, i, TreeNode*));
+        printf("\n");
+    }
+    printf("\n");
 
     // build AST
 

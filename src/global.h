@@ -8,6 +8,7 @@
 #ifdef DEBUG_ALL
  #define DEBUG_PRINT_TOKENS
  #define DEBUG_TOKEN_COUNT
+ #define DEBUG_PRINT_AST
 #endif
 
 
