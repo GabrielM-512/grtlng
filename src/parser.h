@@ -14,7 +14,7 @@ typedef struct {
     ParseResult program;
     ArrayList *Tokens;
     u16 token;
-    Token current;
+    Token current, previous;
     bool hadError, panicMode;
 } Parser;
 
@@ -23,6 +23,7 @@ typedef enum {
     NODE_ERROR,
     NODE_BINARY_EXPR,
     NODE_UNARY_EXPR,
+    NODE_NUMBER,
 } NodeType;
 
 typedef struct {
@@ -30,7 +31,7 @@ typedef struct {
 } TreeNode;
 
 
-/*typedef struct {
+typedef struct {
     TreeNode header;
     TreeNode *left;
     TreeNode *right;
@@ -41,7 +42,12 @@ typedef struct {
     TreeNode header;
     TreeNode *right;
     TokenType operator;
-} UnaryExprNode;*/
+} UnaryExprNode;
+
+typedef struct {
+    TreeNode header;
+    double value;
+} NumberNode;
 
 
 ParseResult parseAll(Parser *parser, ArrayList *tokens);
