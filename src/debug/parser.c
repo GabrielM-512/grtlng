@@ -20,6 +20,28 @@ void printUnary(UnaryExprNode* expr) {
     printExpr(expr->right);
 }
 
+void printBinary(BinaryExprNode *expr) {
+    printExpr(expr->left);
+
+    switch (expr->operator) {
+        case TOKEN_PLUS:
+            printf(" + ");
+            break;
+        case TOKEN_MINUS:
+            printf(" - ");
+            break;
+        case TOKEN_STAR:
+            printf(" * ");
+            break;
+        case TOKEN_SLASH:
+            printf(" / ");
+            break;
+        default:
+            printf("???");
+    }
+    printExpr(expr->right);
+}
+
 void printExpr(TreeNode* expr) {
     printf("(");
     switch (expr->type) {
@@ -28,8 +50,16 @@ void printExpr(TreeNode* expr) {
             printUnary((UnaryExprNode*) expr);
             break;
 
+        case NODE_BINARY_EXPR:
+            printBinary((BinaryExprNode*) expr);
+            break;
+
         case NODE_NUMBER:
             printf("%f", ((NumberNode*)expr)->value);
+            break;
+
+        case NODE_ERROR:
+            printf("Error Token");
             break;
 
         default:
