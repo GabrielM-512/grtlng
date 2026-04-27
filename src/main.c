@@ -7,6 +7,7 @@
 #include "parser.h"
 #include "debug/lexer.h"
 #include "debug/parser.h"
+#include "interpret/interpreter.h"
 
 void parseFlags(int argc, char* argv[]) {
     //IDK do that parsing
@@ -57,7 +58,12 @@ int main(const int argc, char* argv[]) {
     }
     printf("\n");
 
-    // build AST
+#endif
+
+
+    interpretProgram(ast.tree);
+
+
 
     // optimise (?)
 
