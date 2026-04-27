@@ -95,6 +95,30 @@ void populate_table() {
     free(source);
 }
 
+void printTokenError(const Token token) {
+    if (hasFailed) return;
+    if (text == nullptr) populate_table();
+
+    // print token name left aligned with a width of 20 characters
+    fprintf(stderr,"%04d | %-20.20s", token.line, lookup[token.type]);
+
+    switch (token.type) {
+        case TOKEN_NUM:
+            fprintf(stderr,"| %lf", *(double*) token.data);
+            break;
+        case TOKEN_ERROR:
+        case TOKEN_STRING:
+            fprintf(stderr,"| '%s'", (char*) token.data);
+            break;
+        case TOKEN_IDENTIFIER:
+            fprintf(stderr,"| %s", (char*) token.data);
+            break;
+        default:
+            break;
+
+    }
+    fprintf(stderr, "\n");
+}
 
 void printToken(const Token token) {
     if (hasFailed) return;
