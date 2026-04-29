@@ -83,7 +83,12 @@ static bool isAtEnd(const Parser *parser) {
 static void advance(Parser *parser) {
     parser->previous = parser->current;
     while (true) {
-        parser->current = ArrayListRead(parser->Tokens, parser->token++, Token);
+        if (parser->token >= parser->Tokens->size) {
+            parser->current = ArrayListRead(parser->Tokens, parser->Tokens->size - 1, Token);
+        } else {
+            parser->current = ArrayListRead(parser->Tokens, parser->token++, Token);
+        }
+
         if (parser->current.type != TOKEN_ERROR) break;
 
         parseErrorAtCurrent(parser, parser->current.data);
