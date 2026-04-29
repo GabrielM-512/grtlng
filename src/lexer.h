@@ -58,6 +58,9 @@ typedef enum {
 
     TOKEN_IDENTIFIER,
 
+    // type tokens
+    TOKEN_I16,
+
     TOKEN_UNKNOWN
 } TokenType;
 
@@ -69,7 +72,6 @@ typedef struct {
 
 /*
  * The construct for creating Tokens out of the source string.
- * The Lexer owns the source string. It will free the source string upon being destroyed.
  */
 typedef struct {
     char *source;

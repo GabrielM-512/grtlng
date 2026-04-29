@@ -1,6 +1,5 @@
 #include "lexer.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -130,6 +129,22 @@ Token string(Lexer *lexer) {
     return (Token) {TOKEN_STRING, start, data};
 }
 
+Token checkKeyword(const Lexer *lexer, const u16 start, const char *remaining, TokenType type) {
+    u16 len = strlen(remaining);
+    if (len + start == lexer->head-lexer->base && memcmp(remaining, &lexer->source[lexer->base + start], len) == 0) {
+        return (Token) {type, lexer->line, nullptr};
+    }
+    return (Token) {TOKEN_UNKNOWN, lexer->line, nullptr};
+}
+
+Token keyword(const Lexer *lexer) {
+    switch (lexer->source[lexer->base]) {
+        case 'i':
+            return checkKeyword(lexer, 1, "16", TOKEN_I16);
+        default: return (Token) {TOKEN_UNKNOWN, lexer->line, nullptr};
+    }
+}
+
 Token identifier(Lexer *lexer) {
 
     while (true) {
@@ -138,8 +153,12 @@ Token identifier(Lexer *lexer) {
         advance(lexer);
     }
 
-    // check for keywords here
+    // keyword check
+    const Token token = keyword(lexer);
+    if (token.type != TOKEN_UNKNOWN) return token;
 
+
+    // is identifier
     const size_t size = lexer->head - lexer->base + 1;
 
     if (size > lexer->data->capacity) {
