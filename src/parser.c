@@ -11,8 +11,8 @@ typedef enum {
     PREC_PRODUCT
 } ExprPrecedence;
 
-typedef TreeNode*(*PrefixFn)(Parser*);
-typedef TreeNode*(*InfixFn)(Parser*, TreeNode*);
+typedef ExprNode*(*PrefixFn)(Parser*);
+typedef ExprNode*(*InfixFn)(Parser*, ExprNode*);
 
 typedef struct {
     PrefixFn prefix;
@@ -22,10 +22,13 @@ typedef struct {
 
 static void advance(Parser* parser);
 void consume(Parser *parser, TokenType type, const char *message);
+static bool match(Parser *parser, TokenType type);
+bool check (const Parser *parser, TokenType type);
 
 ParseRule getRule(TokenType token);
 
-TreeNode *parseExpr(Parser* parser, ExprPrecedence precedence);
+ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence);
+StmtNode *parseStmt(Parser *parser);
 
 // externally callable function(s)
 
@@ -33,7 +36,7 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens) {
     parser->Tokens = tokens;
     parser->token = 0;
 
-    parser->program.tree = ArrayListNew(sizeof(TreeNode*));
+    parser->program.tree = ArrayListNew(sizeof(StmtNode*));
     parser->program.data = ArenaNew();
 
     parser->hadError = false;
@@ -41,9 +44,10 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens) {
 
     advance(parser);
 
-
-    TreeNode *expr = parseExpr(parser, PREC_ASSIGNMENT);
-    ArrayListAdd(parser->program.tree, &expr);
+    while (!match(parser, TOKEN_EOF)) {
+        StmtNode *expr = parseStmt(parser);
+        ArrayListAdd(parser->program.tree, &expr);
+    }
 
     consume(parser, TOKEN_EOF, "Expected end of file");
 
@@ -83,7 +87,7 @@ static bool isAtEnd(const Parser *parser) {
 static void advance(Parser *parser) {
     parser->previous = parser->current;
     while (true) {
-        if (parser->token >= parser->Tokens->size) {
+        if (isAtEnd(parser)) {
             parser->current = ArrayListRead(parser->Tokens, parser->Tokens->size - 1, Token);
         } else {
             parser->current = ArrayListRead(parser->Tokens, parser->token++, Token);
@@ -103,50 +107,116 @@ void consume(Parser *parser, TokenType type, const char *message) {
     parseError(parser, message);
 }
 
-// internal functions
+static bool match(Parser *parser, TokenType type) {
+    if (!check(parser, type)) return false;
+    advance(parser);
+    return true;
+}
 
-TreeNode *exprBinary(Parser *parser, TreeNode *left) {
+bool check (const Parser *parser, TokenType type) {
+    return parser->current.type == type;
+}
+
+
+bool isVarIdent(Parser *parser) {
+    const TokenType types[] = {TOKEN_I16, TOKEN_UNKNOWN};
+    u16 i = 0;
+    bool matched = false;
+    while (types[i] != TOKEN_UNKNOWN) {
+        if (types[i] == parser->current.type) {
+            matched = true;
+            advance(parser);
+            break;
+        }
+        i++;
+    }
+    return matched;
+}
+
+// statement functions
+
+StmtNode *exprStmt(Parser *parser) {
+    StmtExprNode *node = ArenaAlloc(parser->program.data, sizeof(StmtExprNode));
+    node->header.type = STMT_EXPR;
+
+    node->expr = parseExpr(parser, PREC_ASSIGNMENT);
+    consume(parser, TOKEN_SEMICOLON, "Expect ';' after Expression.");
+
+    return (StmtNode*) node;
+}
+
+StmtNode *varDeclStmt(Parser *parser) {
+    VarDeclNode *node = ArenaAlloc(parser->program.data, sizeof(VarDeclNode));
+
+    node->varType = parser->previous.type;
+
+    consume(parser, TOKEN_IDENTIFIER, "Expect identifier after variable type");
+
+    node->header.type = STMT_VAR_DEC;
+    node->name = parser->previous.data;
+
+
+    node->value = nullptr;
+
+    // if instant assignment
+    if (match(parser, TOKEN_EQUALS)) {
+        node->value = parseExpr(parser, PREC_ASSIGNMENT);
+    }
+
+    consume(parser, TOKEN_SEMICOLON, "Expect ';' after variable declaration");
+
+    return (StmtNode*) node;
+}
+
+StmtNode *parseStmt(Parser *parser) {
+    if (isVarIdent(parser)) return varDeclStmt(parser);
+    return exprStmt(parser);
+}
+
+// expression functions
+
+ExprNode *exprBinary(Parser *parser, ExprNode *left) {
     BinaryExprNode *node = ArenaAlloc(parser->program.data, sizeof(BinaryExprNode));
 
-    node->header.type = NODE_BINARY_EXPR;
+    node->header.type = EXPR_BINARY_EXPR;
 
     node->operator = parser->previous.type;
     node->left = left;
 
     node->right = parseExpr(parser, getRule(parser->previous.type).precedence);
 
-    return (TreeNode*) node;
+    return (ExprNode*) node;
 
 }
 
-TreeNode *exprUnary(Parser *parser) {
+ExprNode *exprUnary(Parser *parser) {
     UnaryExprNode *node = ArenaAlloc(parser->program.data, sizeof(UnaryExprNode));
 
-    node->header.type = NODE_UNARY_EXPR;
+    node->header.type = EXPR_UNARY_EXPR;
     node->operator = parser->previous.type;
 
     node->right = parseExpr(parser, getRule(parser->previous.type).precedence);
 
-    return (TreeNode*) node;
+    return (ExprNode*) node;
 }
 
-static TreeNode *number(Parser *parser) {
+static ExprNode *number(Parser *parser) {
     NumberNode *node = ArenaAlloc(parser->program.data, sizeof(NumberNode));
 
-    node->header.type = NODE_NUMBER;
+    node->header.type = EXPR_NUMBER;
     node->value = * (double*) parser->previous.data;
 
-    return (TreeNode*) node;
+    return (ExprNode*) node;
 }
 
-TreeNode *grouping(Parser *parser) {
-    TreeNode *node = parseExpr(parser, getRule(parser->previous.type).precedence);
+ExprNode *grouping(Parser *parser) {
+    ExprNode *node = parseExpr(parser, getRule(parser->previous.type).precedence);
     consume(parser, TOKEN_RIGHT_PAREN, "Expect ')'");
     return node;
 }
 
 
-TreeNode *parseExpr(Parser* parser, ExprPrecedence precedence) {
+ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence) {
     advance(parser);
 
     const PrefixFn prefixRule = getRule(parser->previous.type).prefix;
@@ -156,13 +226,13 @@ TreeNode *parseExpr(Parser* parser, ExprPrecedence precedence) {
         parseError(parser, "Unexpected Token");
         printTokenError(parser->previous);
 
-        TreeNode *node = ArenaAlloc(parser->program.data, sizeof(TreeNode));
-        node->type = NODE_ERROR;
+        ExprNode *node = ArenaAlloc(parser->program.data, sizeof(ExprNode));
+        node->type = EXPR_ERROR;
 
         return node;
     }
 
-    TreeNode *left = prefixRule(parser);
+    ExprNode *left = prefixRule(parser);
 
     while (precedence < getRule(parser->current.type).precedence) {
         advance(parser);
@@ -174,7 +244,8 @@ TreeNode *parseExpr(Parser* parser, ExprPrecedence precedence) {
 
 }
 
-ParseRule rules [] = {
+
+ParseRule rules [TOKEN_UNKNOWN + 1] = {
     [TOKEN_EOF]             = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_ERROR]           = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_NUM]             = {number,      nullptr,    PREC_NONE   },

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <linux/limits.h>
 
 #include "lexer.h"
@@ -8,20 +9,36 @@
 #include "debug/parser.h"
 #include "interpret/interpreter.h"
 
-void parseFlags(int argc, char* argv[]) {
-    //IDK do that parsing
+typedef enum {
+    ARCH_NONE,
+    ARCH_X86_64,
+    ARCH_GRTCMP,
+    ARCH_INTERPRET
+} Architecture;
+
+typedef struct {
+    Architecture architecture;
+    char *sourcefile;
+} Flags;
+
+Flags parseFlags(int argc, char* argv[]) {
+    Flags flags =  {ARCH_NONE};
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-i") == 0) flags.architecture = ARCH_INTERPRET;
+        else flags.sourcefile = argv[i];
+    }
 }
 
 int main(const int argc, char* argv[]) {
 
-    if (argc != 2) {
+    if (argc <= 2) {
         fprintf(stderr, "Incorrect usage\n"
                               "Proper Usage: grtcmp <source file>\n"
                               "Use -h for help\n");
         exit(64);
     }
 
-    parseFlags(argc, argv);
+    Flags compileFlags = parseFlags(argc, argv);
 
     ArenaAllocator *tokenData = ArenaNew();
     Lexer lexer; //last argument must be source file
@@ -54,15 +71,14 @@ int main(const int argc, char* argv[]) {
 #ifdef DEBUG_PRINT_AST
 
     for (u32 i = 0; i < ast.tree->size; i++) {
-        printExpr(ArrayListRead(ast.tree, i, TreeNode*));
+        printStmt(ArrayListRead(ast.tree, i, StmtNode*));
         printf("\n");
     }
     printf("\n");
 
 #endif
 
-
-    interpretProgram(ast.tree);
+    if (compileFlags.architecture == ARCH_INTERPRET) interpretProgram(ast.tree);
 
 
 
@@ -70,7 +86,7 @@ int main(const int argc, char* argv[]) {
 
     // Compile to IR (?)
 
-    // Compile to Assembly depending on flags
+    // Compile to Assembly depending on Flags
 
     return 0;
 }

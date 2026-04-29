@@ -2,6 +2,10 @@
 
 #include <stdio.h>
 
+#include "debugInfos.h"
+
+void printExpr(ExprNode* expr);
+
 void printUnary(UnaryExprNode* expr) {
     switch (expr->operator) {
         case TOKEN_MINUS:
@@ -42,29 +46,53 @@ void printBinary(BinaryExprNode *expr) {
     printExpr(expr->right);
 }
 
-void printExpr(TreeNode* expr) {
+void printExpr(ExprNode *expr) {
     printf("(");
     switch (expr->type) {
 
-        case NODE_UNARY_EXPR:
+        case EXPR_UNARY_EXPR:
             printUnary((UnaryExprNode*) expr);
             break;
 
-        case NODE_BINARY_EXPR:
+        case EXPR_BINARY_EXPR:
             printBinary((BinaryExprNode*) expr);
             break;
 
-        case NODE_NUMBER:
+        case EXPR_NUMBER:
             printf("%f", ((NumberNode*)expr)->value);
             break;
 
-        case NODE_ERROR:
+        case EXPR_ERROR:
             printf("Error Token");
             break;
 
         default:
-            fprintf(stderr, "Unhandled Node type: %d\n", expr->type);
+            fprintf(stderr, "Unhandled Expression Node type: %d\n", expr->type);
     }
     printf(")");
 
+}
+
+void printVarDec(VarDeclNode *stmt) {
+    printf("Declare Variable '%s' of type %s ", stmt->name, getTokenType(stmt->varType));
+    if (stmt->value == nullptr) printf("without value");
+    else {
+        printf("with value = ");
+        printExpr(stmt->value);
+    }
+
+}
+
+void printStmt(StmtNode *stmt) {
+    switch (stmt->type) {
+        case STMT_EXPR:
+            printf("[EXPR] ");
+            printExpr(((StmtExprNode*)stmt)->expr);
+            break;
+        case STMT_VAR_DEC:
+            printVarDec((VarDeclNode*) stmt);
+            break;
+        default:
+            fprintf(stderr, "Unhandled Statement Node type: %d\n", stmt->type);
+    }
 }

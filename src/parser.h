@@ -20,34 +20,74 @@ typedef struct {
 
 
 typedef enum {
-    NODE_ERROR,
-    NODE_BINARY_EXPR,
-    NODE_UNARY_EXPR,
-    NODE_NUMBER,
-} NodeType;
+    EXPR_ERROR,
+
+    EXPR_BINARY_EXPR,
+    EXPR_UNARY_EXPR,
+    EXPR_NUMBER,
+    EXPR_VAR
+
+} ExprNodeType;
 
 typedef struct {
-    NodeType type;
-} TreeNode;
+    ExprNodeType type;
+} ExprNode;
 
 
 typedef struct {
-    TreeNode header;
-    TreeNode *left;
-    TreeNode *right;
+    ExprNode header;
+    ExprNode *left;
+    ExprNode *right;
     TokenType operator;
 } BinaryExprNode;
 
 typedef struct {
-    TreeNode header;
-    TreeNode *right;
+    ExprNode header;
+    ExprNode *right;
     TokenType operator;
 } UnaryExprNode;
 
 typedef struct {
-    TreeNode header;
+    ExprNode header;
     double value;
 } NumberNode;
+
+typedef struct {
+    ExprNodeType header;
+    char *name;
+} VarAccessNode;
+
+
+typedef enum {
+    STMT_VAR_DEC,
+    STMT_VAR_ASSIGN,
+    STMT_EXPR,
+} StmtNodeType;
+
+typedef struct {
+    StmtNodeType type;
+} StmtNode;
+
+
+typedef struct {
+    StmtNode header;
+    char* name;
+    ExprNode *value;
+} VarAssignNode;
+
+typedef struct {
+    StmtNode header;
+    TokenType varType;
+    char* name;
+    ExprNode *value;
+} VarDeclNode;
+
+typedef struct {
+    StmtNode header;
+    ExprNode *expr;
+} StmtExprNode;
+
+
 
 
 ParseResult parseAll(Parser *parser, ArrayList *tokens);

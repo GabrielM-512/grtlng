@@ -2,4 +2,4 @@
 
 #include "../parser.h"
 
-void printExpr(TreeNode* expr);
+void printStmt(StmtNode *stmt);
