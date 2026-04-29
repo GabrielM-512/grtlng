@@ -1,106 +1,19 @@
 #include "lexer.h"
-#include "../util/ArenaAllocator.h"
+#include "debugInfos.h"
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-
-ArenaAllocator *text = nullptr;
-
-char* lookup[TOKEN_UNKNOWN + 1];
-
-bool hasFailed = false;
 
 /**
  * @brief Automatically finds the literals for the token names from 'src/lexer.h' and stores
  * them into the lookup table as strings.
  *
  */
-void populate_table() {
-    if (hasFailed) return;
-    size_t length;
-    char* source;
-    {
-        const char* filename = "/home/gabriel/CLionProjects/language/src/lexer.h";
-        FILE* file = fopen(filename, "r");
-        fseek(file, 0L, SEEK_END);
-        length = ftell(file) + 1;
-        source = malloc(length);
-
-        // reset to start of file
-        rewind(file);
-
-        //read the file
-        fread(source, sizeof(char), length, file);
-        fclose(file);
-
-        source[length - 1] = '\0';
-    }
-
-
-
-    // look for the enum
-    u32 start;
-    for (u32 i = 0;; i++) {
-        if (i + 9 > length) {
-            fprintf(stderr, "[DEBUG ERROR] %s: Couldnt locate enum start\n", __FILE__);
-            hasFailed = true;
-            free(source);
-            return;
-        }
-
-        const char *target = "TOKEN_EOF";
-        if (memcmp(target, &source[i], 9) == 0) {
-            start = i;
-            break;
-        }
-    }
-
-    text = ArenaNew();
-
-    // transfer tokens
-    for (int i = 0; i <= TOKEN_UNKNOWN; i++) {
-        int tokenlength = 0;
-
-        // search for token end
-        char c = source[start];
-        while (c != ',') {
-            tokenlength++;
-            c = source[start + tokenlength];
-        }
-        tokenlength++;
-
-        // store into the lookup table
-
-        char *textdata = ArenaAlloc(text, tokenlength);
-
-        memcpy(textdata, &source[start], tokenlength);
-        textdata[tokenlength - 1] = '\0';
-
-        start += tokenlength;
-
-        lookup[i] = textdata;
-
-
-        // skip whitespace
-        c = source[start];
-        while (c != 'T') {
-            start++;
-            c = source[start];
-        }
-
-    }
-
-    free(source);
-}
 
 void printTokenError(const Token token) {
-    if (hasFailed) return;
-    if (text == nullptr) populate_table();
+    if (hasFailed()) return;
 
     // print token name left aligned with a width of 20 characters
-    fprintf(stderr,"%04d | %-20.20s", token.line, lookup[token.type]);
+    fprintf(stderr,"%04d | %-20.20s", token.line, getTokenName(token.type));
 
     switch (token.type) {
         case TOKEN_NUM:
@@ -121,11 +34,9 @@ void printTokenError(const Token token) {
 }
 
 void printToken(const Token token) {
-    if (hasFailed) return;
-    if (text == nullptr) populate_table();
 
     // print token name left aligned with a width of 20 characters
-    printf("%04d | %-20.20s", token.line, lookup[token.type]);
+    printf("%04d | %-20.20s", token.line, getTokenName(token.type));
 
     switch (token.type) {
         case TOKEN_NUM:

@@ -24,6 +24,8 @@ add_executable(grtcmp src/main.c
         src/debug/parser.h
         src/interpret/interpreter.c
         src/interpret/interpreter.h
+        src/debug/debugInfos.c
+        src/debug/debugInfos.h
 )
 
 target_compile_options(grtcmp
