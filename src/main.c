@@ -22,11 +22,12 @@ typedef struct {
 } Flags;
 
 Flags parseFlags(int argc, char* argv[]) {
-    Flags flags =  {ARCH_NONE};
+    Flags flags =  {ARCH_NONE, nullptr};
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-i") == 0) flags.architecture = ARCH_INTERPRET;
         else flags.sourcefile = argv[i];
     }
+    return flags;
 }
 
 int main(const int argc, char* argv[]) {
@@ -38,7 +39,7 @@ int main(const int argc, char* argv[]) {
         exit(64);
     }
 
-    Flags compileFlags = parseFlags(argc, argv);
+    const Flags compileFlags = parseFlags(argc, argv);
 
     ArenaAllocator *tokenData = ArenaNew();
     Lexer lexer; //last argument must be source file
