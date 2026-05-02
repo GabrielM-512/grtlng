@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 
 #include "debug/debugInfos.h"
@@ -56,7 +57,7 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens) {
 
 // error handling
 
-void parseErrorAt(Parser *parser, const Token* token, const char* message) {
+void parseErrorAt(Parser *parser, const Token* token, const char* message, va_list args) {
     if (parser->panicMode) {
         return;
     }
@@ -64,18 +65,28 @@ void parseErrorAt(Parser *parser, const Token* token, const char* message) {
     parser->panicMode = true;
     parser->hadError = true;
 
-    fprintf(stderr, "Encountered error on line %d: %s\n", token->line, (char*) message);
+    fprintf(stderr, "Encountered error on line %d: ", token->line);
+    vfprintf(stderr, message, args);
+    fprintf(stderr, "\n");
 
     // synchronise here
 
 }
 
-void parseErrorAtCurrent(Parser *parser, const char* message) {
-    parseErrorAt(parser, &parser->current, message);
+void parseErrorAtCurrent(Parser *parser, const char* message, ...) {
+    va_list args;
+    va_start(args, message);
+
+    parseErrorAt(parser, &parser->current, message, args);
+
+    va_end(args);
 }
 
-void parseError(Parser *parser, const char* message) {
-    parseErrorAt(parser, &parser->previous, message);
+void parseError(Parser *parser, const char* message, ...) {
+    va_list args;
+    va_start(args, message);
+    parseErrorAt(parser, &parser->previous, message, args);
+    va_end(args);
 }
 
 // utils
@@ -226,8 +237,7 @@ ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence) {
 
     if (prefixRule == nullptr) {
 
-        parseError(parser, "Unexpected Token");
-        printTokenError(parser->previous);
+        parseError(parser, "Tried starting expression with unexpected Token: %s", getTokenSymbol(parser->previous.type));
 
         ExprNode *node = ArenaAlloc(parser->program.data, sizeof(ExprNode));
         node->type = EXPR_ERROR;
