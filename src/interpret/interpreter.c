@@ -4,17 +4,7 @@
 #include <stdlib.h>
 
 #include "../parser.h"
-
-typedef enum {
-    VALUE_i16,
-} ValueTypes;
-
-typedef struct {
-    ValueTypes type;
-    union {
-        i16 i16;
-    } value;
-} Value;
+#include "value.h"
 
 typedef struct {
 
