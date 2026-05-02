@@ -35,7 +35,7 @@ void populate_table() {
     text = ArenaNew();
 
     // transfer tokens
-    for (int i = 0; i <= TOKEN_LAST; i++) {
+    for (int i = 0; i < TOKEN_LAST; i++) {
         int tokenlength = 0;
 
         // search for token end
