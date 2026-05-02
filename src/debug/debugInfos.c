@@ -7,7 +7,7 @@
 
 ArenaAllocator *text = nullptr;
 
-char* lookup[TOKEN_UNKNOWN + 1];
+char* lookup[TOKEN_LAST];
 bool bHasFailed = false;
 
 void populate_table() {
@@ -35,7 +35,7 @@ void populate_table() {
     text = ArenaNew();
 
     // transfer tokens
-    for (int i = 0; i <= TOKEN_UNKNOWN; i++) {
+    for (int i = 0; i <= TOKEN_LAST; i++) {
         int tokenlength = 0;
 
         // search for token end
