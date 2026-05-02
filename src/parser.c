@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#include "debug/lexer.h"
+#include "debug/debugInfos.h"
 
 typedef enum {
     PREC_NONE,
