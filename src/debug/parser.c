@@ -47,6 +47,7 @@ void printBinary(BinaryExprNode *expr) {
 }
 
 void printExpr(ExprNode *expr) {
+
     printf("(");
     switch (expr->type) {
 
@@ -59,7 +60,7 @@ void printExpr(ExprNode *expr) {
             break;
 
         case EXPR_NUMBER:
-            printf("%f", ((NumberNode*)expr)->value);
+            printf("%f", ((NumberNode*) expr)->value);
             break;
 
         case EXPR_VAR:
