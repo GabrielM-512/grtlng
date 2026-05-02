@@ -233,6 +233,13 @@ ExprNode *grouping(Parser *parser) {
     return node;
 }
 
+ExprNode *variable(Parser *parser) {
+    VarAccessNode *node = ArenaAlloc(parser->program.data, sizeof(VarAccessNode));
+    node->header.type = EXPR_VAR;
+    node->name = parser->previous.data;
+    return (ExprNode*) node;
+}
+
 
 ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence) {
     advance(parser);
@@ -301,7 +308,7 @@ ParseRule rules [TOKEN_LAST] = {
     [TOKEN_MORE_EQUALS]     = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_LESS_EQUALS]     = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_BANG_EQUALS]     = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_IDENTIFIER]      = {nullptr,     nullptr,    PREC_NONE   },
+    [TOKEN_IDENTIFIER]      = {variable,     nullptr,    PREC_NONE  },
 };
 
 ParseRule getRule(const TokenType token) {

@@ -62,6 +62,10 @@ void printExpr(ExprNode *expr) {
             printf("%f", ((NumberNode*)expr)->value);
             break;
 
+        case EXPR_VAR:
+            printf("%s", ((VarAccessNode*) expr)->name);
+            break;
+
         case EXPR_ERROR:
             printf("Error Token");
             break;
