@@ -89,6 +89,10 @@ void parseError(Parser *parser, const char* message, ...) {
     va_end(args);
 }
 
+void expectedGotInstead(Parser *parser, const char* location, TokenType expected, TokenType got) {
+    parseError(parser, "Expected %s%s, got %s instead", getTokenSymbol(expected), location, getTokenSymbol(got));
+}
+
 // utils
 
 static bool isAtEnd(const Parser *parser) {
@@ -115,7 +119,7 @@ void consume(Parser *parser, TokenType type, const char *message) {
         if (!isAtEnd(parser)) advance(parser);
         return;
     }
-    parseError(parser, message);
+    expectedGotInstead(parser, message, type, parser->current.type);
 }
 
 static bool match(Parser *parser, TokenType type) {
@@ -154,7 +158,7 @@ StmtNode *exprStmt(Parser *parser) {
     node->header.type = STMT_EXPR;
 
     node->expr = parseExpr(parser, PREC_ASSIGNMENT);
-    consume(parser, TOKEN_SEMICOLON, "Expect ';' after Expression.");
+    consume(parser, TOKEN_SEMICOLON, " after Expression");
 
     return (StmtNode*) node;
 }
@@ -164,7 +168,7 @@ StmtNode *varDeclStmt(Parser *parser) {
 
     node->varType = parser->previous.type;
 
-    consume(parser, TOKEN_IDENTIFIER, "Expect identifier after variable type");
+    consume(parser, TOKEN_IDENTIFIER, " after variable type");
 
     node->header.type = STMT_VAR_DEC;
     node->name = parser->previous.data;
@@ -177,7 +181,7 @@ StmtNode *varDeclStmt(Parser *parser) {
         node->value = parseExpr(parser, PREC_ASSIGNMENT);
     }
 
-    consume(parser, TOKEN_SEMICOLON, "Expect ';' after variable declaration");
+    consume(parser, TOKEN_SEMICOLON, " after variable declaration");
 
     return (StmtNode*) node;
 }
@@ -225,7 +229,7 @@ static ExprNode *number(Parser *parser) {
 
 ExprNode *grouping(Parser *parser) {
     ExprNode *node = parseExpr(parser, getRule(parser->previous.type).precedence);
-    consume(parser, TOKEN_RIGHT_PAREN, "Expect ')'");
+    consume(parser, TOKEN_RIGHT_PAREN, "");
     return node;
 }
 

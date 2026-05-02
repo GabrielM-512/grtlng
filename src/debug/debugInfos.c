@@ -85,3 +85,49 @@ char *getTokenType(TokenType type) {
     if (bHasFailed) return "TOKEN NAME LOOKUP FAILED";
     return lookup[type] + 6; // cut off "TOKEN_"
 }
+
+char *getTokenSymbol(TokenType type) {
+    char* table[] = {
+        [TOKEN_EOF] = "[End of file]",
+        [TOKEN_ERROR] = "an error",
+        [TOKEN_NUM] = "a number",
+        [TOKEN_STRING] = "a string",
+        [TOKEN_SEMICOLON] = "';'",
+        [TOKEN_LEFT_PAREN] = "'('",
+        [TOKEN_RIGHT_PAREN] = "')'",
+        [TOKEN_LEFT_BRACE] = "'{'",
+        [TOKEN_RIGHT_BRACE] = "'}'",
+        [TOKEN_LEFT_BRACKET] = "'['",
+        [TOKEN_RIGHT_BRACKET] = "']'",
+        [TOKEN_PLUS] = "'+'",
+        [TOKEN_MINUS] = "'-'",
+        [TOKEN_STAR] = "'*'",
+        [TOKEN_SLASH] = "'/'",
+        [TOKEN_PLUS_EQUALS] = "'+='",
+        [TOKEN_MINUS_EQUALS] = "'-='",
+        [TOKEN_STAR_EQUALS] = "'*='",
+        [TOKEN_SLASH_EQUALS] = "'/='",
+        [TOKEN_PLUS_PLUS] = "'++'",
+        [TOKEN_MINUS_MINUS] = "'--'",
+        [TOKEN_AMP] = "'&'",
+        [TOKEN_PIPE] = "'|'",
+        [TOKEN_TILDE] = "'~'",
+        [TOKEN_AMP_AMP] = "'&&'",
+        [TOKEN_PIPE_PIPE] = "'||'",
+        [TOKEN_AMP_EQUALS] = "'&='",
+        [TOKEN_BANG] = "'!'",
+        [TOKEN_DOT] = "'.'",
+        [TOKEN_COMMA] = "','",
+        [TOKEN_MORE] = "'>'",
+        [TOKEN_LESS] = "'<'",
+        [TOKEN_EQUALS] = "'='",
+        [TOKEN_EQUALS_EQUALS] = "'=='",
+        [TOKEN_MORE_EQUALS] = "'>='",
+        [TOKEN_LESS_EQUALS] = "'<='",
+        [TOKEN_BANG_EQUALS] = "'!='",
+        [TOKEN_IDENTIFIER] = "an identifier",
+        [TOKEN_I16] = "'i16'"
+    };
+
+    return table[type];
+}
