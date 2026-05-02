@@ -122,14 +122,17 @@ bool isVarIdent(Parser *parser) {
     const TokenType types[] = {TOKEN_I16, TOKEN_LAST};
     u16 i = 0;
     bool matched = false;
+
     while (types[i] != TOKEN_LAST) {
-        if (types[i] == parser->current.type) {
-            matched = true;
-            advance(parser);
-            break;
-        }
-        i++;
+        if (types[i++] != parser->current.type) continue;
+
+
+        matched = true;
+        advance(parser);
+        break;
+
     }
+
     return matched;
 }
 
