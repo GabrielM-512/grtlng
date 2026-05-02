@@ -78,6 +78,8 @@ void interpret(StmtNode *stmt) {
 }
 
 void interpretProgram(ArrayList *program) {
+    usleep(100000);
+
     printf("========== INTERPRETER OUTPUT ==========\n");
     for (u32 i = 0; i < program->size; i++) {
         interpret(ArrayListRead(program, i, StmtNode*));
