@@ -1,7 +1,9 @@
 #include "interpreter.h"
 
+#include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "../parser.h"
 #include "value.h"
@@ -43,11 +45,15 @@ double interpretNumExpr(ExprNode *expr) {
         case EXPR_NUMBER:
             return ((NumberNode*) expr)->value;
 
+        case EXPR_VAR:
+            break;
+
         default:
             fprintf(stderr, "Non-expression node in expression AST: %d\n", expr->type);
             exit(1);
 
     }
+    return NAN;
 }
 
 void interpretExpr(ExprNode *expr) {
@@ -55,6 +61,7 @@ void interpretExpr(ExprNode *expr) {
         case EXPR_UNARY_EXPR:
         case EXPR_NUMBER:
         case EXPR_BINARY_EXPR:
+        case EXPR_VAR:
             printf("%f", interpretNumExpr(expr));
             break;
         case EXPR_ERROR:
