@@ -53,7 +53,7 @@ typedef struct {
 } NumberNode;
 
 typedef struct {
-    ExprNodeType header;
+    ExprNode header;
     char *name;
 } VarAccessNode;
 
