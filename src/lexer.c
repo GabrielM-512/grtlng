@@ -27,7 +27,7 @@ void lexerInit(Lexer* lexer, const char *source, ArenaAllocator *tokenData) {
 ArrayList *scanAll(Lexer* lexer) {
     ArrayList *tokens = ArrayListNew(sizeof(Token));
 
-    Token token = {TOKEN_UNKNOWN, 1, nullptr};
+    Token token = {TOKEN_LAST, 1, nullptr};
     skipWhitespace(lexer);
 
     while (token.type != TOKEN_EOF) {
@@ -134,14 +134,14 @@ Token checkKeyword(const Lexer *lexer, const u16 start, const char *remaining, T
     if (len + start == lexer->head-lexer->base && memcmp(remaining, &lexer->source[lexer->base + start], len) == 0) {
         return (Token) {type, lexer->line, nullptr};
     }
-    return (Token) {TOKEN_UNKNOWN, lexer->line, nullptr};
+    return (Token) {TOKEN_LAST, lexer->line, nullptr};
 }
 
 Token keyword(const Lexer *lexer) {
     switch (lexer->source[lexer->base]) {
         case 'i':
             return checkKeyword(lexer, 1, "16", TOKEN_I16);
-        default: return (Token) {TOKEN_UNKNOWN, lexer->line, nullptr};
+        default: return (Token) {TOKEN_LAST, lexer->line, nullptr};
     }
 }
 
@@ -155,7 +155,7 @@ Token identifier(Lexer *lexer) {
 
     // keyword check
     const Token token = keyword(lexer);
-    if (token.type != TOKEN_UNKNOWN) return token;
+    if (token.type != TOKEN_LAST) return token;
 
 
     // is identifier
@@ -194,7 +194,7 @@ Token scanToken(Lexer* lexer) {
         case ']': return noDataToken(lexer, TOKEN_RIGHT_BRACKET);
 
         case ',': return noDataToken(lexer, TOKEN_COMMA);
-        case '.': return noDataToken(lexer, TOKEN_PERIOD);
+        case '.': return noDataToken(lexer, TOKEN_DOT);
 
         case '~': return noDataToken(lexer, TOKEN_TILDE);
 

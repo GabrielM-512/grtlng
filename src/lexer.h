@@ -44,7 +44,7 @@ typedef enum {
     TOKEN_PIPE_EQUALS,
 
     TOKEN_BANG, // '!'
-    TOKEN_PERIOD,
+    TOKEN_DOT,
     TOKEN_COMMA,
 
     TOKEN_MORE,
@@ -61,7 +61,7 @@ typedef enum {
     // type tokens
     TOKEN_I16,
 
-    TOKEN_UNKNOWN
+    TOKEN_LAST // a marker token to always be the last token
 } TokenType;
 
 typedef struct {

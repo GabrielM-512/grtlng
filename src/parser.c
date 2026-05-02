@@ -119,10 +119,10 @@ bool check (const Parser *parser, TokenType type) {
 
 
 bool isVarIdent(Parser *parser) {
-    const TokenType types[] = {TOKEN_I16, TOKEN_UNKNOWN};
+    const TokenType types[] = {TOKEN_I16, TOKEN_LAST};
     u16 i = 0;
     bool matched = false;
-    while (types[i] != TOKEN_UNKNOWN) {
+    while (types[i] != TOKEN_LAST) {
         if (types[i] == parser->current.type) {
             matched = true;
             advance(parser);
@@ -245,7 +245,7 @@ ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence) {
 }
 
 
-ParseRule rules [TOKEN_UNKNOWN + 1] = {
+ParseRule rules [TOKEN_LAST] = {
     [TOKEN_EOF]             = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_ERROR]           = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_NUM]             = {number,      nullptr,    PREC_NONE   },
@@ -275,7 +275,7 @@ ParseRule rules [TOKEN_UNKNOWN + 1] = {
     [TOKEN_AMP_EQUALS]      = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_PIPE_EQUALS]     = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_BANG]            = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_PERIOD]          = {nullptr,     nullptr,    PREC_NONE   },
+    [TOKEN_DOT]             = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_COMMA]           = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_MORE]            = {nullptr,     nullptr,    PREC_NONE   },
     [TOKEN_LESS]            = {nullptr,     nullptr,    PREC_NONE   },
