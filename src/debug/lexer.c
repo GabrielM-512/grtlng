@@ -34,6 +34,7 @@ void printTokenError(const Token token) {
 }
 
 void printToken(const Token token) {
+    if (hasFailed()) return;
 
     // print token name left aligned with a width of 20 characters
     printf("%04d | %-20.20s", token.line, getTokenName(token.type));
