@@ -21,8 +21,6 @@ typedef struct {
 
 
 typedef enum {
-    EXPR_ERROR,
-
     EXPR_BINARY_EXPR,
     EXPR_UNARY_EXPR,
     EXPR_NUMBER,

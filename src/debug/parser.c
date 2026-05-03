@@ -67,10 +67,6 @@ void printExpr(ExprNode *expr) {
             printf("%s", ((VarAccessNode*) expr)->name);
             break;
 
-        case EXPR_ERROR:
-            printf("Error Token");
-            break;
-
         default:
             fprintf(stderr, "Unhandled Expression Node type: %d\n", expr->type);
     }

@@ -291,10 +291,7 @@ ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence) {
 
         parseError(parser, "Tried starting (sub-) expression with invalid token: %s", getTokenSymbol(parser->previous.type));
 
-        ExprNode *node = ArenaAlloc(parser->program.data, sizeof(ExprNode));
-        node->type = EXPR_ERROR;
-
-        return node;
+        return nullptr;
     }
 
     ExprNode *left = prefixRule(parser);

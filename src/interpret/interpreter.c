@@ -64,8 +64,6 @@ void interpretExpr(ExprNode *expr) {
         case EXPR_VAR:
             printf("%f", interpretNumExpr(expr));
             break;
-        case EXPR_ERROR:
-            printf("Error expression");
         default:
             fprintf(stderr, "Unhandled Expression Node type: %d", expr->type);
     }
