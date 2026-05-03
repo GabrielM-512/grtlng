@@ -124,6 +124,16 @@ void expectedGotInstead(Parser *parser, const char* location, TokenType expected
     parseErrorAtCurrent(parser, "Expected %s%s, got %s instead", getTokenSymbol(expected), location, getTokenSymbol(got));
 }
 
+void synchronise(Parser *parser) {
+    parser->panicMode = false;
+
+    while (parser->current.type != TOKEN_EOF) {
+        if (parser->previous.type == TOKEN_SEMICOLON) return;
+
+        advance(parser);
+    }
+}
+
 // utils
 
 static bool isAtEnd(const Parser *parser) {
@@ -211,8 +221,13 @@ StmtNode *varDeclStmt(Parser *parser) {
 }
 
 StmtNode *parseStmt(Parser *parser) {
-    if (isVarIdent(parser)) return varDeclStmt(parser);
-    return exprStmt(parser);
+    StmtNode* node;
+    if (isVarIdent(parser)) node = varDeclStmt(parser);
+    else node = exprStmt(parser);
+
+    synchronise(parser);
+
+    return node;
 }
 
 // expression functions
