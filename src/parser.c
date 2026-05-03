@@ -2,6 +2,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "debug/debugInfos.h"
 
@@ -33,7 +34,7 @@ StmtNode *parseStmt(Parser *parser);
 
 // externally callable function(s)
 
-ParseResult parseAll(Parser *parser, ArrayList *tokens) {
+ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
     parser->Tokens = tokens;
     parser->token = 0;
 
@@ -42,6 +43,8 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens) {
 
     parser->hadError = false;
     parser->panicMode = false;
+
+    parser->source = source;
 
     advance(parser);
 
@@ -57,6 +60,29 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens) {
 
 // error handling
 
+void printErrorLine(Parser* parser, const Token *token) {
+    u32 start = token->position;
+    while (start > 0 && parser->source[start - 1] != '\n') start--;
+
+    u32 end = token->position;
+    for (u8 i = 20; i > 0; i--) {
+        end++;
+        if (parser->source[end] == '\n' || parser->source[end] == '\0') break;
+    }
+
+    const u32 range = end - start;
+
+    char lineString[6];
+    sprintf(lineString, "%d", token->line);
+
+    fprintf(stderr, "[%s]   ", lineString);
+    fprintf(stderr, "%.*s", range, &parser->source[start]);
+    if (token->position + 20 == end) fprintf(stderr, "...");
+    fprintf(stderr, "\n");
+    const u16 hatStart = token->position - start + 5 + strlen(lineString);
+    fprintf(stderr, "%-*.*s^ Here\n\n\n", hatStart, hatStart, "");
+}
+
 void parseErrorAt(Parser *parser, const Token* token, const char* message, va_list args) {
     if (parser->panicMode) {
         return;
@@ -69,7 +95,9 @@ void parseErrorAt(Parser *parser, const Token* token, const char* message, va_li
     vfprintf(stderr, message, args);
     fprintf(stderr, "\n");
 
-    // synchronise here
+
+    // print offending line
+    printErrorLine(parser, token);
 
 }
 
@@ -90,7 +118,7 @@ void parseError(Parser *parser, const char* message, ...) {
 }
 
 void expectedGotInstead(Parser *parser, const char* location, TokenType expected, TokenType got) {
-    parseError(parser, "Expected %s%s, got %s instead", getTokenSymbol(expected), location, getTokenSymbol(got));
+    parseErrorAtCurrent(parser, "Expected %s%s, got %s instead", getTokenSymbol(expected), location, getTokenSymbol(got));
 }
 
 // utils
@@ -248,7 +276,7 @@ ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence) {
 
     if (prefixRule == nullptr) {
 
-        parseError(parser, "Tried starting expression with unexpected Token: %s", getTokenSymbol(parser->previous.type));
+        parseError(parser, "Tried starting (sub-) expression with invalid token: %s", getTokenSymbol(parser->previous.type));
 
         ExprNode *node = ArenaAlloc(parser->program.data, sizeof(ExprNode));
         node->type = EXPR_ERROR;

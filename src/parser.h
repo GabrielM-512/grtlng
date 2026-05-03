@@ -16,6 +16,7 @@ typedef struct {
     u16 token;
     Token current, previous;
     bool hadError, panicMode;
+    const char *source;
 } Parser;
 
 
@@ -90,4 +91,4 @@ typedef struct {
 
 
 
-ParseResult parseAll(Parser *parser, ArrayList *tokens);
+ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source);

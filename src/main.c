@@ -45,7 +45,6 @@ int main(const int argc, char* argv[]) {
     Lexer lexer; //last argument must be source file
     lexerInit(&lexer, argv[argc - 1], tokenData);
     ArrayList *tokens = scanAll(&lexer);
-    free(lexer.source);
 
 #ifdef DEBUG_PRINT_TOKENS
 
@@ -66,7 +65,7 @@ int main(const int argc, char* argv[]) {
 #endif
 
     Parser parser;
-    ParseResult ast = parseAll(&parser, tokens);
+    ParseResult ast = parseAll(&parser, tokens, lexer.source);
 
     if (parser.hadError) return 1;
 #ifdef DEBUG_PRINT_AST
