@@ -104,16 +104,18 @@ void parseErrorAt(Parser *parser, const Token* token, const char* message, va_li
 
 void parseErrorAtCurrent(Parser *parser, const char* message, ...) {
     va_list args;
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
     va_start(args, message);
-
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
     parseErrorAt(parser, &parser->current, message, args);
-
     va_end(args);
 }
 
 void parseError(Parser *parser, const char* message, ...) {
     va_list args;
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
     va_start(args, message);
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
     parseErrorAt(parser, &parser->previous, message, args);
     va_end(args);
 }
@@ -157,7 +159,7 @@ static bool match(Parser *parser, TokenType type) {
     return true;
 }
 
-bool check (const Parser *parser, TokenType type) {
+bool check(const Parser *parser, TokenType type) {
     return parser->current.type == type;
 }
 
@@ -240,6 +242,7 @@ ExprNode *exprUnary(Parser *parser) {
     return (ExprNode*) node;
 }
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 static ExprNode *number(Parser *parser) {
     NumberNode *node = ArenaAlloc(parser->program.data, sizeof(NumberNode));
 
@@ -255,6 +258,7 @@ ExprNode *grouping(Parser *parser) {
     return node;
 }
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 ExprNode *variable(Parser *parser) {
     VarAccessNode *node = ArenaAlloc(parser->program.data, sizeof(VarAccessNode));
     node->header.type = EXPR_VAR;
