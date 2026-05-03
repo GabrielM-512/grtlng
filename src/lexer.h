@@ -67,6 +67,7 @@ typedef enum {
 typedef struct {
     TokenType type;
     u16 line;
+    u32 position;
     void *data; //May hold any data the Token needs from the source string (e.g. Literals, Variable/Function names, etc)
 } Token;
 

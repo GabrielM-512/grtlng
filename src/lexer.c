@@ -27,7 +27,7 @@ void lexerInit(Lexer* lexer, const char *source, ArenaAllocator *tokenData) {
 ArrayList *scanAll(Lexer* lexer) {
     ArrayList *tokens = ArrayListNew(sizeof(Token));
 
-    Token token = {TOKEN_LAST, 1, nullptr};
+    Token token = {TOKEN_LAST, 1, 0, nullptr};
     skipWhitespace(lexer);
 
     while (token.type != TOKEN_EOF) {
@@ -74,7 +74,7 @@ char peekNext(const Lexer *lexer) {
 
 
 Token makeToken(const Lexer *lexer, const TokenType type, void* data) {
-    return (Token) {type, lexer->line, data};
+    return (Token) {type, lexer->line, lexer->base, data};
 }
 
 Token noDataToken(const Lexer *lexer, const TokenType type) {
@@ -82,7 +82,7 @@ Token noDataToken(const Lexer *lexer, const TokenType type) {
 }
 
 Token errorToken(const Lexer *lexer, char* message) {
-    return (Token) {TOKEN_ERROR, lexer->line, message};
+    return (Token) {TOKEN_ERROR, lexer->line, lexer->base, message};
 }
 
 // internal functions
@@ -110,14 +110,14 @@ Token string(Lexer *lexer) {
         if (advance(lexer) == '\n') lexer->line++;
     }
 
-    if (isAtEnd(lexer)) return (Token) {TOKEN_ERROR, start, "Unterminated string."};
+    if (isAtEnd(lexer)) return (Token) {TOKEN_ERROR, start, lexer->base, "Unterminated string."};
     advance(lexer); // eat last '"'
 
     const u32 beginning = lexer->base + 1; // skip first '"'
     const u32 size = lexer->head - beginning; // Text + 1 byte for \0
 
     if (size > lexer->data->capacity) {
-        return (Token) {TOKEN_ERROR, start, "Strings may not exceed 4096 characters in size."};
+        return (Token) {TOKEN_ERROR, start, lexer->base, "Strings may not exceed 4096 characters in size."};
     }
 
 
@@ -126,22 +126,22 @@ Token string(Lexer *lexer) {
 
     data[size - 1] = '\0';
 
-    return (Token) {TOKEN_STRING, start, data};
+    return (Token) {TOKEN_STRING, start, lexer->base, data};
 }
 
 Token checkKeyword(const Lexer *lexer, const u16 start, const char *remaining, TokenType type) {
     u16 len = strlen(remaining);
-    if (len + start == lexer->head-lexer->base && memcmp(remaining, &lexer->source[lexer->base + start], len) == 0) {
-        return (Token) {type, lexer->line, nullptr};
+    if (len + start == lexer->head - lexer->base && memcmp(remaining, &lexer->source[lexer->base + start], len) == 0) {
+        return (Token) {type, lexer->line, lexer->base, nullptr};
     }
-    return (Token) {TOKEN_LAST, lexer->line, nullptr};
+    return (Token) {TOKEN_IDENTIFIER, lexer->line, lexer->base, nullptr};
 }
 
 Token keyword(const Lexer *lexer) {
     switch (lexer->source[lexer->base]) {
         case 'i':
             return checkKeyword(lexer, 1, "16", TOKEN_I16);
-        default: return (Token) {TOKEN_LAST, lexer->line, nullptr};
+        default: return (Token) {TOKEN_IDENTIFIER, lexer->line, lexer->base, nullptr};
     }
 }
 
@@ -155,10 +155,11 @@ Token identifier(Lexer *lexer) {
 
     // keyword check
     const Token token = keyword(lexer);
-    if (token.type != TOKEN_LAST) return token;
+    if (token.type != TOKEN_IDENTIFIER) return token;
 
 
     // is identifier
+
     const size_t size = lexer->head - lexer->base + 1;
 
     if (size > lexer->data->capacity) {
