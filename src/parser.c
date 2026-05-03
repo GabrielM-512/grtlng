@@ -30,6 +30,7 @@ bool check (const Parser *parser, TokenType type);
 ParseRule getRule(TokenType token);
 
 ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence);
+ExprNode *parseExprPrec(Parser *parser);
 StmtNode *parseStmt(Parser *parser);
 
 // externally callable function(s)
@@ -206,7 +207,7 @@ StmtNode *varDeclStmt(Parser *parser) {
 
     // if instant assignment
     if (match(parser, TOKEN_EQUALS)) {
-        node->value = parseExpr(parser, PREC_ASSIGNMENT);
+        node->value = parseExprPrec(parser);
     }
 
     consume(parser, TOKEN_SEMICOLON, " after variable declaration");
@@ -229,7 +230,7 @@ ExprNode *exprBinary(Parser *parser, ExprNode *left) {
     node->operator = parser->previous.type;
     node->left = left;
 
-    node->right = parseExpr(parser, getRule(parser->previous.type).precedence);
+    node->right = parseExprPrec(parser);
 
     return (ExprNode*) node;
 
@@ -241,7 +242,7 @@ ExprNode *exprUnary(Parser *parser) {
     node->header.type = EXPR_UNARY_EXPR;
     node->operator = parser->previous.type;
 
-    node->right = parseExpr(parser, getRule(parser->previous.type).precedence);
+    node->right = parseExprPrec(parser);
 
     return (ExprNode*) node;
 }
@@ -256,7 +257,7 @@ static ExprNode *number(Parser *parser) {
 }
 
 ExprNode *grouping(Parser *parser) {
-    ExprNode *node = parseExpr(parser, getRule(parser->previous.type).precedence);
+    ExprNode *node = parseExprPrec(parser);
     consume(parser, TOKEN_RIGHT_PAREN, "");
     return node;
 }
@@ -294,6 +295,10 @@ ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence) {
 
     return left;
 
+}
+
+ExprNode *parseExprPrec(Parser *parser) {
+    return parseExpr(parser, getRule(parser->previous.type).precedence);
 }
 
 
