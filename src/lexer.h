@@ -60,6 +60,11 @@ typedef enum {
 
     // type tokens
     TOKEN_I16,
+    TOKEN_I32,
+    TOKEN_U16,
+
+    // keyword tokens
+    TOKEN_EXTERN,
 
     TOKEN_LAST // a marker token to always be the last token
 } TokenType;
