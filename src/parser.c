@@ -175,7 +175,7 @@ bool check(const Parser *parser, TokenType type) {
 
 
 bool isVarIdent(Parser *parser) {
-    constexpr TokenType types[] = {TOKEN_I16, TOKEN_I32, TOKEN_U16, TOKEN_LAST};
+    constexpr TokenType types[] = {TOKEN_I16, TOKEN_I32, TOKEN_U16, TOKEN_U32, TOKEN_LAST};
     u16 i = 0;
     while (types[i] != TOKEN_LAST) {
         if (match(parser, types[i])) return true;

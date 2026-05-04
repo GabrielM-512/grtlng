@@ -140,9 +140,22 @@ Token checkKeyword(const Lexer *lexer, const u16 start, const char *remaining, T
 Token keyword(const Lexer *lexer) {
     switch (lexer->source[lexer->base]) {
         case 'i':
-            return checkKeyword(lexer, 1, "16", TOKEN_I16);
-        default: return (Token) {TOKEN_IDENTIFIER, lexer->line, lexer->base, nullptr};
+            switch (lexer->source[lexer->base + 1]) {
+                case '1': return checkKeyword(lexer, 2, "6", TOKEN_I16);
+                case '3': return checkKeyword(lexer, 2, "2", TOKEN_I32);
+                default:
+            }
+            break;
+        case 'u':
+            switch (lexer->source[lexer->base + 1]) {
+            case '1': return checkKeyword(lexer, 2, "6", TOKEN_U16);
+            case '3': return checkKeyword(lexer, 2, "2", TOKEN_U32);
+            default:
+        }
+            break;
+        default:
     }
+    return (Token) {TOKEN_IDENTIFIER, lexer->line, lexer->base, nullptr};
 }
 
 Token identifier(Lexer *lexer) {

@@ -62,6 +62,7 @@ typedef enum {
     TOKEN_I16,
     TOKEN_I32,
     TOKEN_U16,
+    TOKEN_U32,
 
     // keyword tokens
     TOKEN_EXTERN,
