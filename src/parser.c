@@ -6,6 +6,8 @@
 
 #include "debug/debugInfos.h"
 
+#define ALLOC_NODE(type) (ArenaAlloc(parser->program.data, sizeof(type)))
+
 typedef enum {
     PREC_NONE,
     PREC_ASSIGNMENT,
@@ -188,7 +190,7 @@ bool isVarIdent(Parser *parser) {
 // statement functions
 
 StmtNode *exprStmt(Parser *parser) {
-    StmtExprNode *node = ArenaAlloc(parser->program.data, sizeof(StmtExprNode));
+    StmtExprNode *node = ALLOC_NODE(StmtExprNode);
     node->header.type = STMT_EXPR;
 
     node->expr = parseExpr(parser, PREC_ASSIGNMENT);
@@ -198,7 +200,7 @@ StmtNode *exprStmt(Parser *parser) {
 }
 
 StmtNode *varDeclStmt(Parser *parser) {
-    VarDeclNode *node = ArenaAlloc(parser->program.data, sizeof(VarDeclNode));
+    VarDeclNode *node = ALLOC_NODE(VarDeclNode);
 
     node->varType = parser->previous.type;
 
@@ -233,7 +235,7 @@ StmtNode *parseStmt(Parser *parser) {
 // expression functions
 
 ExprNode *exprBinary(Parser *parser, ExprNode *left) {
-    BinaryExprNode *node = ArenaAlloc(parser->program.data, sizeof(BinaryExprNode));
+    BinaryExprNode *node = ALLOC_NODE(BinaryExprNode);
 
     node->header.type = EXPR_BINARY_EXPR;
 
@@ -247,7 +249,7 @@ ExprNode *exprBinary(Parser *parser, ExprNode *left) {
 }
 
 ExprNode *exprUnary(Parser *parser) {
-    UnaryExprNode *node = ArenaAlloc(parser->program.data, sizeof(UnaryExprNode));
+    UnaryExprNode *node = ALLOC_NODE(UnaryExprNode);
 
     node->header.type = EXPR_UNARY_EXPR;
     node->operator = parser->previous.type;
@@ -259,7 +261,7 @@ ExprNode *exprUnary(Parser *parser) {
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 static ExprNode *number(Parser *parser) {
-    NumberNode *node = ArenaAlloc(parser->program.data, sizeof(NumberNode));
+    NumberNode *node = ALLOC_NODE(NumberNode);
 
     node->header.type = EXPR_NUMBER;
     node->value = * (double*) parser->previous.data;
@@ -275,7 +277,7 @@ ExprNode *grouping(Parser *parser) {
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 ExprNode *variable(Parser *parser) {
-    VarAccessNode *node = ArenaAlloc(parser->program.data, sizeof(VarAccessNode));
+    VarAccessNode *node = ALLOC_NODE(VarAccessNode);
     node->header.type = EXPR_VAR;
     node->name = parser->previous.data;
     return (ExprNode*) node;
