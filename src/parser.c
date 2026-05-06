@@ -160,7 +160,7 @@ StmtNode *parseStmt(Parser *parser) {
     if (isVarIdent(parser)) node = varDeclStmt(parser);
     else node = exprStmt(parser);
 
-    synchronise(parser);
+    if (parser->panicMode) synchronise(parser);
 
     return node;
 }
