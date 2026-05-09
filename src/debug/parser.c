@@ -46,6 +46,12 @@ void printBinary(ExprBinaryNode *expr) {
     printExpr(expr->right);
 }
 
+void printAssignment(ExprVarAssignNode *expr) {
+    printExpr(expr->target);
+    printf(" = ");
+    printExpr(expr->value);
+}
+
 void printExpr(ExprNode *expr) {
 
     printf("(");
@@ -65,6 +71,10 @@ void printExpr(ExprNode *expr) {
 
         case EXPR_VAR:
             printf("%s", ((ExprVarNode*) expr)->name);
+            break;
+
+        case EXPR_VAR_ASSIGN:
+            printAssignment((ExprVarAssignNode*) expr);
             break;
 
         default:

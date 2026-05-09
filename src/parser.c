@@ -31,6 +31,7 @@ ParseRule getRule(TokenType token);
 
 ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence);
 ExprNode *parseExprPrec(Parser *parser);
+ExprNode *parseExprPrecRight(Parser *parser);
 StmtNode *parseStmt(Parser *parser);
 
 // externally callable function(s)
@@ -126,7 +127,7 @@ StmtNode *exprStmt(Parser *parser) {
     StmtExprNode *node = ALLOC_NODE(StmtExprNode);
     node->header.type = STMT_EXPR;
 
-    node->expr = parseExpr(parser, PREC_ASSIGNMENT);
+    node->expr = parseExpr(parser, PREC_NONE);
     consume(parser, TOKEN_SEMICOLON, " after Expression");
 
     return (StmtNode*) node;
@@ -147,7 +148,7 @@ StmtNode *varDeclStmt(Parser *parser) {
 
     // if instant assignment
     if (match(parser, TOKEN_EQUALS)) {
-        node->value = parseExprPrec(parser);
+        node->value = parseExprPrecRight(parser);
         consume(parser, TOKEN_SEMICOLON, " after variable assignment");
     } else {
         consume(parser, TOKEN_SEMICOLON, " after variable declaration");
@@ -218,6 +219,27 @@ ExprNode *variable(Parser *parser) {
 }
 
 
+/*
+ * An assignment acts as an expression which also has a side effect.
+ * The value of the expression is the same as the value assigned to the variable.
+ */
+ExprNode *assignment(Parser *parser, ExprNode *left) {
+    ExprVarAssignNode *node = ALLOC_NODE(ExprVarAssignNode);
+
+    node->header.type = EXPR_VAR_ASSIGN;
+
+    // TODO: maybe its possible to mark the start of the l-value instead of the = on the error message?
+    if (left->type != EXPR_VAR) {
+        parseError(parser, "Invalid assignment target");
+    }
+
+    node->target = left;
+    node->value = parseExprPrecRight(parser);
+
+    return (ExprNode*) node;
+}
+
+
 ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence) {
     advance(parser);
 
@@ -246,47 +268,51 @@ ExprNode *parseExprPrec(Parser *parser) {
     return parseExpr(parser, getRule(parser->previous.type).precedence);
 }
 
+ExprNode *parseExprPrecRight(Parser *parser) {
+    return parseExpr(parser, getRule(parser->previous.type).precedence - 1);
+}
+
 
 ParseRule rules [TOKEN_LAST] = {
-    [TOKEN_EOF]             = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_ERROR]           = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_NUM]             = {number,      nullptr,    PREC_NONE   },
-    [TOKEN_STRING]          = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_SEMICOLON]       = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_LEFT_PAREN]      = {grouping,    nullptr,    PREC_NONE   },
-    [TOKEN_RIGHT_PAREN]     = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_LEFT_BRACE]      = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_RIGHT_BRACE]     = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_LEFT_BRACKET]    = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_RIGHT_BRACKET]   = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_PLUS]            = {nullptr,     exprBinary, PREC_SUM    },
-    [TOKEN_MINUS]           = {exprUnary,   exprBinary, PREC_SUM    },
-    [TOKEN_STAR]            = {nullptr,     exprBinary, PREC_PRODUCT},
-    [TOKEN_SLASH]           = {nullptr,     exprBinary, PREC_PRODUCT},
-    [TOKEN_PLUS_EQUALS]     = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_MINUS_EQUALS]    = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_STAR_EQUALS]     = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_SLASH_EQUALS]    = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_PLUS_PLUS]       = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_MINUS_MINUS]     = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_AMP]             = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_PIPE]            = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_TILDE]           = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_AMP_AMP]         = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_PIPE_PIPE]       = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_AMP_EQUALS]      = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_PIPE_EQUALS]     = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_BANG]            = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_DOT]             = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_COMMA]           = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_MORE]            = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_LESS]            = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_EQUALS]          = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_EQUALS_EQUALS]   = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_MORE_EQUALS]     = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_LESS_EQUALS]     = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_BANG_EQUALS]     = {nullptr,     nullptr,    PREC_NONE   },
-    [TOKEN_IDENTIFIER]      = {variable,    nullptr,    PREC_NONE   },
+    [TOKEN_EOF]             = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_ERROR]           = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_NUM]             = {number,      nullptr,    PREC_NONE       },
+    [TOKEN_STRING]          = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_SEMICOLON]       = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_LEFT_PAREN]      = {grouping,    nullptr,    PREC_NONE       },
+    [TOKEN_RIGHT_PAREN]     = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_LEFT_BRACE]      = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_RIGHT_BRACE]     = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_LEFT_BRACKET]    = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_RIGHT_BRACKET]   = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_PLUS]            = {nullptr,     exprBinary, PREC_SUM        },
+    [TOKEN_MINUS]           = {exprUnary,   exprBinary, PREC_SUM        },
+    [TOKEN_STAR]            = {nullptr,     exprBinary, PREC_PRODUCT    },
+    [TOKEN_SLASH]           = {nullptr,     exprBinary, PREC_PRODUCT    },
+    [TOKEN_PLUS_EQUALS]     = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_MINUS_EQUALS]    = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_STAR_EQUALS]     = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_SLASH_EQUALS]    = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_PLUS_PLUS]       = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_MINUS_MINUS]     = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_AMP]             = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_PIPE]            = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_TILDE]           = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_AMP_AMP]         = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_PIPE_PIPE]       = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_AMP_EQUALS]      = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_PIPE_EQUALS]     = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_BANG]            = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_DOT]             = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_COMMA]           = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_MORE]            = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_LESS]            = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_EQUALS]          = {nullptr,     assignment, PREC_ASSIGNMENT },
+    [TOKEN_EQUALS_EQUALS]   = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_MORE_EQUALS]     = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_LESS_EQUALS]     = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_BANG_EQUALS]     = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_IDENTIFIER]      = {variable,    nullptr,    PREC_NONE       },
 };
 
 ParseRule getRule(const TokenType token) {

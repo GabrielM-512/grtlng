@@ -24,7 +24,9 @@ typedef enum {
     EXPR_BINARY_EXPR,
     EXPR_UNARY_EXPR,
     EXPR_NUMBER,
-    EXPR_VAR
+    EXPR_VAR,
+
+    EXPR_VAR_ASSIGN,
 
 } ExprNodeType;
 
@@ -55,6 +57,12 @@ typedef struct {
     ExprNode header;
     char *name;
 } ExprVarNode;
+
+typedef struct {
+    ExprNode header;
+    ExprNode *target;
+    ExprNode *value;
+} ExprVarAssignNode;
 
 
 typedef enum {
