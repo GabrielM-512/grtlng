@@ -36,24 +36,24 @@ void populate_table() {
 
     // transfer tokens
     for (int i = 0; i < TOKEN_LAST; i++) {
-        int tokenlength = 0;
+        int tokenLength = 0;
 
         // search for token end
         char c = file.source[start];
         while (c != ',') {
-            tokenlength++;
-            c = file.source[start + tokenlength];
+            tokenLength++;
+            c = file.source[start + tokenLength];
         }
-        tokenlength++;
+        tokenLength++;
 
         // store into the lookup table
 
-        char *textdata = ArenaAlloc(text, tokenlength);
+        char *textdata = ArenaAlloc(text, tokenLength);
 
-        memcpy(textdata, &file.source[start], tokenlength);
-        textdata[tokenlength - 1] = '\0';
+        memcpy(textdata, &file.source[start], tokenLength);
+        textdata[tokenLength - 1] = '\0';
 
-        start += tokenlength;
+        start += tokenLength;
 
         lookup[i] = textdata;
 

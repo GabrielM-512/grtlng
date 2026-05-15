@@ -57,10 +57,10 @@ int main(const int argc, char* argv[]) {
 
 #ifdef DEBUG_TOKEN_COUNT
 
-    char actualpath[PATH_MAX + 1];
-    realpath(argv[argc - 1], actualpath);
+    char actualPath[PATH_MAX + 1];
+    realpath(argv[argc - 1], actualPath);
 
-    printf("%d Tokens in %s\n\n", tokens->size, actualpath);
+    printf("%d Tokens in %s\n\n", tokens->size, actualPath);
 
 #endif
 
