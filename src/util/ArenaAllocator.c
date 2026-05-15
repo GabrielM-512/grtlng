@@ -18,7 +18,7 @@ ArenaAllocator *ArenaNew() {
     ArenaAllocator *arena = malloc(sizeof(ArenaAllocator) + ARENA_ALLOC_SIZE);
 
     if (arena == nullptr) {
-        INTERN_ERROR_LOCATION(__FILE__, __LINE__);
+        INTERN_ERROR_LOCATION();
         fprintf(stderr, "Failed to allocate new Arena.\n");
         exit(1);
     }

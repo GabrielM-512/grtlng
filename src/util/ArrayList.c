@@ -5,7 +5,7 @@
 #include <string.h>
 
 #define GROW_CAPACITY(capacity) ((capacity) < 8 ? 8 : (capacity) * 2)
-#define GROW_ARRAY(size, pointer, newCount) (realloc(pointer, size * newCount))
+#define GROW_ARRAY(size, pointer, newCount) (realloc((pointer), (size) * (newCount)))
 
 ArrayList *ArrayListNew(const size_t elementSize) {
     ArrayList *list = malloc(sizeof(ArrayList));
@@ -28,13 +28,13 @@ void ArrayListFree(ArrayList *list) {
 void ArrayListAdd(ArrayList *list, const void *element) {
     if (list->size + 1 > list->capacity) {
         list->capacity = GROW_CAPACITY(list->capacity);
-        list->elements = GROW_ARRAY(list->elementSize, list->elements, list->capacity);
-
-        if (list->elements == nullptr) {
-            INTERN_ERROR_LOCATION(__FILE__, __LINE__);
+        void* new = GROW_ARRAY(list->elementSize, list->elements, list->capacity);
+        if (new == nullptr) {
+            INTERN_ERROR_LOCATION();
             fprintf(stderr, "Couldnt realloc ArrayList\n");
             exit(1);
         }
+        list->elements = new;
     }
 
 
@@ -46,7 +46,7 @@ void ArrayListAdd(ArrayList *list, const void *element) {
 }
 void *ArrayListGet(const ArrayList *list, const u32 index) {
     if (index >= list->size) {
-        INTERN_ERROR_LOCATION(__FILE__, __LINE__);
+        INTERN_ERROR_LOCATION();
         fprintf(stderr, "Tried accessing list with size of %d at index %d\n", list->size, index);
         exit(1);
     }
