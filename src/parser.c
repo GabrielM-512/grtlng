@@ -70,7 +70,13 @@ void synchronise(Parser *parser) {
     }
 }
 
-// utils
+/*
+    U   U   TTTTT    III    L        III    TTTTT    III    EEEEE    SSSS
+    U   U     T      III    L        III      T      III    E       S
+    U   U     T      III    L        III      T      III    EEEEE    SSS
+    U   U     T      III    L        III      T      III    E           S
+     UUU      T      III    LLLLL    III      T      III    EEEEE   SSSS
+ */
 
 static bool isAtEnd(const Parser *parser) {
     return parser->Tokens->size <= parser->token;
@@ -109,6 +115,13 @@ bool check(const Parser *parser, TokenType type) {
     return parser->current.type == type;
 }
 
+/*
+     SSSS   TTTTT     A     TTTTT   EEEEE   M   M   EEEEE   N   N   TTTTT    SSSS
+    S         T      A A      T     E       MM MM   E       NN  N     T     S
+     SSS      T      AAA      T     EEEEE   M M M   EEEEE   N N N     T      SSS
+        S     T     A   A     T     E       M   M   E       N  NN     T         S
+    SSSS      T     A   A     T     EEEEE   M   M   EEEEE   N   N     T     SSSS
+ */
 
 bool isVarIdent(Parser *parser) {
     constexpr TokenType types[] = {TOKEN_I16, TOKEN_I32, TOKEN_U16, TOKEN_U32};
@@ -119,8 +132,6 @@ bool isVarIdent(Parser *parser) {
 
     return false;
 }
-
-// statement functions
 
 StmtNode *exprStmt(Parser *parser) {
     StmtExprNode *node = ALLOC_NODE(StmtExprNode);
@@ -166,7 +177,13 @@ StmtNode *parseStmt(Parser *parser) {
     return node;
 }
 
-// expression functions
+/*
+    EEEEE   X   X   PPPP    RRRR    EEEEE    SSSS    SSSS    III     OOO    N   N    SSSS
+    E        X X    P   P   R   R   E       S       S        III    O   O   NN  N   S
+    EEEEE     X     PPPP    RRRR    EEEEE    SSS     SSS     III    O   O   N N N    SSS
+    E        X X    P       R  R    E           S       S    III    O   O   N  NN       S
+    EEEEE   X   X   P       R   R   EEEEE   SSSS    SSSS     III     OOO    N   N   SSSS
+ */
 
 ExprNode *exprBinary(Parser *parser, ExprNode *left) {
     ExprBinaryNode *node = ALLOC_NODE(ExprBinaryNode);
