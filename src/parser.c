@@ -156,7 +156,8 @@ static void advance(Parser *parser) {
         if (isAtEnd(parser)) {
             parser->current = ArrayListRead(parser->Tokens, parser->Tokens->size - 1, Token);
         } else {
-            parser->current = ArrayListRead(parser->Tokens, parser->token++, Token);
+            parser->current = ArrayListRead(parser->Tokens, parser->token, Token);
+            parser->token++;
         }
 
         if (parser->current.type != TOKEN_ERROR) break;
