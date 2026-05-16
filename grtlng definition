@@ -1,0 +1,25 @@
+program        → declaration* EOF;
+
+declaration    → funDecl | varDecl;
+
+funDecl        → TYPE function ;
+varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+
+block          → "{" ( declaration | statement )* "}" ;
+
+statement      → exprStmt
+               | block ;
+               | exprStatement
+
+exprStmt       → expression ";" ;
+
+
+function       → IDENTIFIER "(" parameters? ")" block ;
+parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
+
+TYPE           → "i16" | "i32" | "u16" | "u32" ;
+NUMBER         → DIGIT+ ( "." DIGIT+ )? ;
+STRING         → "\"" <any char except "\"">* "\"" ;
+IDENTIFIER     → ALPHA ( ALPHA | DIGIT )* ;
+ALPHA          → "a" ... "z" | "A" ... "Z" | "_" ;
+DIGIT          → "0" ... "9" ;
