@@ -127,6 +127,8 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
     return parser->program;
 }
 
+
+// error recovery function
 void synchronise(Parser *parser) {
     parser->panicMode = false;
 
@@ -341,6 +343,7 @@ ExprNode *variable(Parser *parser) {
  * The value of the expression is the same as the value assigned to the variable.
  * E.g. 5 + (a = 5) == 10
  */
+
 ExprNode *assignment(Parser *parser, ExprNode *left) {
     ExprVarAssignNode *node = ALLOC_NODE(ExprVarAssignNode);
 
