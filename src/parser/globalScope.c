@@ -19,10 +19,12 @@ void globalSynchronise(Parser *parser) {
             while (level > 0) {
                 if (match(parser, TOKEN_EOF)) break; // error will be handled later
                 if (match(parser, TOKEN_LEFT_BRACE)) level++;
-                if (match(parser, TOKEN_RIGHT_BRACE)) level--;
+                else if (match(parser, TOKEN_RIGHT_BRACE)) level--;
+                else advance(parser);
             }
             return;
         }
+        advance(parser);
     }
 }
 
@@ -112,7 +114,8 @@ ArrayList *parseGlobals(Parser *parser) {
                 while (level > 0) {
                     if (match(parser, TOKEN_EOF)) break; // error will be handled later
                     if (match(parser, TOKEN_LEFT_BRACE)) level++;
-                    if (match(parser, TOKEN_RIGHT_BRACE)) level--;
+                    else if (match(parser, TOKEN_RIGHT_BRACE)) level--;
+                    else advance(parser);
                 }
 
                 break;
