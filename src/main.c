@@ -3,6 +3,9 @@
 #include <string.h>
 #include <linux/limits.h>
 
+#include "util/ArenaAllocator.h"
+#include "util/ArrayList.h"
+
 #include "lexer.h"
 #include "parser/parser.h"
 #include "debug/lexer.h"
