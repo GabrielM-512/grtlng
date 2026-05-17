@@ -164,6 +164,15 @@ void interpretExpr(ExprNode *expr) {
 
             break;
         }
+        case EXPR_CALL: {
+            ExprCallNode *node = (ExprCallNode*) expr;
+            StmtFunction function;
+            HashMapGet(&interpreter.functions, node->target, &function);
+            StmtBlockNode *body = function.body;
+
+            interpret((StmtNode*) body);
+            break;
+        }
 
         default:
             fprintf(stderr, "Unhandled Expression Node type: %d [interpret/interpreter.c]\n", expr->type);

@@ -77,6 +77,10 @@ void printExpr(ExprNode *expr) {
             printAssignment((ExprVarAssignNode*) expr);
             break;
 
+        case EXPR_CALL:
+            printf("%s()", ((ExprCallNode*) expr)->target);
+            break;
+
         default:
             fprintf(stderr, "Unhandled Expression Node type: %d [debug/parser.c]\n", expr->type);
     }

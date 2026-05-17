@@ -31,10 +31,10 @@ void globalSynchronise(Parser *parser) {
 StmtNode *globalDeclaration(Parser *parser) {
 
     if (!isTypeIdent(parser)) {
-        parseError(parser, "Expected Function or Variable declaration");
+        parseErrorAtCurrent(parser, "Expected Function or Variable declaration");
     }
 
-    TokenType type = parser->previous.type;
+    TokenType dataType = parser->previous.type;
 
     if (!consume(parser, TOKEN_IDENTIFIER, " after declaration type")) {
         return nullptr;
@@ -43,12 +43,18 @@ StmtNode *globalDeclaration(Parser *parser) {
     char *name = parser->previous.data;
 
     if (match(parser, TOKEN_LEFT_PAREN)) {
-        // its a function
+        // it's a function
         if (HashMapHas(&parser->program.functions, name)) {
-            parseError(parser, "Function \"%s\" already declared", name);
+            parseError(parser, "Function \"%s\" has already been declared", name);
+        }
+        if (varExists(parser, name)) {
+            parseError(parser, "Function \"%s\" has already been declared as a global variable", name);
         }
 
         // check for parameters here
+
+        consume(parser, TOKEN_RIGHT_PAREN, " after function parameters");
+
         StmtFunction *function = ALLOC_NODE(StmtFunction);
 
         function->header.type = STMT_FUN_DEC;
@@ -59,14 +65,19 @@ StmtNode *globalDeclaration(Parser *parser) {
         return (StmtNode*) function;
     }
 
-    // its a variable
+    // it's a variable
 
     StmtVarDeclNode *node = ALLOC_NODE(StmtVarDeclNode);
 
     node->header.type = STMT_VAR_DEC;
     node->name = parser->previous.data;
+    node->varType = dataType;
 
-    Variable var = {node->varType};
+    Variable var = {dataType};
+
+    if (HashMapHas(&parser->program.functions, node->name)) {
+        parseError(parser, "Global variable \"%s\" has already been declared as a function");
+    }
 
     createCurrentScopeVar(parser, node->name, var);
 
@@ -100,12 +111,14 @@ ArrayList *parseGlobals(Parser *parser) {
             case STMT_FUN_DEC: {
                 StmtFunction *funNode = (StmtFunction*) node;
 
+                // subtract 1 because parser->token points to current, not to previous
+                FunctionDeclaration fun = {funNode->name, parser->token - 1};
+
                 // add to queue
-                FunctionDeclaration fun = {funNode->name, parser->token};
                 ArrayListAdd(functions, &fun);
 
                 // add to known functions
-                HashMapSet(&parser->program.functions, funNode->name, &funNode);
+                HashMapSet(&parser->program.functions, fun.name, funNode);
 
 
                 // skip function block to be handled later

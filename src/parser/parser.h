@@ -30,6 +30,7 @@ typedef enum {
     EXPR_UNARY_EXPR,
     EXPR_NUMBER,
     EXPR_VAR,
+    EXPR_CALL,
 
     EXPR_VAR_ASSIGN,
 
@@ -62,6 +63,11 @@ typedef struct {
     ExprNode header;
     char *name;
 } ExprVarNode;
+
+typedef struct {
+    ExprNode header;
+    char *target;
+} ExprCallNode;
 
 typedef struct {
     ExprNode header;
