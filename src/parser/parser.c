@@ -29,6 +29,8 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
     parser->hadError = false;
     parser->panicMode = false;
 
+    parser->inGlobalPhase = true;
+
     parser->source = source;
 
     parser->currentScope = nullptr;
@@ -38,6 +40,8 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
 
     // parse global declarations (functions and variables)
     ArrayList *functions = parseGlobals(parser);
+
+    parser->inGlobalPhase = false;
 
     // parse function bodies
     for (u32 i = 0; i < functions->length; i++) {

@@ -24,7 +24,8 @@ ALPHA          → "a" ... "z" | "A" ... "Z" | "_" ;
 DIGIT          → "0" ... "9" ;
 
 All global function and variable declarations come into existence at the start of the source file, no matter where they are actually listed in the source file.
-An exception to this are other global variables, which may only reference functions and variables declared before them in the source file.
+An exception to this are other global variables, which may only reference variables declared before them in the source file.
+Global variables may not call functions in their initializers. When that is needed, the function call must be executed from within the main (or any other) function.
 
 Local variables come into existence at the point where they are declared.
 

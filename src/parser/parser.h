@@ -19,6 +19,7 @@ typedef struct {
     ArrayList *Tokens;
     u32 token;
     Token current, previous;
+    bool inGlobalPhase;
     bool hadError, panicMode;
     const char *source;
     struct Scope *currentScope;
