@@ -1,4 +1,5 @@
 #pragma once
-#include "../util/ArrayList.h"
 
-void interpretProgram(ArrayList *program);
+#include "../parser/parser.h"
+
+void interpretProgram(ParseResult program);

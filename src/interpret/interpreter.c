@@ -16,11 +16,15 @@ typedef struct Environment {
 
 typedef struct {
     Environment *env;
+    HashMap functions;
 } Interpreter;
 
 Interpreter interpreter = {
-    nullptr
+    nullptr,
+    {}
 };
+
+void interpret(StmtNode *stmt);
 
 void startEnvironment() {
     Environment *env = malloc(sizeof(Environment));
@@ -201,14 +205,15 @@ void interpret(StmtNode *stmt) {
     }
 }
 
-void interpretProgram(ArrayList *program) {
+void interpretProgram(ParseResult program) {
     usleep(100000);
 
     // create starting environment
     startEnvironment();
+    interpreter.functions = program.functions;
 
     printf("========== INTERPRETER OUTPUT ==========\n");
-    for (u32 i = 0; i < program->length; i++) {
-        interpret(ArrayListRead(program, i, StmtNode*));
+    for (u32 i = 0; i < program.tree->length; i++) {
+        interpret(ArrayListRead(program.tree, i, StmtNode*));
     }
 }
