@@ -10,6 +10,7 @@
 
 #define ALLOC_NODE(type) (ArenaAlloc(parser->program.data, sizeof(type)))
 
+// todo: also skips next function declaration after the current error
 void globalSynchronise(Parser *parser) {
     parser->panicMode = false;
 
@@ -122,6 +123,8 @@ ArrayList *parseGlobals(Parser *parser) {
 
 
                 // skip function block to be handled later
+                while (!match(parser, TOKEN_LEFT_BRACE)) advance(parser);
+
                 u16 level = 1;
 
                 while (level > 0) {
