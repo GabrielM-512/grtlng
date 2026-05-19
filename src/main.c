@@ -45,7 +45,7 @@ int main(const int argc, char* argv[]) {
     const Flags compileFlags = parseFlags(argc, argv);
 
     ArenaAllocator *tokenData = ArenaNew();
-    Lexer lexer; //last argument must be source file
+    Lexer lexer;
     lexerInit(&lexer, compileFlags.sourcefile, tokenData);
     ArrayList *tokens = scanAll(&lexer);
 
