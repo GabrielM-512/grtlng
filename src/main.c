@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <linux/limits.h>
 
 #include "util/ArenaAllocator.h"
 #include "util/ArrayList.h"

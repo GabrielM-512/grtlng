@@ -66,6 +66,7 @@ typedef enum {
     TOKEN_VOID,
 
     // keyword tokens
+    TOKEN_RETURN,
     TOKEN_EXTERN,
 
     TOKEN_LAST // a marker token to always be the last token

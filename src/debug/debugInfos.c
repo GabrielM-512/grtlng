@@ -129,6 +129,9 @@ char *getTokenSymbol(TokenType type) {
         [TOKEN_I16] = "'i16'",
         [TOKEN_I32] = "'i32'",
         [TOKEN_U16] = "'u16'",
+        [TOKEN_U32] = "'u32'",
+        [TOKEN_VOID] = "'void'",
+        [TOKEN_RETURN] = "'return'",
         [TOKEN_EXTERN] = "'extern'"
     };
 
