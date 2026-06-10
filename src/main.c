@@ -67,6 +67,8 @@ int main(const int argc, char* argv[]) {
 
 #ifdef DEBUG_TOKEN_COUNT
 
+    #include <linux/limits.h>
+
     char actualPath[PATH_MAX + 1];
     realpath(compileFlags.sourcefile, actualPath);
 
