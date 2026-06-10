@@ -3,7 +3,7 @@ program        → declaration* EOF;
 declaration    → funDecl | varDecl;
 
 funDecl        → TYPE function ;
-varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+varDecl        → TYPE IDENTIFIER ( "=" expression )? ";" ;
 
 block          → "{" ( declaration | statement )* "}" ;
 
@@ -14,7 +14,7 @@ exprStmt       → expression ";" ;
 
 
 function       → IDENTIFIER "(" parameters? ")" block ;
-parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
+parameters     → TYPE IDENTIFIER ( "," TYPE IDENTIFIER )* ;
 
 TYPE           → "i16" | "i32" | "u16" | "u32" ;
 NUMBER         → DIGIT+ ( "." DIGIT+ )? ;
