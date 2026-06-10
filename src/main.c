@@ -31,7 +31,7 @@ Flags parseFlags(int argc, char* argv[]) {
             flags.sourcefile = argv[i];
             if (i + 1 != argc) {
                 fprintf(stderr, "Incorrect usage:\n"
-                                "  Source File must be last argument");
+                                      "  Source File must be last argument");
                 exit(1);
             }
             break;
