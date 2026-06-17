@@ -72,7 +72,11 @@ StmtNode *blockStmt(Parser *parser) {
     beginScope(parser);
 
     while (!match(parser, TOKEN_RIGHT_BRACE)) {
-        if (match(parser, TOKEN_EOF)) parseError(parser, "Unterminated block");
+
+        if (match(parser, TOKEN_EOF)) {
+            parseError(parser, "Unterminated block");
+            break;
+        }
 
         StmtNode *next;
 
