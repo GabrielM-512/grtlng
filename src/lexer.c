@@ -143,6 +143,7 @@ Token keyword(const Lexer *lexer) {
             switch (lexer->source[lexer->base + 1]) {
                 case '1': return checkKeyword(lexer, 2, "6", TOKEN_I16);
                 case '3': return checkKeyword(lexer, 2, "2", TOKEN_I32);
+                case '6': return checkKeyword(lexer, 2, "4", TOKEN_I64);
                 default:
             }
             break;
@@ -153,6 +154,7 @@ Token keyword(const Lexer *lexer) {
             switch (lexer->source[lexer->base + 1]) {
             case '1': return checkKeyword(lexer, 2, "6", TOKEN_U16);
             case '3': return checkKeyword(lexer, 2, "2", TOKEN_U32);
+            case '6': return checkKeyword(lexer, 2, "4", TOKEN_U64);
             default:
         }
             break;

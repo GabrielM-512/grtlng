@@ -61,8 +61,10 @@ typedef enum {
     // type tokens
     TOKEN_I16,
     TOKEN_I32,
+    TOKEN_I64,
     TOKEN_U16,
     TOKEN_U32,
+    TOKEN_U64,
     TOKEN_VOID,
 
     // keyword tokens
