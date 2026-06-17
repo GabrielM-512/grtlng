@@ -2,11 +2,85 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "parser/parser.h"
 #include "lexer.h"
 #include "debug/debugInfos.h"
+
+#include "util/ArrayList.h"
+
+typedef struct {
+    ArrayList *errors;
+    ArenaAllocator *data;
+    char *testing;
+    const char *source;
+} ErrorHandler;
+
+typedef struct {
+    Token token;
+    const char *message;
+} Error;
+
+ErrorHandler handler;
+
+void printErrorLine(const char *source, const Token *token);
+
+void errorSetup() {
+    handler.errors = ArrayListNew(sizeof(Error));
+    handler.data = ArenaNew();
+    handler.testing = malloc(256);
+}
+
+void printErrors() {
+    Error errors[handler.errors->length];
+
+    for (u32 i = 0; i < handler.errors->length; i++) {
+        errors[i] = ArrayListRead(handler.errors, i, Error);
+    }
+
+    for (u32 i = 0; i < handler.errors->length; i++) {
+        u16 line = errors[i].token.line;
+        for (u32 j = i; j < handler.errors->length; j++) {
+            if (errors[j].token.line < line) {
+                Error temp = errors[j];
+                errors[j] = errors[i];
+                errors[i] = temp;
+            }
+        }
+    }
+
+    for (u32 i = 0; i < handler.errors->length; i++) {
+
+        Error current = errors[i];
+
+        fprintf(stderr, "Encountered error on line %d: %s\n", current.token.line, current.message);
+
+        // print offending line
+        printErrorLine(handler.source, &current.token);
+    }
+
+}
+
+void enqueueError(const char *message, va_list args, const Token token) {
+    u32 length = vsnprintf(handler.testing, 256, message, args) + 1;
+
+    char *target = ArenaAlloc(handler.data, length);
+
+    strcpy(target, handler.testing);
+
+    for (u16 i = 0; i < 256; i++) {
+        handler.testing[i] = 0;
+    }
+
+    Error error = {
+        token,
+        target
+    };
+
+    ArrayListAdd(handler.errors, &error);
+}
 
 void printErrorLine(const char *source, const Token *token) {
     u32 start = token->position;
@@ -34,7 +108,7 @@ void printErrorLine(const char *source, const Token *token) {
     fprintf(stderr, "%-*.*s^ Here\n\n\n", hatStart, hatStart, "");
 }
 
-void parseErrorAt(Parser *parser, const Token* token, const char* message, va_list args) {
+void parseErrorAt(Parser *parser, const Token token, const char* message, va_list args) {
     if (parser->panicMode) {
         return;
     }
@@ -42,13 +116,9 @@ void parseErrorAt(Parser *parser, const Token* token, const char* message, va_li
     parser->panicMode = true;
     parser->hadError = true;
 
-    fprintf(stderr, "Encountered error on line %d: ", token->line);
-    vfprintf(stderr, message, args);
-    fprintf(stderr, "\n");
+    enqueueError(message, args, token);
 
-
-    // print offending line
-    printErrorLine(parser->source, token);
+    handler.source = parser->source;
 
 }
 
@@ -57,7 +127,7 @@ void parseErrorAtCurrent(Parser *parser, const char* message, ...) {
     // ReSharper disable once CppLocalVariableMightNotBeInitialized
     va_start(args, message);
     // ReSharper disable once CppLocalVariableMightNotBeInitialized
-    parseErrorAt(parser, &parser->current, message, args);
+    parseErrorAt(parser, parser->current, message, args);
     va_end(args);
 }
 
@@ -66,7 +136,7 @@ void parseError(Parser *parser, const char* message, ...) {
     // ReSharper disable once CppLocalVariableMightNotBeInitialized
     va_start(args, message);
     // ReSharper disable once CppLocalVariableMightNotBeInitialized
-    parseErrorAt(parser, &parser->previous, message, args);
+    parseErrorAt(parser, parser->previous, message, args);
     va_end(args);
 }
 

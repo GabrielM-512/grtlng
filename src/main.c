@@ -10,6 +10,7 @@
 #include "debug/lexer.h"
 #include "debug/parser.h"
 #include "interpret/interpreter.h"
+#include "error.h"
 
 typedef enum {
     ARCH_NONE,
@@ -51,6 +52,8 @@ int main(const int argc, char* argv[]) {
 
     const Flags compileFlags = parseFlags(argc, argv);
 
+    errorSetup();
+
     ArenaAllocator *tokenData = ArenaNew();
     Lexer lexer;
     lexerInit(&lexer, compileFlags.sourcefile, tokenData);
@@ -79,7 +82,10 @@ int main(const int argc, char* argv[]) {
     Parser parser;
     const ParseResult ast = parseAll(&parser, tokens, lexer.source);
 
-    if (parser.hadError) return 1;
+    if (parser.hadError) {
+        printErrors();
+        return 1;
+    }
 #ifdef DEBUG_PRINT_AST
 
     printProgram(ast);
