@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 4.1)
-project(language C)
+project(grtlng C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_executable(grtcmp src/main.c
+add_executable(grtlng src/main.c
         src/lexer.c
         src/lexer.h
         src/util/ArrayList.c
@@ -42,7 +42,7 @@ add_executable(grtcmp src/main.c
         src/parser/statements.h
 )
 
-target_compile_options(grtcmp
+target_compile_options(grtlng
         PUBLIC -Wall
         PUBLIC -Wextra
         #PUBLIC -Werror
