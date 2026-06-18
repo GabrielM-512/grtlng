@@ -49,25 +49,7 @@ StmtNode *functionDeclaration(Parser *parser, char *name) {
     return (StmtNode*) function;
 }
 
-StmtNode *globalDeclaration(Parser *parser) {
-
-    if (!isTypeIdent(parser)) {
-        parseErrorAtCurrent(parser, "Expected Function or Variable declaration");
-        return nullptr;
-    }
-
-    TokenType dataType = parser->previous.type;
-
-    if (!consume(parser, TOKEN_IDENTIFIER, " after declaration type")) {
-        return nullptr;
-    }
-
-    char *name = parser->previous.data;
-
-    if (match(parser, TOKEN_LEFT_PAREN)) return functionDeclaration(parser, name);
-
-    // it's a variable
-
+StmtNode *variableDeclaration(Parser *parser, TokenType dataType) {
     StmtVarDeclNode *node = ALLOC_NODE(StmtVarDeclNode);
 
     node->header.type = STMT_VAR_DEC;
@@ -93,6 +75,28 @@ StmtNode *globalDeclaration(Parser *parser) {
     }
 
     return (StmtNode*) node;
+}
+
+StmtNode *globalDeclaration(Parser *parser) {
+
+    if (!isTypeIdent(parser)) {
+        parseErrorAtCurrent(parser, "Expected Function or Variable declaration");
+        return nullptr;
+    }
+
+    TokenType dataType = parser->previous.type;
+
+    if (!consume(parser, TOKEN_IDENTIFIER, " after declaration type")) {
+        return nullptr;
+    }
+
+    char *name = parser->previous.data;
+
+    if (match(parser, TOKEN_LEFT_PAREN)) return functionDeclaration(parser, name);
+
+    // it's a variable
+    return variableDeclaration(parser, dataType);
+
 }
 
 ArrayList *parseGlobals(Parser *parser) {
