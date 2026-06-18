@@ -16,6 +16,7 @@ typedef struct Environment {
 
 typedef struct {
     Environment *env;
+    Environment *global;
     HashMap functions;
 } Interpreter;
 
@@ -173,8 +174,13 @@ void interpretExpr(ExprNode *expr) {
             StmtFunction function;
             HashMapGet(&interpreter.functions, node->target, &function);
 
+            Environment *old = interpreter.env;
+            interpreter.env = interpreter.global;
+
             StmtBlockNode *body = function.body;
             interpret((StmtNode*) body);
+
+            interpreter.env = old;
 
             break;
         }
@@ -224,6 +230,8 @@ void interpretProgram(ParseResult program) {
 
     // create starting environment
     startEnvironment();
+    interpreter.global = interpreter.env;
+
     interpreter.functions = program.functions;
 
     printf("========== INTERPRETER OUTPUT ==========\n");
