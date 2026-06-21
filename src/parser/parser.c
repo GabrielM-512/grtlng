@@ -26,16 +26,7 @@ void parseFunction(Parser *parser, FunctionDeclaration declaration) {
     HashMapSet(&parser->program.functions, function.name, &function);
 }
 
-ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
-    /*
-     * Plan:
-     * parse entire source file for declarations
-     * put variable declarations at the beginning of the AST (now called init phase)
-     * put function declarations into own ArrayList (name, starting token)
-     * parse each function
-     * put call to main() at the end of init phase AST
-     */
-    parser->Tokens = tokens;
+void parserInit(Parser *parser) {
     parser->token = 0;
 
     parser->program.tree = ArrayListNew(sizeof(StmtNode*));
@@ -47,12 +38,26 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
 
     parser->inGlobalPhase = true;
 
-    parser->source = source;
-
     parser->currentScope = nullptr;
     beginScope(parser);
 
     advance(parser);
+}
+
+ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
+    /*
+     * Plan:
+     * parse entire source file for declarations
+     * put variable declarations at the beginning of the AST (now called init phase)
+     * put function declarations into own ArrayList (name, starting token)
+     * parse each function
+     * put call to main() at the end of init phase AST
+     */
+
+    parser->Tokens = tokens;
+    parser->source = source;
+
+    parserInit(parser);
 
     // parse global declarations (functions and variables)
     ArrayList *functions = parseGlobals(parser);
