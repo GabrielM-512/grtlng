@@ -80,7 +80,7 @@ StmtNode *blockStmt(Parser *parser) {
 
         StmtNode *next;
 
-        if (isTypeIdent(parser)) next = localVarDeclStmt(parser);
+        if (matchTypeIdent(parser)) next = localVarDeclStmt(parser);
         else next = parseStmt(parser);
 
         ArrayListAdd(node->content, &next);

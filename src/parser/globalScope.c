@@ -79,7 +79,7 @@ StmtNode *variableDeclaration(Parser *parser, TokenType dataType) {
 
 StmtNode *globalDeclaration(Parser *parser) {
 
-    if (!isTypeIdent(parser)) {
+    if (!matchTypeIdent(parser)) {
         parseErrorAtCurrent(parser, "Expected Function or Variable declaration");
         return nullptr;
     }

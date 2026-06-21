@@ -53,10 +53,16 @@ bool isTypeIdent(Parser *parser) {
     constexpr TokenType types[] = {TOKEN_I16, TOKEN_I32, TOKEN_I64, TOKEN_U16, TOKEN_U32, TOKEN_U64, TOKEN_VOID};
 
     for (u64 i = 0; i < sizeof(types) / sizeof(types[0]); i++) {
-        if (match(parser, types[i])) return true;
+        if (check(parser, types[i])) return true;
     }
 
     return false;
+}
+
+bool matchTypeIdent(Parser *parser) {
+    bool result = isTypeIdent(parser);
+    if (result) advance(parser);
+    return result;
 }
 
 void synchronise(Parser *parser) {

@@ -11,6 +11,7 @@ bool match(Parser *parser, TokenType type);
 bool check (const Parser *parser, TokenType type);
 
 bool isTypeIdent(Parser *parser);
+bool matchTypeIdent(Parser *parser);
 
 void synchronise(Parser *parser);
 
