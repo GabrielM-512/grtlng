@@ -28,6 +28,23 @@ ExprNode *exprBinary(Parser *parser, ExprNode *left) {
     return (ExprNode*) node;
 }
 
+void parseArgs(Parser *parser, ExprCallNode *call, u32 arity) {
+    u32 paramsPassed = 0;
+
+    if (!check(parser, TOKEN_RIGHT_PAREN)) {
+        do {
+            ExprNode *param = expression(parser);
+            ArrayListAdd(call->args, &param);
+            paramsPassed++;
+        } while (match(parser, TOKEN_COMMA));
+
+    }
+
+    if (arity != paramsPassed)
+        parseError(parser, "Function \"%s\" expects %u arguments, %u were passed instead", call->target, arity, paramsPassed);
+
+}
+
 ExprNode *call(Parser *parser, ExprNode *left) {
     if (parser->inGlobalPhase) {
         parseError(parser, "No functions may be called during global variable initialisation");
@@ -53,20 +70,7 @@ ExprNode *call(Parser *parser, ExprNode *left) {
             functionArity = 0;
     }
 
-    u32 paramsPassed = 0;
-
-    if (!check(parser, TOKEN_RIGHT_PAREN)) {
-        do {
-            ExprNode *param = expression(parser);
-            ArrayListAdd(node->args, &param);
-            paramsPassed++;
-        } while (match(parser, TOKEN_COMMA));
-
-    }
-
-    if (functionArity != paramsPassed)
-        parseError(parser, "Function \"%s\" expects %u arguments, %u were passed instead", node->target, functionArity, paramsPassed);
-
+    parseArgs(parser, node, functionArity);
 
     consume(parser, TOKEN_RIGHT_PAREN, " after function arguments");
 
