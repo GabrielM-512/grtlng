@@ -155,6 +155,7 @@ f64 interpretNumExpr(ExprNode *expr) {
 }
 
 void interpretExpr(ExprNode *expr) {
+    // todo: change call to interpretNumExpr (handle returns)
     switch (expr->type) {
         case EXPR_UNARY_EXPR:
         case EXPR_NUMBER:
