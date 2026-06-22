@@ -201,7 +201,7 @@ void interpretExpr(ExprNode *expr) {
         }
 
         default:
-            fprintf(stderr, "Unhandled Expression Node type: %d [interpret/interpreter.c]\n", expr->type);
+            fprintf(stderr, "    Unhandled Expression Node type: %d [interpret/interpreter.c]\n", expr->type);
     }
 }
 
@@ -236,7 +236,7 @@ void interpret(StmtNode *stmt) {
             break;
         }
         default:
-            fprintf(stderr, "Unhandled Statement Node type: %d [interpret/interpreter.c]\n", stmt->type);
+            fprintf(stderr, "    Unhandled Statement Node type: %d [interpret/interpreter.c]\n", stmt->type);
     }
 }
 
