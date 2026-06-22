@@ -11,13 +11,29 @@
 #include "../debug/debugInfos.h"
 #include "../util/HashMap.h"
 
+void addParameters(Parser *parser, FunctionDeclaration declaration) {
+    for (u32 i = 0; i < declaration.parameters->length; i++) {
+        Parameter parameter = ArrayListRead(declaration.parameters, i, Parameter);
+        if (varInCurrentScope(parser, parameter.name))
+            parseError(parser, "Parameter \"%s\" used twice in function declaration of function \"%s\"", parameter.name, declaration.name);
+        createVar(parser, parameter.name, (Variable) {parameter.type});
+    }
+}
+
 void parseFunction(Parser *parser, FunctionDeclaration declaration) {
     // set parser to beginning of function and parse body as block
     parser->token = declaration.start;
     advance(parser);
     consume(parser, TOKEN_LEFT_BRACE, " after function declaration");
 
+    // scope for parameters
+    beginScope(parser);
+
+    addParameters(parser, declaration);
+
     StmtBlockNode *body = (StmtBlockNode*) blockStmt(parser);
+
+    endScope(parser);
 
     // add body to Function in HashMap
     StmtFunction function;
