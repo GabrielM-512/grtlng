@@ -20,10 +20,7 @@ typedef struct {
     HashMap functions;
 } Interpreter;
 
-Interpreter interpreter = {
-    nullptr,
-    {}
-};
+Interpreter interpreter;
 
 void interpret(StmtNode *stmt);
 
