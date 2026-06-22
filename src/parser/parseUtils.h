@@ -16,12 +16,6 @@ bool matchTypeIdent(Parser *parser);
 void synchronise(Parser *parser);
 
 
-// used for enqueuing function declarations
-typedef struct {
-    char *name;
-    u32 start;
-} FunctionDeclaration;
-
 typedef struct {
     TokenType type;
 } Variable;
