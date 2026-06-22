@@ -8,6 +8,7 @@
 #include "statements.h"
 
 #include "../error.h"
+#include "../debug/debugInfos.h"
 #include "../util/HashMap.h"
 
 void parseFunction(Parser *parser, FunctionDeclaration declaration) {
@@ -78,6 +79,18 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
         fprintf(stderr, "Encountered error in program: No main function in program\n");
         parser->hadError = true;
         return parser->program;
+    }
+
+    StmtFunction main;
+    HashMapGet(&parser->program.functions, "main", &main);
+
+    switch (main.returns) {
+        case TOKEN_VOID:
+        case TOKEN_I32:
+            break;
+        default:
+            fprintf(stderr, "Encountered error in program: Main function must be of return type \"i32\" or \"void\", was defined as %s instead\n", getTokenSymbol(main.returns));
+            return parser->program;
     }
 
     ExprCallNode *mainCall = ALLOC_NODE(ExprCallNode);
