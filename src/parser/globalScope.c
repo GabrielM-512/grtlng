@@ -6,6 +6,7 @@
 #include "expressions.h"
 
 #include "../error.h"
+#include "../debug/debugInfos.h"
 #include "../util/ArrayList.h"
 
 // todo: also skips next function declaration after the current error
@@ -49,20 +50,24 @@ StmtNode *functionDeclaration(Parser *parser, char *name) {
     return (StmtNode*) function;
 }
 
-StmtNode *variableDeclaration(Parser *parser, TokenType dataType) {
+StmtNode *variableDeclaration(Parser *parser, char *name, TokenType dataType) {
     StmtVarDeclNode *node = ALLOC_NODE(StmtVarDeclNode);
 
     node->header.type = STMT_VAR_DEC;
-    node->name = parser->previous.data;
+    node->name = name;
     node->varType = dataType;
 
     Variable var = {dataType};
 
     if (HashMapHas(&parser->program.functions, node->name)) {
-        parseError(parser, "Global variable \"%s\" has already been declared as a function");
+        parseError(parser, "Global variable \"%s\" has already been declared as a function", name);
     }
 
-    createCurrentScopeVar(parser, node->name, var);
+    if (varInCurrentScope(parser, name)) {
+        parseError(parser, "Global variable \"%s\" has already been declared", name);
+    }
+
+    createVar(parser, node->name, var);
 
     node->value = nullptr;
 
@@ -95,7 +100,7 @@ StmtNode *globalDeclaration(Parser *parser) {
     if (match(parser, TOKEN_LEFT_PAREN)) return functionDeclaration(parser, name);
 
     // it's a variable
-    return variableDeclaration(parser, dataType);
+    return variableDeclaration(parser, name, dataType);
 
 }
 
