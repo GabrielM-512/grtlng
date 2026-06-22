@@ -79,7 +79,12 @@ void printExpr(ExprNode *expr) {
             break;
 
         case EXPR_CALL:
-            printf("%s()", ((ExprCallNode*) expr)->target);
+            printf("%s(", ((ExprCallNode*) expr)->target);
+            for (u32 i = 0; i < ((ExprCallNode*) expr)->args->length; i++) {
+                printExpr(ArrayListRead(((ExprCallNode*) expr)->args, i, ExprNode*));
+            }
+
+            printf(")");
             break;
 
         default:

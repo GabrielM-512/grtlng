@@ -35,14 +35,38 @@ ExprNode *call(Parser *parser, ExprNode *left) {
     ExprCallNode *node = ALLOC_NODE(ExprCallNode);
 
     node->header.type = EXPR_CALL;
+    node->args = ArrayListNew(sizeof(ExprNode*));
+
+    u32 functionArity;
 
     switch (left->type) {
         case EXPR_VAR:
             node->target = ((ExprVarNode*) left)->name;
+
+            StmtFunction function;
+            HashMapGet(&parser->program.functions, node->target, &function);
+            functionArity = function.parameters->length;
+
             break;
         default:
             parseError(parser, "Invalid assignment target");
+            functionArity = 0;
     }
+
+    u32 paramsPassed = 0;
+
+    if (!check(parser, TOKEN_RIGHT_PAREN)) {
+        do {
+            ExprNode *param = expression(parser);
+            ArrayListAdd(node->args, &param);
+            paramsPassed++;
+        } while (match(parser, TOKEN_COMMA));
+
+    }
+
+    if (functionArity != paramsPassed)
+        parseError(parser, "Function \"%s\" expects %u arguments, %u were passed instead", node->target, functionArity, paramsPassed);
+
 
     consume(parser, TOKEN_RIGHT_PAREN, " after function arguments");
 

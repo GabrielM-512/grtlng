@@ -68,6 +68,7 @@ typedef struct {
 typedef struct {
     ExprNode header;
     char *target;
+    ArrayList *args;
 } ExprCallNode;
 
 typedef struct {
