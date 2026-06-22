@@ -36,7 +36,34 @@ StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) 
         parseError(parser, "Function \"%s\" has already been declared as a global variable", name);
     }
 
-    // check for parameters here
+    ArrayList *parameters = ArrayListNew(sizeof(Parameter));
+
+    // left parenthesis has already been consumed
+
+    if (isTypeIdent(parser)) {
+        // parse parameters
+        do {
+            if (!matchTypeIdent(parser)) {
+                parseErrorAtCurrent(parser, "Expected type identifier after comma, got %s instead", getTokenSymbol(parser->current.type));
+                // skip remaining parameters
+                while (!check(parser, TOKEN_RIGHT_PAREN) && !check(parser, TOKEN_EOF)) advance(parser);
+                break;
+            }
+
+            TokenType type = parser->previous.type;
+
+            consume(parser, TOKEN_IDENTIFIER, " after parameter type");
+
+            char *paramName = parser->previous.data;
+
+            Parameter parameter = {
+                type,
+                paramName
+            };
+            ArrayListAdd(parameters, &parameter);
+
+        } while (match(parser, TOKEN_COMMA));
+    }
 
     consume(parser, TOKEN_RIGHT_PAREN, " after function parameters");
 
@@ -48,6 +75,8 @@ StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) 
     function->returns = returnType;
 
     function->body = nullptr;
+
+    function->parameters = parameters;
 
     return (StmtNode*) function;
 }
