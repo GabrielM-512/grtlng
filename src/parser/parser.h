@@ -110,6 +110,14 @@ typedef struct {
     StmtNode header;
     char *name;
     StmtBlockNode *body;
+    ArrayList *parameters;
 } StmtFunction;
+
+
+
+typedef struct {
+    TokenType type;
+    char *name;
+} Parameter;
 
 ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source);

@@ -122,7 +122,7 @@ ArrayList *parseGlobals(Parser *parser) {
                 StmtFunction *funNode = (StmtFunction*) node;
 
                 // subtract 1 because parser->token points to current, not to previous
-                FunctionDeclaration fun = {funNode->name, parser->token - 1};
+                FunctionDeclaration fun = {funNode->name, parser->token - 1, funNode->parameters};
 
                 // add to queue
                 ArrayListAdd(functions, &fun);
