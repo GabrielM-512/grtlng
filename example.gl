@@ -1,4 +1,4 @@
-i16 main() {
+i32 main() {
     i16 someVar = 19 + 5 / 7 + (2 * 4);
     i16 other = someVar - 6;
     someVar / other;
