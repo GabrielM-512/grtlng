@@ -106,6 +106,7 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
             break;
         default:
             fprintf(stderr, "Encountered error in program: Main function must be of return type \"i32\" or \"void\", was defined as %s instead\n", getTokenSymbol(main.returns));
+            parser->hadError = true;
             return parser->program;
     }
 
