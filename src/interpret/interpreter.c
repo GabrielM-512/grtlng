@@ -18,6 +18,8 @@ typedef struct {
     Environment *env;
     Environment *global;
     HashMap functions;
+    bool returning;
+    Value returnValue;
 } Interpreter;
 
 Interpreter interpreter;
@@ -94,6 +96,47 @@ Value getVar(char *name) {
 
 }
 
+f64 interpretNumExpr(ExprNode *expr);
+
+
+f64 interpretCall(ExprCallNode *call) {
+
+    StmtFunction function;
+    HashMapGet(&interpreter.functions, call->target, &function);
+
+    ArrayList *params = ArrayListNew(sizeof(Value));
+
+    for (u32 i = 0; i < call->args->length; i++) {
+        Value val;
+        val.value = interpretNumExpr(ArrayListRead(call->args, i, ExprNode*));
+        ArrayListAdd(params, &val);
+    }
+
+    Environment *old = interpreter.env;
+    interpreter.env = interpreter.global;
+
+
+    startEnvironment();
+
+    for (u32 i = 0; i < call->args->length; i++) {
+        createVar(ArrayListRead(function.parameters, i, Parameter).name, &ArrayListRead(params, i, Value));
+    }
+
+    StmtBlockNode *body = function.body;
+    interpret((StmtNode*) body);
+
+    endEnvironment();
+
+    interpreter.env = old;
+
+    interpreter.returning = false;
+
+    Value returns = interpreter.returnValue;
+
+    interpreter.returnValue.value = NAN;
+
+    return returns.value;
+}
 
 f64 interpretNumExpr(ExprNode *expr) {
     switch (expr->type) {
@@ -145,6 +188,9 @@ f64 interpretNumExpr(ExprNode *expr) {
             }
         }
 
+        case EXPR_CALL:
+            return interpretCall((ExprCallNode*) expr);
+
 
         default:
             fprintf(stderr, "Non-expression node in expression AST: %d\n", expr->type);
@@ -155,50 +201,17 @@ f64 interpretNumExpr(ExprNode *expr) {
 }
 
 void interpretExpr(ExprNode *expr) {
-    // todo: change call to interpretNumExpr (handle returns)
     switch (expr->type) {
         case EXPR_UNARY_EXPR:
         case EXPR_NUMBER:
         case EXPR_BINARY_EXPR:
         case EXPR_VAR:
+        case EXPR_CALL:
             printf("%f", interpretNumExpr(expr));
             break;
         case EXPR_VAR_ASSIGN:
             interpretNumExpr(expr);
             break;
-        case EXPR_CALL: {
-            ExprCallNode *node = (ExprCallNode*) expr;
-
-            StmtFunction function;
-            HashMapGet(&interpreter.functions, node->target, &function);
-
-            ArrayList *params = ArrayListNew(sizeof(Value));
-
-            for (u32 i = 0; i < node->args->length; i++) {
-                Value val;
-                val.value = interpretNumExpr(ArrayListRead(node->args, i, ExprNode*));
-                ArrayListAdd(params, &val);
-            }
-
-            Environment *old = interpreter.env;
-            interpreter.env = interpreter.global;
-
-
-            startEnvironment();
-
-            for (u32 i = 0; i < node->args->length; i++) {
-                createVar(ArrayListRead(function.parameters, i, Parameter).name, &ArrayListRead(params, i, Value));
-            }
-
-            StmtBlockNode *body = function.body;
-            interpret((StmtNode*) body);
-
-            endEnvironment();
-
-            interpreter.env = old;
-
-            break;
-        }
 
         default:
             fprintf(stderr, "    Unhandled Expression Node type: %d [interpret/interpreter.c]\n", expr->type);
@@ -230,9 +243,19 @@ void interpret(StmtNode *stmt) {
 
             for (u32 i = 0; i < block->content->length; i++) {
                 interpret(ArrayListRead(block->content, i, StmtNode*));
+                if (interpreter.returning) break;
             }
 
             endEnvironment();
+            break;
+        }
+        case STMT_RETURN: {
+            StmtReturn *node = (StmtReturn*) stmt;
+
+            if (node->value != nullptr) interpreter.returnValue.value = interpretNumExpr(node->value);
+
+            interpreter.returning = true;
+
             break;
         }
         default:
