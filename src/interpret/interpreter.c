@@ -174,11 +174,28 @@ void interpretExpr(ExprNode *expr) {
             StmtFunction function;
             HashMapGet(&interpreter.functions, node->target, &function);
 
+            ArrayList *params = ArrayListNew(sizeof(Value));
+
+            for (u32 i = 0; i < node->args->length; i++) {
+                Value val;
+                val.value = interpretNumExpr(ArrayListRead(node->args, i, ExprNode*));
+                ArrayListAdd(params, &val);
+            }
+
             Environment *old = interpreter.env;
             interpreter.env = interpreter.global;
 
+
+            startEnvironment();
+
+            for (u32 i = 0; i < node->args->length; i++) {
+                createVar(ArrayListRead(function.parameters, i, Parameter).name, &ArrayListRead(params, i, Value));
+            }
+
             StmtBlockNode *body = function.body;
             interpret((StmtNode*) body);
+
+            endEnvironment();
 
             interpreter.env = old;
 
