@@ -7,4 +7,9 @@ i16 main() {
         someVar;
     }
     someVar;
+    add(5, 15);
+}
+
+i16 add(i16 a, i16 b) {
+    a + b;
 }
