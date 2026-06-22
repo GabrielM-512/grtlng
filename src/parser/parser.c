@@ -77,17 +77,18 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
     if (!HashMapHas(&parser->program.functions, "main")) {
         fprintf(stderr, "Encountered error in program: No main function in program\n");
         parser->hadError = true;
-    } else {
-        ExprCallNode *mainCall = ALLOC_NODE(ExprCallNode);
-        mainCall->header.type = EXPR_CALL;
-        mainCall->target = "main";
-
-        StmtExprNode *call = ALLOC_NODE(StmtExprNode);
-        call->header.type = STMT_EXPR;
-        call->expr = (ExprNode*) mainCall;
-
-        ArrayListAdd(parser->program.tree, &call);
+        return parser->program;
     }
+
+    ExprCallNode *mainCall = ALLOC_NODE(ExprCallNode);
+    mainCall->header.type = EXPR_CALL;
+    mainCall->target = "main";
+
+    StmtExprNode *call = ALLOC_NODE(StmtExprNode);
+    call->header.type = STMT_EXPR;
+    call->expr = (ExprNode*) mainCall;
+
+    ArrayListAdd(parser->program.tree, &call);
 
     return parser->program;
 }
