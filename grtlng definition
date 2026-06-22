@@ -33,5 +33,3 @@ Variables may shadow other variables from enclosing scopes.
 If a Variable shadows another variable from an enclosing scope, it may not use that variable's value in its own declaration.
 
 Functions may only be declared in the global scope.
-
-A function's parameters are treated to be in the same scope as the function's code.
