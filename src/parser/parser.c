@@ -83,6 +83,7 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
     ExprCallNode *mainCall = ALLOC_NODE(ExprCallNode);
     mainCall->header.type = EXPR_CALL;
     mainCall->target = "main";
+    mainCall->args = ArrayListNew(sizeof(ExprNode*));
 
     StmtExprNode *call = ALLOC_NODE(StmtExprNode);
     call->header.type = STMT_EXPR;
