@@ -62,6 +62,22 @@ StmtNode *exprStmt(Parser *parser) {
     return (StmtNode*) node;
 }
 
+StmtNode *returnStmt(Parser *parser) {
+    // todo: check what values are allowed (void vs. number etc)
+    // todo: check whether all paths properly return
+    StmtReturn *node = ALLOC_NODE(StmtReturn);
+
+    node->header.type = STMT_RETURN;
+
+    node->value = nullptr;
+
+    if (!check(parser, TOKEN_SEMICOLON)) node->value = expression(parser);
+
+    consume(parser, TOKEN_SEMICOLON, " after return statement");
+
+    return (StmtNode*) node;
+}
+
 StmtNode *blockStmt(Parser *parser) {
 
     StmtBlockNode *node = ALLOC_NODE(StmtBlockNode);
@@ -81,6 +97,7 @@ StmtNode *blockStmt(Parser *parser) {
         StmtNode *next;
 
         if (matchTypeIdent(parser)) next = localVarDeclStmt(parser);
+        else if (match(parser, TOKEN_RETURN)) next = returnStmt(parser);
         else next = parseStmt(parser);
 
         ArrayListAdd(node->content, &next);

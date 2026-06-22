@@ -8,10 +8,12 @@ varDecl        → TYPE IDENTIFIER ( "=" expression )? ";" ;
 block          → "{" ( declaration | statement )* "}" ;
 
 statement      → exprStmt
-               | block ;
+               | block
+               | returnStmt;
 
 exprStmt       → expression ";" ;
 
+returnStmt     → "return" expression ? ";" ;
 
 function       → IDENTIFIER "(" parameters? ")" block ;
 parameters     → TYPE IDENTIFIER ( "," TYPE IDENTIFIER )* ;

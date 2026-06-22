@@ -83,6 +83,7 @@ typedef enum {
     STMT_FUN_DEC,
     STMT_EXPR,
     STMT_BLOCK,
+    STMT_RETURN,
 } StmtNodeType;
 
 typedef struct {
@@ -114,6 +115,11 @@ typedef struct {
     StmtBlockNode *body;
     ArrayList *parameters;
 } StmtFunction;
+
+typedef struct {
+    StmtNode header;
+    ExprNode *value;
+} StmtReturn;
 
 
 

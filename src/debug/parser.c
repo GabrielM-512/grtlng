@@ -124,6 +124,14 @@ void printStmt(StmtNode *stmt) {
         case STMT_BLOCK:
             printBlock((StmtBlockNode*) stmt);
             break;
+        case STMT_RETURN:
+            printf("    Return ");
+            if (((StmtReturn*) stmt)->value == nullptr) printf("without value");
+            else {
+                printf("with value ");
+                printExpr(((StmtReturn*) stmt)->value);
+                break;
+            }
         default:
             fprintf(stderr, "    Unhandled Statement Node type: %d [debug/parser.c]\n", stmt->type);
     }
