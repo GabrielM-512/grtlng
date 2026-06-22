@@ -28,7 +28,7 @@ void globalSynchronise(Parser *parser) {
     }
 }
 
-StmtNode *functionDeclaration(Parser *parser, char *name) {
+StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) {
     if (HashMapHas(&parser->program.functions, name)) {
         parseError(parser, "Function \"%s\" has already been declared", name);
     }
@@ -44,6 +44,8 @@ StmtNode *functionDeclaration(Parser *parser, char *name) {
 
     function->header.type = STMT_FUN_DEC;
     function->name = name;
+
+    function->returns = returnType;
 
     function->body = nullptr;
 
@@ -97,7 +99,7 @@ StmtNode *globalDeclaration(Parser *parser) {
 
     char *name = parser->previous.data;
 
-    if (match(parser, TOKEN_LEFT_PAREN)) return functionDeclaration(parser, name);
+    if (match(parser, TOKEN_LEFT_PAREN)) return functionDeclaration(parser, name, dataType);
 
     // it's a variable
     return variableDeclaration(parser, name, dataType);

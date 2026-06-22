@@ -108,6 +108,7 @@ typedef struct {
 
 typedef struct {
     StmtNode header;
+    TokenType returns;
     char *name;
     StmtBlockNode *body;
     ArrayList *parameters;
