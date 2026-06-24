@@ -60,9 +60,7 @@ ExprNode *call(Parser *parser, ExprNode *left) {
         case EXPR_VAR:
             node->target = ((ExprVarNode*) left)->name;
 
-            StmtFunction function;
-            HashMapGet(&parser->program.functions, node->target, &function);
-            functionArity = function.parameters->length;
+            functionArity = getFunction(parser, node->target).parameters->length;
 
             break;
         default:

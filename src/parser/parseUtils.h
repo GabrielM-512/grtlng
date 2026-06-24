@@ -15,6 +15,8 @@ bool matchTypeIdent(Parser *parser);
 
 void synchronise(Parser *parser);
 
+StmtFunction getFunction(Parser *parser, char *name);
+
 
 typedef struct {
     TokenType type;

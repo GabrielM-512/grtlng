@@ -36,8 +36,7 @@ void parseFunction(Parser *parser, FunctionDeclaration declaration) {
     endScope(parser);
 
     // add body to Function in HashMap
-    StmtFunction function;
-    HashMapGet(&parser->program.functions, declaration.name, &function);
+    StmtFunction function = getFunction(parser, declaration.name);
     function.body = body;
 
     HashMapSet(&parser->program.functions, function.name, &function);
@@ -97,8 +96,7 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
         return parser->program;
     }
 
-    StmtFunction main;
-    HashMapGet(&parser->program.functions, "main", &main);
+    StmtFunction main = getFunction(parser, "main");
 
     switch (main.returns) {
         case TOKEN_VOID:
