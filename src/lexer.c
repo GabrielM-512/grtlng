@@ -139,11 +139,13 @@ Token checkKeyword(const Lexer *lexer, const u16 start, const char *remaining, T
 
 Token keyword(const Lexer *lexer) {
     switch (lexer->source[lexer->base]) {
+        case 'e': return checkKeyword(lexer, 1, "lse", TOKEN_ELSE);
         case 'i':
             switch (lexer->source[lexer->base + 1]) {
                 case '1': return checkKeyword(lexer, 2, "6", TOKEN_I16);
                 case '3': return checkKeyword(lexer, 2, "2", TOKEN_I32);
                 case '6': return checkKeyword(lexer, 2, "4", TOKEN_I64);
+                case 'f': return checkKeyword(lexer, 2, "", TOKEN_IF);
                 default:
             }
             break;

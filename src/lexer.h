@@ -71,6 +71,9 @@ typedef enum {
     TOKEN_RETURN,
     TOKEN_EXTERN,
 
+    TOKEN_IF,
+    TOKEN_ELSE,
+
     TOKEN_LAST // a marker token to always be the last token
 } TokenType;
 

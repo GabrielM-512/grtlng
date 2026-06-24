@@ -126,7 +126,9 @@ char *getTokenSymbol(TokenType type) {
         [TOKEN_U64] = "\"u64\"",
         [TOKEN_VOID] = "\"void\"",
         [TOKEN_RETURN] = "\"return\"",
-        [TOKEN_EXTERN] = "\"extern\""
+        [TOKEN_EXTERN] = "\"extern\"",
+        [TOKEN_IF] = "\"if\"",
+        [TOKEN_ELSE] = "\"else\""
     };
 
     return table[type];
