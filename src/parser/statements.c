@@ -113,6 +113,7 @@ StmtNode *parseStmt(Parser *parser) {
     StmtNode* node;
 
     if (match(parser, TOKEN_LEFT_BRACE)) node = blockStmt(parser);
+    else if (match(parser, TOKEN_RETURN)) node = returnStmt(parser);
     else node = exprStmt(parser);
 
 
