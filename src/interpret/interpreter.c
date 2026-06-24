@@ -138,6 +138,11 @@ f64 interpretCall(ExprCallNode *call) {
     return returns.value;
 }
 
+bool isTruthy(Value val) {
+    return val.value != 0;
+}
+
+
 f64 evaluateNum(ExprNode *expr) {
     switch (expr->type) {
         case EXPR_UNARY_EXPR: {
@@ -257,6 +262,18 @@ void interpret(StmtNode *stmt) {
 
             interpreter.returning = true;
 
+            break;
+        }
+        case STMT_IF: {
+            StmtIfNode *node = (StmtIfNode*) stmt;
+
+            if (isTruthy((Value) {
+                evaluateNum(node->condition)
+            })) {
+                interpret(node->thenBranch);
+            } else if (node->elseBranch != nullptr) {
+                interpret(node->elseBranch);
+            }
             break;
         }
         default:
