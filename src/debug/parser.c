@@ -126,10 +126,10 @@ void printStmt(StmtNode *stmt) {
             break;
         case STMT_RETURN:
             printf("    Return ");
-            if (((StmtReturn*) stmt)->value == nullptr) printf("without value");
+            if (((StmtReturnNode*) stmt)->value == nullptr) printf("without value");
             else {
                 printf("with value ");
-                printExpr(((StmtReturn*) stmt)->value);
+                printExpr(((StmtReturnNode*) stmt)->value);
             }
             break;
         default:

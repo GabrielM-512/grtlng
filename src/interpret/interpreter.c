@@ -251,7 +251,7 @@ void interpret(StmtNode *stmt) {
             break;
         }
         case STMT_RETURN: {
-            StmtReturn *node = (StmtReturn*) stmt;
+            StmtReturnNode *node = (StmtReturnNode*) stmt;
 
             if (node->value != nullptr) interpreter.returnValue.value = evaluateNum(node->value);
 

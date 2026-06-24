@@ -91,16 +91,17 @@ typedef struct {
 
 typedef struct {
     StmtNode header;
+    ExprNode *value;
+} StmtReturnNode;
+
+
+typedef struct {
+    StmtNode header;
     TokenType returns;
     char *name;
     StmtBlockNode *body;
     ArrayList *parameters;
 } StmtFunction;
-
-typedef struct {
-    StmtNode header;
-    ExprNode *value;
-} StmtReturn;
 
 
 typedef struct {

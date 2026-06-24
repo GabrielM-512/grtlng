@@ -65,7 +65,7 @@ StmtNode *exprStmt(Parser *parser) {
 StmtNode *returnStmt(Parser *parser) {
     // todo: check what values are allowed (void vs. number etc)
     // todo: check whether all paths properly return
-    StmtReturn *node = ALLOC_NODE(StmtReturn);
+    StmtReturnNode *node = ALLOC_NODE(StmtReturnNode);
 
     node->header.type = STMT_RETURN;
 
