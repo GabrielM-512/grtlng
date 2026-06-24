@@ -6,25 +6,6 @@
 
 #include "../lexer.h"
 
-typedef struct {
-    ArenaAllocator* data;
-    ArrayList *tree;
-    HashMap functions;
-} ParseResult;
-
-struct Scope;
-
-typedef struct {
-    ParseResult program;
-    ArrayList *Tokens;
-    u32 token;
-    Token current, previous;
-    bool inGlobalPhase;
-    bool hadError, panicMode;
-    const char *source;
-    struct Scope *currentScope;
-} Parser;
-
 
 typedef enum {
     EXPR_BINARY_EXPR,
@@ -121,6 +102,26 @@ typedef struct {
     ExprNode *value;
 } StmtReturn;
 
+
+typedef struct {
+    ArenaAllocator* data;
+    ArrayList *tree;
+    HashMap functions;
+    ExprCallNode main;
+} ParseResult;
+
+struct Scope;
+
+typedef struct {
+    ParseResult program;
+    ArrayList *Tokens;
+    u32 token;
+    Token current, previous;
+    bool inGlobalPhase;
+    bool hadError, panicMode;
+    const char *source;
+    struct Scope *currentScope;
+} Parser;
 
 
 typedef struct {

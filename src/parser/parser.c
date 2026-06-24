@@ -108,16 +108,12 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
             return parser->program;
     }
 
-    ExprCallNode *mainCall = ALLOC_NODE(ExprCallNode);
-    mainCall->header.type = EXPR_CALL;
-    mainCall->target = "main";
-    mainCall->args = ArrayListNew(sizeof(ExprNode*));
+    ExprCallNode mainCall;
+    mainCall.header.type = EXPR_CALL;
+    mainCall.target = "main";
+    mainCall.args = ArrayListNew(sizeof(ExprNode*));
 
-    StmtExprNode *call = ALLOC_NODE(StmtExprNode);
-    call->header.type = STMT_EXPR;
-    call->expr = (ExprNode*) mainCall;
-
-    ArrayListAdd(parser->program.tree, &call);
+    parser->program.main = mainCall;
 
     return parser->program;
 }
