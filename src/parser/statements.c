@@ -17,6 +17,25 @@
     SSSS      T     A   A     T     EEEEE   M   M   EEEEE   N   N     T     SSSS
  */
 
+StmtNode *ifStmt(Parser *parser) {
+    StmtIfNode *node = ALLOC_NODE(StmtIfNode);
+
+    node->header.type = STMT_IF;
+
+    consume(parser, TOKEN_LEFT_PAREN, " after if");
+
+    node->condition = expression(parser);
+
+    consume(parser, TOKEN_RIGHT_PAREN, " after condition");
+
+    node->thenBranch = parseStmt(parser);
+
+    if (match(parser, TOKEN_ELSE)) node->elseBranch = parseStmt(parser);
+    else node->elseBranch = nullptr;
+
+    return (StmtNode*) node;
+}
+
 StmtNode *localVarDeclStmt(Parser *parser) {
     StmtVarDeclNode *node = ALLOC_NODE(StmtVarDeclNode);
 
@@ -113,6 +132,7 @@ StmtNode *parseStmt(Parser *parser) {
     StmtNode* node;
 
     if (match(parser, TOKEN_LEFT_BRACE)) node = blockStmt(parser);
+    else if (match(parser, TOKEN_IF)) node = ifStmt(parser);
     else if (match(parser, TOKEN_RETURN)) node = returnStmt(parser);
     else node = exprStmt(parser);
 

@@ -65,6 +65,7 @@ typedef enum {
     STMT_EXPR,
     STMT_BLOCK,
     STMT_RETURN,
+    STMT_IF,
 } StmtNodeType;
 
 typedef struct {
@@ -93,6 +94,13 @@ typedef struct {
     StmtNode header;
     ExprNode *value;
 } StmtReturnNode;
+
+typedef struct {
+    StmtNode header;
+    ExprNode *condition;
+    StmtNode *thenBranch;
+    StmtNode *elseBranch;
+} StmtIfNode;
 
 
 typedef struct {

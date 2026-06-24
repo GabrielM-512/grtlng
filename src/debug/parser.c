@@ -112,6 +112,19 @@ void printBlock(StmtBlockNode *block) {
     printf("    End block");
 }
 
+void printIf(StmtIfNode *stmt) {
+    printf("    IF ");
+    printExpr(stmt->condition);
+    printf(" THEN\n");
+    printStmt(stmt->thenBranch);
+
+    if (stmt->elseBranch == nullptr) printf("    NO ELSE");
+    else {
+        printf("    ELSE\n");
+        printStmt(stmt->elseBranch);
+    }
+}
+
 void printStmt(StmtNode *stmt) {
     switch (stmt->type) {
         case STMT_EXPR:
@@ -131,6 +144,9 @@ void printStmt(StmtNode *stmt) {
                 printf("with value ");
                 printExpr(((StmtReturnNode*) stmt)->value);
             }
+            break;
+        case STMT_IF:
+            printIf((StmtIfNode*) stmt);
             break;
         default:
             fprintf(stderr, "    Unhandled Statement Node type: %d [debug/parser.c]\n", stmt->type);
