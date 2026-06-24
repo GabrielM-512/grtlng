@@ -96,7 +96,7 @@ Value getVar(char *name) {
 
 }
 
-f64 interpretNumExpr(ExprNode *expr);
+f64 evaluateNum(ExprNode *expr);
 
 
 f64 interpretCall(ExprCallNode *call) {
@@ -108,7 +108,7 @@ f64 interpretCall(ExprCallNode *call) {
 
     for (u32 i = 0; i < call->args->length; i++) {
         Value val;
-        val.value = interpretNumExpr(ArrayListRead(call->args, i, ExprNode*));
+        val.value = evaluateNum(ArrayListRead(call->args, i, ExprNode*));
         ArrayListAdd(params, &val);
     }
 
@@ -138,13 +138,13 @@ f64 interpretCall(ExprCallNode *call) {
     return returns.value;
 }
 
-f64 interpretNumExpr(ExprNode *expr) {
+f64 evaluateNum(ExprNode *expr) {
     switch (expr->type) {
         case EXPR_UNARY_EXPR: {
             ExprUnaryNode *node = (ExprUnaryNode*) expr;
             switch (node->operator) {
                 case TOKEN_MINUS:
-                    return -interpretNumExpr(node->right);
+                    return -evaluateNum(node->right);
                 default:
             }
 
@@ -154,13 +154,13 @@ f64 interpretNumExpr(ExprNode *expr) {
             ExprBinaryNode *node = (ExprBinaryNode*) expr;
             switch (node->operator) {
                 case TOKEN_PLUS:
-                    return interpretNumExpr(node->left) + interpretNumExpr(node->right);
+                    return evaluateNum(node->left) + evaluateNum(node->right);
                 case TOKEN_MINUS:
-                    return interpretNumExpr(node->left) - interpretNumExpr(node->right);
+                    return evaluateNum(node->left) - evaluateNum(node->right);
                 case TOKEN_STAR:
-                    return interpretNumExpr(node->left) * interpretNumExpr(node->right);
+                    return evaluateNum(node->left) * evaluateNum(node->right);
                 case TOKEN_SLASH:
-                    return interpretNumExpr(node->left) / interpretNumExpr(node->right);
+                    return evaluateNum(node->left) / evaluateNum(node->right);
                 default:
             }
         }
@@ -177,7 +177,7 @@ f64 interpretNumExpr(ExprNode *expr) {
             switch (node->target->type) {
                 case EXPR_VAR: {
                     ExprVarNode *target = (ExprVarNode*) node->target;
-                    Value val = {interpretNumExpr(node->value)};
+                    Value val = {evaluateNum(node->value)};
                     setVar(target->name, &val);
                     return val.value;
                 }
@@ -200,17 +200,17 @@ f64 interpretNumExpr(ExprNode *expr) {
     return NAN;
 }
 
-void interpretExpr(ExprNode *expr) {
+void evaluate(ExprNode *expr) {
     switch (expr->type) {
         case EXPR_UNARY_EXPR:
         case EXPR_NUMBER:
         case EXPR_BINARY_EXPR:
         case EXPR_VAR:
         case EXPR_CALL:
-            printf("%f", interpretNumExpr(expr));
+            printf("%f", evaluateNum(expr));
             break;
         case EXPR_VAR_ASSIGN:
-            interpretNumExpr(expr);
+            evaluateNum(expr);
             break;
 
         default:
@@ -222,7 +222,7 @@ void interpret(StmtNode *stmt) {
 
     switch (stmt->type) {
         case STMT_EXPR:
-            interpretExpr(((StmtExprNode*) stmt)->expr);
+            evaluate(((StmtExprNode*) stmt)->expr);
             printf("\n");
             break;
         case STMT_VAR_DEC: {
@@ -231,7 +231,7 @@ void interpret(StmtNode *stmt) {
             Value val;
 
             if (node->value != nullptr) {
-                val.value = interpretNumExpr(node->value);
+                val.value = evaluateNum(node->value);
             }
 
             createVar(node->name, &val);
@@ -252,7 +252,7 @@ void interpret(StmtNode *stmt) {
         case STMT_RETURN: {
             StmtReturn *node = (StmtReturn*) stmt;
 
-            if (node->value != nullptr) interpreter.returnValue.value = interpretNumExpr(node->value);
+            if (node->value != nullptr) interpreter.returnValue.value = evaluateNum(node->value);
 
             interpreter.returning = true;
 
