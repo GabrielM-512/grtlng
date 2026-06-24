@@ -130,8 +130,8 @@ void printStmt(StmtNode *stmt) {
             else {
                 printf("with value ");
                 printExpr(((StmtReturn*) stmt)->value);
-                break;
             }
+            break;
         default:
             fprintf(stderr, "    Unhandled Statement Node type: %d [debug/parser.c]\n", stmt->type);
     }
@@ -142,14 +142,16 @@ void printProgram(ParseResult program) {
     printf("init:\n");
     for (u32 i = 0; i < program.tree->length; i++) {
         printStmt(ArrayListRead(program.tree, i, StmtNode*));
-        printf("\n");
+        putchar('\n');
     }
+
+    putchar('\n');
 
     ArrayList *functions = HashMapAll(&program.functions);
     for (u32 i = 0; i < functions->length; i++) {
         StmtFunction current = ArrayListRead(functions, i, StmtFunction);
         printf("%s:\n", current.name);
         printBlock(current.body);
-        putchar('\n');
+        printf("\n\n");
     }
 }
