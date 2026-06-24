@@ -93,7 +93,7 @@ int main(const int argc, char* argv[]) {
 
 #endif
 
-    if (compileFlags.architecture == ARCH_INTERPRET) interpretProgram(ast);
+    if (compileFlags.architecture == ARCH_INTERPRET) return interpretProgram(ast);
 
 
 

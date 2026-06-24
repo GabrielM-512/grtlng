@@ -263,7 +263,7 @@ void interpret(StmtNode *stmt) {
     }
 }
 
-void interpretProgram(ParseResult program) {
+i32 interpretProgram(ParseResult program) {
     usleep(100000);
 
     // create starting environment
@@ -276,4 +276,7 @@ void interpretProgram(ParseResult program) {
     for (u32 i = 0; i < program.tree->length; i++) {
         interpret(ArrayListRead(program.tree, i, StmtNode*));
     }
+
+    return (i32) interpretCall(&program.main);
+
 }

@@ -2,4 +2,4 @@
 
 #include "../parser/parser.h"
 
-void interpretProgram(ParseResult program);
+i32 interpretProgram(ParseResult program);
