@@ -10,7 +10,7 @@ ArenaAllocator *text = nullptr;
 char* lookup[TOKEN_LAST];
 bool bHasFailed = false;
 
-void populate_table() {
+void populateTable() {
     if (bHasFailed) return;
 
     const TextFile file = textfileRead("/home/gabriel/CLionProjects/language/src/lexer.h");
@@ -39,31 +39,23 @@ void populate_table() {
         int tokenLength = 0;
 
         // search for token end
-        char c = file.source[start];
-        while (c != ',') {
-            tokenLength++;
-            c = file.source[start + tokenLength];
-        }
-        tokenLength++;
+        while (file.source[start + tokenLength] != ',') tokenLength++;
 
         // store into the lookup table
 
-        char *textdata = ArenaAlloc(text, tokenLength);
+        char *textdata = ArenaAlloc(text, tokenLength + 1);
 
         memcpy(textdata, &file.source[start], tokenLength);
-        textdata[tokenLength - 1] = '\0';
-
-        start += tokenLength;
+        textdata[tokenLength] = '\0';
 
         lookup[i] = textdata;
 
 
+        start += tokenLength;
+
         // skip whitespace
-        c = file.source[start];
-        while (c != 'T') {
-            start++;
-            c = file.source[start];
-        }
+
+        while (file.source[start] != 'T') start++;
 
     }
 
@@ -75,13 +67,13 @@ bool hasFailed() {
 }
 
 char *getTokenName(TokenType type) {
-    if (text == nullptr) populate_table();
+    if (text == nullptr) populateTable();
     if (bHasFailed) return "TOKEN NAME LOOKUP FAILED";
     return lookup[type];
 }
 
 char *getTokenType(TokenType type) {
-    if (text == nullptr) populate_table();
+    if (text == nullptr) populateTable();
     if (bHasFailed) return "TOKEN NAME LOOKUP FAILED";
     return lookup[type] + 6; // cut off "TOKEN_"
 }
