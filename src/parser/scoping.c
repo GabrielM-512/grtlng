@@ -61,3 +61,28 @@ void createCurrentScopeVar(Parser *parser, char *name, Variable var) {
     if (varInCurrentScope(parser, name)) parseError(parser, "Variable \"%s\" already declared in current scope", name);
     else createVar(parser, name, var);
 }
+
+Variable getVar(Parser *parser, char *name) {
+    Variable var = {
+        TOKEN_ERROR
+    };
+
+    Scope *scope = parser->currentScope;
+
+    while (true) {
+        // it exists
+        if (HashMapHas(&scope->variables, name)) {
+            HashMapGet(&scope->variables, name, &var);
+            break;
+        }
+
+        // it doesnt exist
+        if (scope->enclosing == nullptr) break;
+
+        // keep iterating
+        scope = scope->enclosing;
+    }
+
+
+    return var;
+}

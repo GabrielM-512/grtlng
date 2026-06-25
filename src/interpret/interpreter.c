@@ -73,7 +73,7 @@ void setVar(char *name, const Value *value) {
 
 }
 
-Value getVar(char *name) {
+static Value getVar(char *name) {
     Value val;
 
     Environment *env = interpreter.env;
