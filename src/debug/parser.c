@@ -1,6 +1,7 @@
 #include "parser.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "debugInfos.h"
 
@@ -28,22 +29,8 @@ void printUnary(ExprUnaryNode* expr) {
 void printBinary(ExprBinaryNode *expr) {
     printExpr(expr->left);
 
-    switch (expr->operator) {
-        case TOKEN_PLUS:
-            printf(" + ");
-            break;
-        case TOKEN_MINUS:
-            printf(" - ");
-            break;
-        case TOKEN_STAR:
-            printf(" * ");
-            break;
-        case TOKEN_SLASH:
-            printf(" / ");
-            break;
-        default:
-            printf("???");
-    }
+    printf(" %.*s ", (int) strlen(getTokenSymbol(expr->operator)) - 2, getTokenSymbol(expr->operator) + 1);
+
     printExpr(expr->right);
 }
 
