@@ -138,8 +138,8 @@ f64 interpretCall(ExprCallNode *call) {
     return returns.value;
 }
 
-bool isTruthy(Value val) {
-    return val.value != 0;
+bool isTruthy(f64 val) {
+    return val != 0;
 }
 
 
@@ -156,20 +156,35 @@ f64 evaluateNum(ExprNode *expr) {
         } break;
 
         case EXPR_BINARY_EXPR: {
+
+#define MAKE_OPERATION(type, operator) case type: return evaluateNum(node->left) operator evaluateNum(node->right)
+
             ExprBinaryNode *node = (ExprBinaryNode*) expr;
             switch (node->operator) {
-                case TOKEN_PLUS:
-                    return evaluateNum(node->left) + evaluateNum(node->right);
-                case TOKEN_MINUS:
-                    return evaluateNum(node->left) - evaluateNum(node->right);
-                case TOKEN_STAR:
-                    return evaluateNum(node->left) * evaluateNum(node->right);
-                case TOKEN_SLASH:
-                    return evaluateNum(node->left) / evaluateNum(node->right);
+                MAKE_OPERATION(TOKEN_PLUS, +);
+                MAKE_OPERATION(TOKEN_MINUS, -);
+                MAKE_OPERATION(TOKEN_STAR, *);
+                MAKE_OPERATION(TOKEN_SLASH, /);
+
+                MAKE_OPERATION(TOKEN_MORE, >);
+                MAKE_OPERATION(TOKEN_LESS, <);
+                MAKE_OPERATION(TOKEN_MORE_EQUALS, >=);
+                MAKE_OPERATION(TOKEN_LESS_EQUALS, <=);
+                MAKE_OPERATION(TOKEN_EQUALS_EQUALS, ==);
+                MAKE_OPERATION(TOKEN_BANG_EQUALS, !=);
+
+                case TOKEN_AMP_AMP:
+                    if (!isTruthy(evaluateNum(node->left))) return false;
+                    return isTruthy(evaluateNum(node->right));
+                case TOKEN_PIPE_PIPE:
+                    if (isTruthy(evaluateNum(node->left))) return true;
+                    return isTruthy(evaluateNum(node->right));
                 default:
+                    fprintf(stderr, "Interpreter cannot evaluate Binary Expression Token %s (%d)", getTokenSymbol(node->operator), node->operator);
+                    exit(1);
             }
+#undef MAKE_OPERATION
         }
-            break;
 
         case EXPR_NUMBER:
             return ((ExprNumberNode*) expr)->value;
@@ -264,9 +279,7 @@ void interpret(StmtNode *stmt) {
         case STMT_IF: {
             StmtIfNode *node = (StmtIfNode*) stmt;
 
-            if (isTruthy((Value) {
-                evaluateNum(node->condition)
-            })) {
+            if (isTruthy(evaluateNum(node->condition))) {
                 interpret(node->thenBranch);
             } else if (node->elseBranch != nullptr) {
                 interpret(node->elseBranch);

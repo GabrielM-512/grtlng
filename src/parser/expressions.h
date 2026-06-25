@@ -5,6 +5,8 @@ typedef enum {
     PREC_NONE,
     PREC_LIMIT, // here so we dont eat any tokens with PREC_NONE
     PREC_ASSIGNMENT,
+    PREC_EQUALITY,
+    PREC_COMPARISON,
     PREC_SUM,
     PREC_PRODUCT,
     PREC_UNARY,
