@@ -181,6 +181,7 @@ ExprNode *expression(Parser *parser) {
     return parseExpr(parser, PREC_LIMIT);
 }
 
+// TODO: not, and, or
 
 ParseRule rules [TOKEN_LAST] = {
     [TOKEN_EOF]             = {nullptr,     nullptr,    PREC_NONE       },

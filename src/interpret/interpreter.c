@@ -10,6 +10,8 @@
 #include "../debug/debugInfos.h"
 #include "../util/HashMap.h"
 
+// TODO: make [EXPR] [FUNCTION_IDENTIFIER]; valid usable
+
 typedef struct Environment {
     struct Environment *enclosing;
     HashMap *vars;
