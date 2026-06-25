@@ -271,6 +271,7 @@ void interpret(StmtNode *stmt) {
             StmtReturnNode *node = (StmtReturnNode*) stmt;
 
             if (node->value != nullptr) interpreter.returnValue.value = evaluateNum(node->value);
+            else interpreter.returnValue.value = NAN;
 
             interpreter.returning = true;
 
