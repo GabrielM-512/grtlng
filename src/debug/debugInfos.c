@@ -128,7 +128,8 @@ char *getTokenSymbol(TokenType type) {
         [TOKEN_RETURN] = "\"return\"",
         [TOKEN_EXTERN] = "\"extern\"",
         [TOKEN_IF] = "\"if\"",
-        [TOKEN_ELSE] = "\"else\""
+        [TOKEN_ELSE] = "\"else\"",
+        [TOKEN_PRINT] = "\"print\""
     };
 
     return table[type];

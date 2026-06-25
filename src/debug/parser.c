@@ -5,7 +5,7 @@
 #include "debugInfos.h"
 
 void printExpr(ExprNode* expr);
-void printStmt(StmtNode *stmt);
+static void printStmt(StmtNode *stmt);
 
 void printUnary(ExprUnaryNode* expr) {
     switch (expr->operator) {
@@ -125,7 +125,7 @@ void printIf(StmtIfNode *stmt) {
     }
 }
 
-void printStmt(StmtNode *stmt) {
+static void printStmt(StmtNode *stmt) {
     switch (stmt->type) {
         case STMT_EXPR:
             printf("    [EXPR] ");
@@ -147,6 +147,10 @@ void printStmt(StmtNode *stmt) {
             break;
         case STMT_IF:
             printIf((StmtIfNode*) stmt);
+            break;
+        case STMT_PRINT:
+            printf("    print ");
+            printExpr(((StmtPrintNode*) stmt)->value);
             break;
         default:
             fprintf(stderr, "    Unhandled Statement Node type: %d [debug/parser.c]\n", stmt->type);

@@ -128,12 +128,24 @@ StmtNode *blockStmt(Parser *parser) {
 
 }
 
+static StmtNode *printStmt(Parser *parser) {
+    StmtPrintNode *node = ALLOC_NODE(StmtPrintNode);
+    node->header.type = STMT_PRINT;
+
+    node->value = expression(parser);
+
+    consume(parser, TOKEN_SEMICOLON, " after print statement");
+    return (StmtNode*) node;
+}
+
+
 StmtNode *parseStmt(Parser *parser) {
     StmtNode* node;
 
     if (match(parser, TOKEN_LEFT_BRACE)) node = blockStmt(parser);
     else if (match(parser, TOKEN_IF)) node = ifStmt(parser);
     else if (match(parser, TOKEN_RETURN)) node = returnStmt(parser);
+    else if (match(parser, TOKEN_PRINT)) node = printStmt(parser);
     else node = exprStmt(parser);
 
 

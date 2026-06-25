@@ -212,8 +212,6 @@ void evaluate(ExprNode *expr) {
         case EXPR_BINARY_EXPR:
         case EXPR_VAR:
         case EXPR_CALL:
-            printf("%f", evaluateNum(expr));
-            break;
         case EXPR_VAR_ASSIGN:
             evaluateNum(expr);
             break;
@@ -229,7 +227,6 @@ void interpret(StmtNode *stmt) {
     switch (stmt->type) {
         case STMT_EXPR:
             evaluate(((StmtExprNode*) stmt)->expr);
-            printf("\n");
             break;
         case STMT_VAR_DEC: {
             StmtVarDeclNode *node = (StmtVarDeclNode*) stmt;
@@ -274,6 +271,11 @@ void interpret(StmtNode *stmt) {
             } else if (node->elseBranch != nullptr) {
                 interpret(node->elseBranch);
             }
+            break;
+        }
+        case STMT_PRINT: {
+            StmtPrintNode *node = (StmtPrintNode*) stmt;
+            printf("%f\n", evaluateNum(node->value));
             break;
         }
         default:

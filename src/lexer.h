@@ -74,6 +74,8 @@ typedef enum {
     TOKEN_IF,
     TOKEN_ELSE,
 
+    TOKEN_PRINT,
+
     TOKEN_LAST // a marker token to always be the last token
 } TokenType;
 

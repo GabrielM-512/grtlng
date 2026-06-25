@@ -150,6 +150,8 @@ Token keyword(const Lexer *lexer) {
             }
             break;
 
+        case 'p': return checkKeyword(lexer, 1, "rint", TOKEN_PRINT);
+
         case 'r': return checkKeyword(lexer, 1, "eturn", TOKEN_RETURN);
 
         case 'u':
