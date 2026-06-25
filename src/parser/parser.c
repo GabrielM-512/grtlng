@@ -16,7 +16,7 @@ void addParameters(Parser *parser, FunctionDeclaration declaration) {
         Parameter parameter = ArrayListRead(declaration.parameters, i, Parameter);
         if (varInCurrentScope(parser, parameter.name))
             parseError(parser, "Parameter \"%s\" used twice in function declaration of function \"%s\"", parameter.name, declaration.name);
-        createVar(parser, parameter.name, (Variable) {parameter.type});
+        createVar(parser, parameter.name, (Variable) {parameter.type, true});
     }
 }
 

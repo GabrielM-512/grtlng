@@ -64,7 +64,8 @@ void createCurrentScopeVar(Parser *parser, char *name, Variable var) {
 
 Variable getVar(Parser *parser, char *name) {
     Variable var = {
-        TOKEN_ERROR
+        TOKEN_ERROR,
+        false
     };
 
     Scope *scope = parser->currentScope;

@@ -20,4 +20,5 @@ StmtFunction getFunction(Parser *parser, char *name);
 
 typedef struct {
     TokenType type;
+    bool initialised;
 } Variable;

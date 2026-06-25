@@ -54,7 +54,7 @@ StmtNode *localVarDeclStmt(Parser *parser) {
 
     node->name = parser->previous.data;
 
-    Variable var = {node->varType};
+    Variable var = {node->varType, false};
 
     createCurrentScopeVar(parser, node->name, var);
 
@@ -67,6 +67,10 @@ StmtNode *localVarDeclStmt(Parser *parser) {
     } else {
         consume(parser, TOKEN_SEMICOLON, " after variable declaration");
     }
+
+    var.initialised = true;
+
+    createVar(parser, node->name, var);
 
     return (StmtNode*) node;
 }

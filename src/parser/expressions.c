@@ -112,6 +112,12 @@ ExprNode *variable(Parser *parser) {
         parseError(parser, "Unknown variable or function identifier \"%s\"", node->name);
     }
 
+    if (varExists(parser, node->name)) {
+        if (!getVar(parser, node->name).initialised) {
+            parseError(parser, "Variable \"%s\" may not use itself in its own declaration", node->name);
+        }
+    }
+
     return (ExprNode*) node;
 }
 

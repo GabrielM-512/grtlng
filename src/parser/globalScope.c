@@ -88,7 +88,7 @@ StmtNode *variableDeclaration(Parser *parser, char *name, TokenType dataType) {
     node->name = name;
     node->varType = dataType;
 
-    Variable var = {dataType};
+    Variable var = {dataType, false};
 
     if (HashMapHas(&parser->program.functions, node->name)) {
         parseError(parser, "Global variable \"%s\" has already been declared as a function", name);
@@ -109,6 +109,10 @@ StmtNode *variableDeclaration(Parser *parser, char *name, TokenType dataType) {
     } else {
         consume(parser, TOKEN_SEMICOLON, " after variable declaration");
     }
+
+    var.initialised = true;
+
+    createVar(parser, node->name, var);
 
     return (StmtNode*) node;
 }
