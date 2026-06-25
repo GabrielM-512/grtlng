@@ -7,6 +7,7 @@
 
 #include "../parser/parser.h"
 #include "value.h"
+#include "../debug/debugInfos.h"
 #include "../util/HashMap.h"
 
 typedef struct Environment {
