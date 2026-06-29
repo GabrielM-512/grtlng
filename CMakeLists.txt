@@ -46,5 +46,5 @@ target_compile_options(grtlng
         PUBLIC -Wall
         PUBLIC -Wextra
         #PUBLIC -Werror
-        #PUBLIC -Ofast
+        PUBLIC -Ofast
 )
