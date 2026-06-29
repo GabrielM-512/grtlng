@@ -1,15 +1,10 @@
 i32 main() {
-    i16 someVar = 19 + 5 / 7 + (2 * 4);
-    i16 other = someVar - 6;
-    someVar / other;
-    {
-        i16 someVar = 5;
-        someVar;
-    }
-    someVar;
-    add(5, 15);
+    i64 a = fib(30);
+    print a;
 }
 
-i16 add(i16 a, i16 b) {
-    a + b;
+i64 fib(u64 num) {
+    if (num < 2) return num;
+
+    return fib(num - 1) + fib(num - 2);
 }
