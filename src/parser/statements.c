@@ -17,6 +17,9 @@
     SSSS      T     A   A     T     EEEEE   M   M   EEEEE   N   N     T     SSSS
  */
 
+StmtNode *localVarDeclStmt(Parser *parser);
+StmtNode *exprStmt(Parser *parser);
+
 StmtNode *whileStmt(Parser *parser) {
     StmtWhileNode *node = ALLOC_NODE(StmtWhileNode);
 
@@ -31,6 +34,77 @@ StmtNode *whileStmt(Parser *parser) {
     node->body = parseStmt(parser);
 
     return (StmtNode*) node;
+}
+
+StmtNode *forStmt(Parser *parser) {
+    // desugaring for loops to while loops and a block
+    consume(parser, TOKEN_LEFT_PAREN, " after \"for\"");
+
+    StmtNode *initialiser = nullptr;
+
+    if (!match(parser, TOKEN_SEMICOLON)) {
+        if (matchTypeIdent(parser)) initialiser = localVarDeclStmt(parser);
+        else initialiser = exprStmt(parser);
+    }
+
+    ExprNode *condition;
+
+    if (!check(parser, TOKEN_SEMICOLON)) {
+        condition = expression(parser);
+    } else {
+        ExprNumberNode *temp = ALLOC_NODE(ExprNumberNode);
+
+        *temp = (ExprNumberNode) {{EXPR_NUMBER}, 1};
+
+        condition = (ExprNode*) temp;
+    }
+
+    consume(parser, TOKEN_SEMICOLON, " after loop condition");
+
+    ExprNode *incrementer = nullptr;
+
+    if (!check(parser, TOKEN_RIGHT_PAREN)) {
+        incrementer = expression(parser);
+    }
+
+    consume(parser, TOKEN_RIGHT_PAREN, " after incrementor clause");
+
+    StmtNode *body = parseStmt(parser);
+
+    StmtBlockNode *block = ALLOC_NODE(StmtBlockNode);
+
+    block->header.type = STMT_BLOCK;
+    block->content = ArrayListNew(sizeof(StmtNode*));
+
+    if (initialiser != nullptr) ArrayListAdd(block->content, &initialiser);
+
+
+    StmtWhileNode *loop = ALLOC_NODE(StmtWhileNode);
+    loop->header.type = STMT_WHILE;
+
+    loop->condition = condition;
+    loop->body = body;
+
+
+    if (incrementer != nullptr) {
+        StmtBlockNode *newBody = ALLOC_NODE(StmtBlockNode);
+
+        newBody->header.type = STMT_BLOCK;
+        newBody->content = ArrayListNew(sizeof(StmtNode*));
+
+        ArrayListAdd(newBody->content, &body);
+
+        StmtExprNode *incExpr = ALLOC_NODE(StmtExprNode);
+        incExpr->header.type = STMT_EXPR;
+        incExpr->expr = incrementer;
+
+        ArrayListAdd(newBody->content, &incExpr);
+        loop->body = (StmtNode*) newBody;
+    }
+
+    ArrayListAdd(block->content, &loop);
+
+    return (StmtNode*) block;
 }
 
 StmtNode *ifStmt(Parser *parser) {
@@ -167,6 +241,7 @@ StmtNode *parseStmt(Parser *parser) {
     else if (match(parser, TOKEN_RETURN)) node = returnStmt(parser);
     else if (match(parser, TOKEN_PRINT)) node = printStmt(parser);
     else if (match(parser, TOKEN_WHILE)) node = whileStmt(parser);
+    else if (match(parser, TOKEN_FOR)) node = forStmt(parser);
     else node = exprStmt(parser);
 
 

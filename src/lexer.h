@@ -75,6 +75,7 @@ typedef enum {
     TOKEN_ELSE,
 
     TOKEN_WHILE,
+    TOKEN_FOR,
 
     TOKEN_PRINT,
 
