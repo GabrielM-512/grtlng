@@ -17,6 +17,22 @@
     SSSS      T     A   A     T     EEEEE   M   M   EEEEE   N   N     T     SSSS
  */
 
+StmtNode *whileStmt(Parser *parser) {
+    StmtWhileNode *node = ALLOC_NODE(StmtWhileNode);
+
+    node->header.type = STMT_WHILE;
+
+    consume(parser, TOKEN_LEFT_PAREN, " after \"while\"");
+
+    node->condition = expression(parser);
+
+    consume(parser, TOKEN_RIGHT_PAREN, " after while condition");
+
+    node->body = parseStmt(parser);
+
+    return (StmtNode*) node;
+}
+
 StmtNode *ifStmt(Parser *parser) {
     StmtIfNode *node = ALLOC_NODE(StmtIfNode);
 
@@ -150,6 +166,7 @@ StmtNode *parseStmt(Parser *parser) {
     else if (match(parser, TOKEN_IF)) node = ifStmt(parser);
     else if (match(parser, TOKEN_RETURN)) node = returnStmt(parser);
     else if (match(parser, TOKEN_PRINT)) node = printStmt(parser);
+    else if (match(parser, TOKEN_WHILE)) node = whileStmt(parser);
     else node = exprStmt(parser);
 
 

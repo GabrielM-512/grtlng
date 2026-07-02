@@ -112,6 +112,14 @@ void printIf(StmtIfNode *stmt) {
     }
 }
 
+void printWhile(StmtWhileNode *stmt) {
+    printf("    WHILE ");
+    printExpr(stmt->condition);
+    printf(" DO\n");
+    printStmt(stmt->body);
+    printf("    END");
+}
+
 static void printStmt(StmtNode *stmt) {
     switch (stmt->type) {
         case STMT_EXPR:
@@ -138,6 +146,9 @@ static void printStmt(StmtNode *stmt) {
         case STMT_PRINT:
             printf("    print ");
             printExpr(((StmtPrintNode*) stmt)->value);
+            break;
+        case STMT_WHILE:
+            printWhile((StmtWhileNode*) stmt);
             break;
         default:
             fprintf(stderr, "    Unhandled Statement Node type: %d [debug/parser.c]\n", stmt->type);

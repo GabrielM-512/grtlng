@@ -129,6 +129,7 @@ char *getTokenSymbol(TokenType type) {
         [TOKEN_EXTERN] = "\"extern\"",
         [TOKEN_IF] = "\"if\"",
         [TOKEN_ELSE] = "\"else\"",
+        [TOKEN_WHILE] = "\"while\"",
         [TOKEN_PRINT] = "\"print\""
     };
 

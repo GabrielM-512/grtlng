@@ -164,6 +164,7 @@ Token keyword(const Lexer *lexer) {
             break;
 
         case 'v': return checkKeyword(lexer, 1, "oid", TOKEN_VOID);
+        case 'w': return checkKeyword(lexer, 1, "hile", TOKEN_WHILE);
         default:
     }
     return (Token) {TOKEN_IDENTIFIER, lexer->line, lexer->base, nullptr};

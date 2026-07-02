@@ -278,6 +278,13 @@ void interpret(StmtNode *stmt) {
             printf("%f\n", evaluate(node->value));
             break;
         }
+        case STMT_WHILE: {
+            StmtWhileNode *node = (StmtWhileNode*) stmt;
+            while (isTruthy(evaluate(node->condition))) {
+                interpret(node->body);
+            }
+            break;
+        }
         default:
             fprintf(stderr, "    Unhandled Statement Node type: %d [interpret/interpreter.c]\n", stmt->type);
             exit(-1);
