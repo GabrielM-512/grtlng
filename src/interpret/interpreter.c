@@ -99,10 +99,10 @@ static Value getVar(char *name) {
 
 }
 
-f64 evaluateNum(ExprNode *expr);
+f64 evaluate(ExprNode *expr);
 
 
-f64 interpretCall(ExprCallNode *call) {
+f64 evaluateCall(ExprCallNode *call) {
 
     StmtFunction function;
     HashMapGet(&interpreter.functions, call->target, &function);
@@ -111,7 +111,7 @@ f64 interpretCall(ExprCallNode *call) {
 
     for (u32 i = 0; i < call->args->length; i++) {
         Value val;
-        val.value = evaluateNum(ArrayListRead(call->args, i, ExprNode*));
+        val.value = evaluate(ArrayListRead(call->args, i, ExprNode*));
         ArrayListAdd(params, &val);
     }
 
@@ -146,13 +146,13 @@ bool isTruthy(f64 val) {
 }
 
 
-f64 evaluateNum(ExprNode *expr) {
+f64 evaluate(ExprNode *expr) {
     switch (expr->type) {
         case EXPR_UNARY_EXPR: {
             ExprUnaryNode *node = (ExprUnaryNode*) expr;
             switch (node->operator) {
                 case TOKEN_MINUS:
-                    return -evaluateNum(node->right);
+                    return -evaluate(node->right);
                 default:
             }
 
@@ -160,7 +160,7 @@ f64 evaluateNum(ExprNode *expr) {
 
         case EXPR_BINARY_EXPR: {
 
-#define MAKE_OPERATION(type, operator) case type: return evaluateNum(node->left) operator evaluateNum(node->right)
+#define MAKE_OPERATION(type, operator) case type: return evaluate(node->left) operator evaluate(node->right)
 
             ExprBinaryNode *node = (ExprBinaryNode*) expr;
             switch (node->operator) {
@@ -177,11 +177,11 @@ f64 evaluateNum(ExprNode *expr) {
                 MAKE_OPERATION(TOKEN_BANG_EQUALS, !=);
 
                 case TOKEN_AMP_AMP:
-                    if (!isTruthy(evaluateNum(node->left))) return false;
-                    return isTruthy(evaluateNum(node->right));
+                    if (!isTruthy(evaluate(node->left))) return false;
+                    return isTruthy(evaluate(node->right));
                 case TOKEN_PIPE_PIPE:
-                    if (isTruthy(evaluateNum(node->left))) return true;
-                    return isTruthy(evaluateNum(node->right));
+                    if (isTruthy(evaluate(node->left))) return true;
+                    return isTruthy(evaluate(node->right));
                 default:
                     fprintf(stderr, "Interpreter cannot evaluate Binary Expression Token %s (%d)", getTokenSymbol(node->operator), node->operator);
                     exit(1);
@@ -200,7 +200,7 @@ f64 evaluateNum(ExprNode *expr) {
             switch (node->target->type) {
                 case EXPR_VAR: {
                     ExprVarNode *target = (ExprVarNode*) node->target;
-                    Value val = {evaluateNum(node->value)};
+                    Value val = {evaluate(node->value)};
                     setVar(target->name, &val);
                     return val.value;
                 }
@@ -212,32 +212,15 @@ f64 evaluateNum(ExprNode *expr) {
         }
 
         case EXPR_CALL:
-            return interpretCall((ExprCallNode*) expr);
+            return evaluateCall((ExprCallNode*) expr);
 
-
-        default:
-            fprintf(stderr, "Non-expression node in expression AST: %d\n", expr->type);
-            exit(1);
-
-    }
-    return NAN;
-}
-
-void evaluate(ExprNode *expr) {
-    switch (expr->type) {
-        case EXPR_UNARY_EXPR:
-        case EXPR_NUMBER:
-        case EXPR_BINARY_EXPR:
-        case EXPR_VAR:
-        case EXPR_CALL:
-        case EXPR_VAR_ASSIGN:
-            evaluateNum(expr);
-            break;
 
         default:
             fprintf(stderr, "    Unhandled Expression Node type: %d [interpret/interpreter.c]\n", expr->type);
             exit(-1);
+
     }
+    return NAN;
 }
 
 void interpret(StmtNode *stmt) {
@@ -252,7 +235,7 @@ void interpret(StmtNode *stmt) {
             Value val;
 
             if (node->value != nullptr) {
-                val.value = evaluateNum(node->value);
+                val.value = evaluate(node->value);
             }
 
             createVar(node->name, &val);
@@ -273,7 +256,7 @@ void interpret(StmtNode *stmt) {
         case STMT_RETURN: {
             StmtReturnNode *node = (StmtReturnNode*) stmt;
 
-            if (node->value != nullptr) interpreter.returnValue.value = evaluateNum(node->value);
+            if (node->value != nullptr) interpreter.returnValue.value = evaluate(node->value);
             else interpreter.returnValue.value = NAN;
 
             interpreter.returning = true;
@@ -283,7 +266,7 @@ void interpret(StmtNode *stmt) {
         case STMT_IF: {
             StmtIfNode *node = (StmtIfNode*) stmt;
 
-            if (isTruthy(evaluateNum(node->condition))) {
+            if (isTruthy(evaluate(node->condition))) {
                 interpret(node->thenBranch);
             } else if (node->elseBranch != nullptr) {
                 interpret(node->elseBranch);
@@ -292,7 +275,7 @@ void interpret(StmtNode *stmt) {
         }
         case STMT_PRINT: {
             StmtPrintNode *node = (StmtPrintNode*) stmt;
-            printf("%f\n", evaluateNum(node->value));
+            printf("%f\n", evaluate(node->value));
             break;
         }
         default:
@@ -315,6 +298,6 @@ i32 interpretProgram(ParseResult program) {
         interpret(ArrayListRead(program.tree, i, StmtNode*));
     }
 
-    return (i32) interpretCall(&program.main);
+    return (i32) evaluateCall(&program.main);
 
 }
