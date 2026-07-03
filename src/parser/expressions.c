@@ -181,7 +181,7 @@ ExprNode *expression(Parser *parser) {
     return parseExpr(parser, PREC_LIMIT);
 }
 
-// TODO: not, and, or
+// TODO: not
 
 ParseRule rules [TOKEN_LAST] = {
     [TOKEN_EOF]             = {nullptr,     nullptr,    PREC_NONE       },
@@ -208,8 +208,8 @@ ParseRule rules [TOKEN_LAST] = {
     [TOKEN_AMP]             = {nullptr,     nullptr,    PREC_NONE       },
     [TOKEN_PIPE]            = {nullptr,     nullptr,    PREC_NONE       },
     [TOKEN_TILDE]           = {nullptr,     nullptr,    PREC_NONE       },
-    [TOKEN_AMP_AMP]         = {nullptr,     nullptr,    PREC_NONE       },
-    [TOKEN_PIPE_PIPE]       = {nullptr,     nullptr,    PREC_NONE       },
+    [TOKEN_AMP_AMP]         = {nullptr,     exprBinary, PREC_AND        },
+    [TOKEN_PIPE_PIPE]       = {nullptr,     exprBinary, PREC_OR         },
     [TOKEN_AMP_EQUALS]      = {nullptr,     nullptr,    PREC_NONE       },
     [TOKEN_PIPE_EQUALS]     = {nullptr,     nullptr,    PREC_NONE       },
     [TOKEN_BANG]            = {nullptr,     nullptr,    PREC_NONE       },
