@@ -1,6 +1,13 @@
 i32 main() {
     i64 a = fib(30);
     print a;
+
+    for (u16 i = 0; i < a; i += 1) {
+        print i / a;
+    }
+
+    print a;
+
 }
 
 i64 fib(u64 num) {
