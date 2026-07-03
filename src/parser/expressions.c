@@ -7,6 +7,31 @@
 #include "../error.h"
 #include "../debug/debugInfos.h"
 
+typedef enum {
+    PREC_NONE,
+    PREC_LIMIT, // here so we dont eat any tokens with PREC_NONE
+    PREC_ASSIGNMENT,
+    PREC_OR,
+    PREC_AND,
+    PREC_EQUALITY,
+    PREC_COMPARISON,
+    PREC_SUM,
+    PREC_PRODUCT,
+    PREC_UNARY,
+    PREC_CALL,
+} ExprPrecedence;
+
+typedef ExprNode*(*PrefixFn)(Parser*);
+typedef ExprNode*(*InfixFn)(Parser*, ExprNode*);
+
+typedef struct {
+    PrefixFn prefix;
+    InfixFn infix;
+    ExprPrecedence precedence;
+} ParseRule;
+
+ParseRule getRule(TokenType token);
+
 /*
     EEEEE   X   X   PPPP    RRRR    EEEEE    SSSS    SSSS    III     OOO    N   N    SSSS
     E        X X    P   P   R   R   E       S       S        III    O   O   NN  N   S
