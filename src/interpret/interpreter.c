@@ -107,12 +107,12 @@ f64 evaluateCall(ExprCallNode *call) {
     StmtFunction function;
     HashMapGet(&interpreter.functions, call->target, &function);
 
-    ArrayList *params = ArrayListNew(sizeof(Value));
+    Value params[call->args->length];
 
     for (u32 i = 0; i < call->args->length; i++) {
         Value val;
         val.value = evaluate(ArrayListRead(call->args, i, ExprNode*));
-        ArrayListAdd(params, &val);
+        params[i] = val;
     }
 
     Environment *old = interpreter.env;
@@ -122,7 +122,7 @@ f64 evaluateCall(ExprCallNode *call) {
     startEnvironment();
 
     for (u32 i = 0; i < call->args->length; i++) {
-        createVar(ArrayListRead(function.parameters, i, Parameter).name, &ArrayListRead(params, i, Value));
+        createVar(ArrayListRead(function.parameters, i, Parameter).name, &params[i]);
     }
 
     StmtBlockNode *body = function.body;
