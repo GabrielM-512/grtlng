@@ -37,16 +37,26 @@ StmtNode *whileStmt(Parser *parser) {
 }
 
 StmtNode *forStmt(Parser *parser) {
-    // desugaring for loops to while loops and a block
+    /* desugaring for loops to while loops and a block:
+     *
+     * for (i16 i = 0; i < 15; i += 1) {...}
+     * is equivalent to
+     * {i16 i = 0; while (i < 15) {... i += 1;}}
+     * (except for scoping of variable i)
+     *
+     * so we turn the first into the second
+     */
     consume(parser, TOKEN_LEFT_PAREN, " after \"for\"");
 
     beginScope(parser);
 
-    StmtNode *initialiser = nullptr;
+    StmtNode *initialiser;
 
     if (!match(parser, TOKEN_SEMICOLON)) {
         if (matchTypeIdent(parser)) initialiser = localVarDeclStmt(parser);
         else initialiser = exprStmt(parser);
+    } else {
+        initialiser = nullptr;
     }
 
     ExprNode *condition;
@@ -63,13 +73,14 @@ StmtNode *forStmt(Parser *parser) {
 
     consume(parser, TOKEN_SEMICOLON, " after loop condition");
 
-    ExprNode *incrementer = nullptr;
 
-    if (!check(parser, TOKEN_RIGHT_PAREN)) {
-        incrementer = expression(parser);
-    }
+    ExprNode *incrementer;
+
+    if (!check(parser, TOKEN_RIGHT_PAREN)) incrementer = expression(parser);
+    else                                        incrementer = nullptr;
 
     consume(parser, TOKEN_RIGHT_PAREN, " after incrementor clause");
+
 
     StmtNode *body = parseStmt(parser);
 
