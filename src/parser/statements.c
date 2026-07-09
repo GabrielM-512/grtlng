@@ -40,6 +40,8 @@ StmtNode *forStmt(Parser *parser) {
     // desugaring for loops to while loops and a block
     consume(parser, TOKEN_LEFT_PAREN, " after \"for\"");
 
+    beginScope(parser);
+
     StmtNode *initialiser = nullptr;
 
     if (!match(parser, TOKEN_SEMICOLON)) {
@@ -103,6 +105,8 @@ StmtNode *forStmt(Parser *parser) {
     }
 
     ArrayListAdd(block->content, &loop);
+
+    endScope(parser);
 
     return (StmtNode*) block;
 }
