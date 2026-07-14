@@ -8,8 +8,8 @@
 
 
 typedef enum {
-    EXPR_BINARY_EXPR,
-    EXPR_UNARY_EXPR,
+    EXPR_BINARY,
+    EXPR_UNARY,
     EXPR_NUMBER,
     EXPR_VAR,
     EXPR_CALL,

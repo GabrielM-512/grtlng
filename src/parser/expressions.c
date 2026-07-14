@@ -43,7 +43,7 @@ ParseRule getRule(TokenType token);
 ExprNode *exprBinary(Parser *parser, ExprNode *left) {
     ExprBinaryNode *node = ALLOC_NODE(ExprBinaryNode);
 
-    node->header.type = EXPR_BINARY_EXPR;
+    node->header.type = EXPR_BINARY;
 
     node->operator = parser->previous.type;
     node->left = left;
@@ -103,7 +103,7 @@ ExprNode *call(Parser *parser, ExprNode *left) {
 ExprNode *exprUnary(Parser *parser) {
     ExprUnaryNode *node = ALLOC_NODE(ExprUnaryNode);
 
-    node->header.type = EXPR_UNARY_EXPR;
+    node->header.type = EXPR_UNARY;
     node->operator = parser->previous.type;
 
     node->right = parseExprPrec(parser);
@@ -176,7 +176,7 @@ ExprNode *relativeAssignment(Parser *parser, ExprNode *left) {
     node->target = left;
 
     ExprBinaryNode *calculation = ALLOC_NODE(ExprBinaryNode);
-    calculation->header.type = EXPR_BINARY_EXPR;
+    calculation->header.type = EXPR_BINARY;
     calculation->left = left;
 
     switch (parser->previous.type) {

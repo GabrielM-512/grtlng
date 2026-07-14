@@ -45,11 +45,11 @@ void printExpr(ExprNode *expr) {
     printf("(");
     switch (expr->type) {
 
-        case EXPR_UNARY_EXPR:
+        case EXPR_UNARY:
             printUnary((ExprUnaryNode*) expr);
             break;
 
-        case EXPR_BINARY_EXPR:
+        case EXPR_BINARY:
             printBinary((ExprBinaryNode*) expr);
             break;
 

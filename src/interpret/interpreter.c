@@ -148,7 +148,7 @@ bool isTruthy(f64 val) {
 
 f64 evaluate(ExprNode *expr) {
     switch (expr->type) {
-        case EXPR_UNARY_EXPR: {
+        case EXPR_UNARY: {
             ExprUnaryNode *node = (ExprUnaryNode*) expr;
             switch (node->operator) {
                 case TOKEN_MINUS:
@@ -158,7 +158,7 @@ f64 evaluate(ExprNode *expr) {
 
         } break;
 
-        case EXPR_BINARY_EXPR: {
+        case EXPR_BINARY: {
 
 #define MAKE_OPERATION(type, operator) case type: return evaluate(node->left) operator evaluate(node->right)
 
