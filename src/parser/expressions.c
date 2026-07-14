@@ -158,7 +158,6 @@ ExprNode *assignment(Parser *parser, ExprNode *left) {
 
     node->header.type = EXPR_VAR_ASSIGN;
 
-    // TODO: maybe its possible to mark the start of the l-value instead of the = on the error message?
     if (left->type != EXPR_VAR) {
         parseError(parser, "Invalid assignment target");
     }
