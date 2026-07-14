@@ -240,8 +240,8 @@ ExprNode *expression(Parser *parser) {
     return parseExpr(parser, PREC_LIMIT);
 }
 
-// TODO: not
-
+// TODO: bitwise
+// TODO: check if unary precedence may remain this (refer to craftinginterpeters?)
 ParseRule rules [TOKEN_LAST] = {
     [TOKEN_EOF]             = {nullptr,     nullptr,               PREC_NONE       },
     [TOKEN_ERROR]           = {nullptr,     nullptr,               PREC_NONE       },
@@ -254,7 +254,7 @@ ParseRule rules [TOKEN_LAST] = {
     [TOKEN_RIGHT_BRACE]     = {nullptr,     nullptr,               PREC_NONE       },
     [TOKEN_LEFT_BRACKET]    = {nullptr,     nullptr,               PREC_NONE       },
     [TOKEN_RIGHT_BRACKET]   = {nullptr,     nullptr,               PREC_NONE       },
-    [TOKEN_PLUS]            = {nullptr,     exprBinary,            PREC_SUM        },
+    [TOKEN_PLUS]            = {exprUnary,   exprBinary,            PREC_SUM        },
     [TOKEN_MINUS]           = {exprUnary,   exprBinary,            PREC_SUM        },
     [TOKEN_STAR]            = {nullptr,     exprBinary,            PREC_PRODUCT    },
     [TOKEN_SLASH]           = {nullptr,     exprBinary,            PREC_PRODUCT    },
@@ -271,7 +271,7 @@ ParseRule rules [TOKEN_LAST] = {
     [TOKEN_PIPE_PIPE]       = {nullptr,     exprBinary,            PREC_OR         },
     [TOKEN_AMP_EQUALS]      = {nullptr,     nullptr,               PREC_NONE       },
     [TOKEN_PIPE_EQUALS]     = {nullptr,     nullptr,               PREC_NONE       },
-    [TOKEN_BANG]            = {nullptr,     nullptr,               PREC_NONE       },
+    [TOKEN_BANG]            = {exprUnary,   nullptr,               PREC_UNARY      },
     [TOKEN_DOT]             = {nullptr,     nullptr,               PREC_NONE       },
     [TOKEN_COMMA]           = {nullptr,     nullptr,               PREC_NONE       },
     [TOKEN_MORE]            = {nullptr,     exprBinary,            PREC_COMPARISON },

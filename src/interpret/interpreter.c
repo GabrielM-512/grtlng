@@ -153,6 +153,10 @@ f64 evaluate(ExprNode *expr) {
             switch (node->operator) {
                 case TOKEN_MINUS:
                     return -evaluate(node->right);
+                case TOKEN_BANG:
+                    return !isTruthy(evaluate(node->right));
+                case TOKEN_PLUS:
+                    return evaluate(node->right);
                 default:
             }
 
