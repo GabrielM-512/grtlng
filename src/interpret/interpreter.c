@@ -52,7 +52,7 @@ void endEnvironment() {
 static void createVar(char *name, const Value *value) {
     if (!HashMapSet(interpreter.env->vars, name, value)) {
         fprintf(stderr, "Fatal Interpreter Error: Variable \"%s\" already exists on declaration\n", name);
-        exit(1);
+        exit(-1);
     }
 }
 
@@ -72,7 +72,7 @@ void setVar(char *name, const Value *value) {
     }
 
     fprintf(stderr, "Fatal Interpreter Error: Unknown Variable \"%s\"\n", name);
-    exit(1);
+    exit(-1);
 
 }
 
@@ -95,7 +95,7 @@ static Value getVar(char *name) {
     }
 
     fprintf(stderr, "Fatal Interpreter Error: Unknown Variable \"%s\"\n", name);
-    exit(1);
+    exit(-1);
 
 }
 
@@ -158,9 +158,10 @@ f64 evaluate(ExprNode *expr) {
                 case TOKEN_PLUS:
                     return evaluate(node->right);
                 default:
+                    fprintf(stderr, "Interpreter cannot evaluate Unary Expression Token %s (#%d)", getTokenSymbol(node->operator), node->operator);
+                    exit(-1);
             }
-
-        } break;
+        }
 
         case EXPR_BINARY: {
 
@@ -188,7 +189,7 @@ f64 evaluate(ExprNode *expr) {
                     return isTruthy(evaluate(node->right));
                 default:
                     fprintf(stderr, "Interpreter cannot evaluate Binary Expression Token %s (%d)", getTokenSymbol(node->operator), node->operator);
-                    exit(1);
+                    exit(-1);
             }
 #undef MAKE_OPERATION
         }
@@ -211,7 +212,7 @@ f64 evaluate(ExprNode *expr) {
                 default:
                     INTERN_ERROR_LOCATION();
                     fprintf(stderr, "Tried assigning to non-variable: %d", node->target->type);
-                    exit(1);
+                    exit(-1);
             }
         }
 
