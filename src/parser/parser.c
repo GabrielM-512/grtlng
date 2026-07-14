@@ -100,10 +100,15 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
 
     switch (main.returns) {
         case TOKEN_VOID:
+        case TOKEN_I16:
         case TOKEN_I32:
+        case TOKEN_I64:
+        case TOKEN_U16:
+        case TOKEN_U32:
+        case TOKEN_U64:
             break;
         default:
-            fprintf(stderr, "Encountered error in program: Main function must be of return type \"i32\" or \"void\", was defined as %s instead\n", getTokenSymbol(main.returns));
+            fprintf(stderr, "Encountered error in program: Return type of main function must be \"void\" or any type of signed or unsigned integer, was defined as %s instead\n", getTokenSymbol(main.returns));
             parser->hadError = true;
             return parser->program;
     }
