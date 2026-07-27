@@ -1,7 +1,9 @@
 #include "textfile.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 // reads in a file as an ascii-file and puts it into a char[] and the length in a size_t.
@@ -11,7 +13,7 @@ TextFile textfileRead(const char *source) {
     FILE *sourceFile = fopen(source, "rb");
 
     if (sourceFile == nullptr) {
-        fprintf(stderr, "Problem opening file %s\n", source);
+        fprintf(stderr, "Problem opening file %s:\n%s", source, strerror(errno));
         exit(1);
     }
 
