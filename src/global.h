@@ -3,7 +3,7 @@
 
 #define INTERN_ERROR_LOCATION() (fprintf(stderr, "[INTERNAL ERROR] %s on line %d:\n ", __FILE__, __LINE__))
 
-#define DEBUG_ALL
+//#define DEBUG_ALL
 
 #ifdef DEBUG_ALL
 // #define DEBUG_PRINT_TOKENS

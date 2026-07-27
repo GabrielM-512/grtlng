@@ -145,9 +145,33 @@ bool isTruthy(f64 val) {
     return val != 0;
 }
 
+void increment() {
+
+}
+
 
 f64 evaluate(ExprNode *expr) {
     switch (expr->type) {
+        case EXPR_HEADER: {
+            ExprNodeHeader *node = (ExprNodeHeader*) expr;
+
+            if (node->prefixIncrement != nullptr) {
+                for (u32 i = 0; i < node->prefixIncrement->length; i++) {
+
+                }
+            }
+
+            f64 val = evaluate(node->expr);
+
+            if (node->postfixIncrement != nullptr) {
+                for (u32 i = 0; i < node->postfixIncrement->length; i++) {
+
+                }
+            }
+
+            return val;
+
+        }
         case EXPR_UNARY: {
             ExprUnaryNode *node = (ExprUnaryNode*) expr;
             switch (node->operator) {
@@ -305,7 +329,6 @@ i32 interpretProgram(ParseResult program) {
 
     interpreter.functions = program.functions;
 
-    printf("========== INTERPRETER OUTPUT ==========\n");
     for (u32 i = 0; i < program.tree->length; i++) {
         interpret(ArrayListRead(program.tree, i, StmtNode*));
     }
