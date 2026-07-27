@@ -1,0 +1,10 @@
+i16 main() {
+  i16 a = 0;
+  print a; // expect: 0
+
+  a = 1;
+  print a; // expect: 1
+
+  print a = 2; // expect: 2
+  print a; // expect: 2
+}

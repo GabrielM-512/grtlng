@@ -1,0 +1,4 @@
+Encountered error on line 4: Invalid assignment target
+[4]       a + b = 3;
+                ^ Here
+

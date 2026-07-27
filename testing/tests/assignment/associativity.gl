@@ -1,0 +1,12 @@
+i16 main() {
+    i16 a = 0;
+    i16 b = 1;
+    i16 c = 2;
+
+    // Assignment is right-associative.
+    a = b = c;
+    print a; // expect: 2
+    print b; // expect: 2
+    print c; // expect: 2
+}
+

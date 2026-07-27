@@ -1,0 +1,39 @@
+{
+  "Instance": "/home/gabriel/CLionProjects/language/cmake-build-debug/grtlng",
+  "log": "/home/gabriel/CLionProjects/language/testing/log.txt",
+  "tests": {
+    "assignment.associativity": {
+      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/assignment/associativity.gl",
+      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/assignment/associativity_stdout"
+    },
+    "assignment.global": {
+      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/assignment/global.gl",
+      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/assignment/global_stdout"
+    },
+    "assignment.infix": {
+      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/assignment/infix_operator.gl",
+      "stderr": "/home/gabriel/CLionProjects/language/testing/tests/assignment/infix_operator_stderr"
+    },
+    "assignment.local": {
+      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/assignment/local.gl",
+      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/assignment/global_stdout"
+    },
+    "assignment.prefix": {
+      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/assignment/prefix_operator.gl",
+      "stderr": "/home/gabriel/CLionProjects/language/testing/tests/assignment/prefix_operator_stderr"
+    },
+    "block.empty": {
+      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/block/empty.gl",
+      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/block/empty_stdout"
+    },
+    "block.scope": {
+      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/block/scope.gl",
+      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/block/scope_stdout"
+    },
+    "expressions.evaluate": {
+      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/expressions/evaluate.gl",
+      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/expressions/evaluate_stdout"
+    }
+  }
+
+}
