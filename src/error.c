@@ -63,8 +63,8 @@ void printErrors() {
 
 }
 
-void enqueueError(const char *message, va_list args, const Token token) {
-    u32 length = vsnprintf(handler.testing, 256, message, args) + 1;
+static void enqueueError(const char *message, va_list args, const Token token) {
+    const u32 length = vsnprintf(handler.testing, 256, message, args) + 1;
 
     char *target = ArenaAlloc(handler.data, length);
 
@@ -108,7 +108,7 @@ void printErrorLine(const char *source, const Token *token) {
     fprintf(stderr, "%-*.*s^ Here\n\n\n", hatStart, hatStart, "");
 }
 
-void parseErrorAt(Parser *parser, const Token token, const char* message, va_list args) {
+static void parseErrorAt(Parser *parser, const Token token, const char* message, va_list args) {
     if (parser->panicMode) {
         return;
     }
