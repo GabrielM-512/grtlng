@@ -45,7 +45,7 @@ int main(const int argc, char* argv[]) {
 
     if (argc <= 2) {
         fprintf(stderr, "Incorrect usage\n"
-                              "  Proper Usage: grtcmp <source file>\n"
+                              "  Proper Usage: grtlng <source file>\n"
                               "  Use -h for help\n");
         exit(64);
     }
