@@ -132,7 +132,7 @@ typedef struct {
     ExprCallNode main;
 } ParseResult;
 
-struct Scope;
+typedef struct Scope Scope;
 
 typedef struct {
     ParseResult program;
@@ -142,7 +142,7 @@ typedef struct {
     bool inGlobalPhase;
     bool hadError, panicMode;
     const char *source;
-    struct Scope *currentScope;
+    Scope *currentScope;
 } Parser;
 
 
