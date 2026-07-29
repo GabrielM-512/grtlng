@@ -21,6 +21,7 @@ typedef struct {
 typedef struct {
     Token token;
     const char *message;
+    const char *hint;
 } Error;
 
 ErrorHandler handler;
@@ -59,11 +60,17 @@ void printErrors() {
 
         // print offending line
         printErrorLine(handler.source, &current.token);
+
+        if (current.hint != nullptr) {
+            fprintf(stderr, "\nHint: %s\n", current.hint);
+        }
+
+        if (i + 1 < handler.errors->length) fprintf(stderr, "\n\n\n");
     }
 
 }
 
-static void enqueueError(const char *message, va_list args, const Token token) {
+static void enqueueError(const char *message, va_list args, const Token token, const char* hint) {
     const u32 length = vsnprintf(handler.testing, 256, message, args) + 1;
 
     char *target = ArenaAlloc(handler.data, length);
@@ -74,9 +81,10 @@ static void enqueueError(const char *message, va_list args, const Token token) {
         handler.testing[i] = 0;
     }
 
-    Error error = {
-        token,
-        target
+    const Error error = {
+        .token = token,
+        .message = target,
+        .hint = hint
     };
 
     ArrayListAdd(handler.errors, &error);
@@ -105,10 +113,10 @@ void printErrorLine(const char *source, const Token *token) {
     fprintf(stderr, "\n");
 
     const u16 hatStart = token->position - start + 5 + strlen(lineString);
-    fprintf(stderr, "%-*.*s^ Here\n\n\n", hatStart, hatStart, "");
+    fprintf(stderr, "%-*.*s^ Here\n", hatStart, hatStart, "");
 }
 
-static void parseErrorAt(Parser *parser, const Token token, const char* message, va_list args) {
+static void parseErrorAt(Parser *parser, const Token token, const char* hint, const char* message, va_list args) {
     if (parser->panicMode) {
         return;
     }
@@ -116,10 +124,19 @@ static void parseErrorAt(Parser *parser, const Token token, const char* message,
     parser->panicMode = true;
     parser->hadError = true;
 
-    enqueueError(message, args, token);
+    enqueueError(message, args, token, hint);
 
     handler.source = parser->source;
 
+}
+
+void parseErrorAtCurrentHint(Parser *parser, const char* hint, const char* message, ...) {
+    va_list args;
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
+    va_start(args, message);
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
+    parseErrorAt(parser, parser->current, hint, message, args);
+    va_end(args);
 }
 
 void parseErrorAtCurrent(Parser *parser, const char* message, ...) {
@@ -127,7 +144,16 @@ void parseErrorAtCurrent(Parser *parser, const char* message, ...) {
     // ReSharper disable once CppLocalVariableMightNotBeInitialized
     va_start(args, message);
     // ReSharper disable once CppLocalVariableMightNotBeInitialized
-    parseErrorAt(parser, parser->current, message, args);
+    parseErrorAt(parser, parser->current, nullptr, message, args);
+    va_end(args);
+}
+
+void parseErrorHint(Parser *parser, const char* hint, const char* message, ...) {
+    va_list args;
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
+    va_start(args, message);
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
+    parseErrorAt(parser, parser->previous, hint, message, args);
     va_end(args);
 }
 
@@ -136,7 +162,7 @@ void parseError(Parser *parser, const char* message, ...) {
     // ReSharper disable once CppLocalVariableMightNotBeInitialized
     va_start(args, message);
     // ReSharper disable once CppLocalVariableMightNotBeInitialized
-    parseErrorAt(parser, parser->previous, message, args);
+    parseErrorAt(parser, parser->previous, nullptr, message, args);
     va_end(args);
 }
 

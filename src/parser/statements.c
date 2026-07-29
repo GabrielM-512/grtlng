@@ -148,8 +148,8 @@ StmtNode *localVarDeclStmt(Parser *parser) {
     }
 
     if (match(parser, TOKEN_LEFT_PAREN)) {
-        parseError(parser, "Unexpected '(' in local variable declaration");
-        fprintf(stderr, "Hint: Function declarations are only permitted in the global scope\n\n\n");
+        const char *hint = "Function declarations are only permitted in the global scope";
+        parseErrorHint(parser, hint, "Unexpected '(' in local variable declaration");
         return nullptr;
     }
 
