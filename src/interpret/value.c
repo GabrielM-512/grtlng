@@ -8,7 +8,7 @@ void printValue(Value val) {
             printf("%f", AS_NUM(val));
             break;
         case VAL_FUNC:
-            printf("<fn %s at %p>", AS_FUNC(val)->name, AS_FUNC(val));
+            printf("<fn \"%s\" at %p>", AS_FUNC(val)->name, AS_FUNC(val));
             break;
         default:
     }
