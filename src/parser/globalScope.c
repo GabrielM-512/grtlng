@@ -10,25 +10,6 @@
 #include "../debug/debugInfos.h"
 #include "../util/ArrayList.h"
 
-// todo: also skips next function declaration after the current error
-void globalSynchronise(Parser *parser) {
-    parser->panicMode = false;
-
-    while (!match(parser, TOKEN_EOF)) {
-        if (match(parser, TOKEN_LEFT_BRACE)) {
-            i16 level = 1;
-            while (level > 0) {
-                if (match(parser, TOKEN_EOF)) break; // error will be handled later
-                if (match(parser, TOKEN_LEFT_BRACE)) level++;
-                else if (match(parser, TOKEN_RIGHT_BRACE)) level--;
-                else advance(parser);
-            }
-            return;
-        }
-        advance(parser);
-    }
-}
-
 StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) {
 
     ArrayList *parameters = ArrayListNew(sizeof(Parameter));
