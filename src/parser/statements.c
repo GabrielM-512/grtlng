@@ -155,8 +155,6 @@ StmtNode *localVarDeclStmt(Parser *parser) {
 
     node->name = parser->previous.data;
 
-    Symbol var;
-
     node->value = nullptr;
 
     // if instant assignment
@@ -166,10 +164,6 @@ StmtNode *localVarDeclStmt(Parser *parser) {
     } else {
         consume(parser, TOKEN_SEMICOLON, " after variable declaration");
     }
-
-    var.initialised = true;
-
-    createVar(parser, node->name, var);
 
     return (StmtNode*) node;
 }
