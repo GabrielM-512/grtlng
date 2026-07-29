@@ -71,7 +71,17 @@ void synchronise(Parser *parser) {
     while (parser->current.type != TOKEN_EOF) {
 
         if (parser->previous.type == TOKEN_SEMICOLON) return;
-        if (check(parser, TOKEN_RIGHT_BRACE)) return;
+
+        switch (parser->current.type) {
+            case TOKEN_RIGHT_BRACE:
+            case TOKEN_FOR:
+            case TOKEN_IF:
+            case TOKEN_WHILE:
+            case TOKEN_RETURN:
+            case TOKEN_PRINT:
+                return;
+            default:
+        }
 
         advance(parser);
     }

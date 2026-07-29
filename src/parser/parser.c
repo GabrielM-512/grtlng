@@ -36,6 +36,10 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
 
     while (!check(parser, TOKEN_EOF)) {
         StmtNode *declaration = globalDeclaration(parser);
+        if (declaration == nullptr) {
+            synchronise(parser);
+            continue;
+        }
 
         switch (declaration->type) {
             case STMT_FUN_DEC: {
