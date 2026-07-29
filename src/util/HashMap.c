@@ -59,6 +59,10 @@ void HashMapFree(HashMap *map) {
     HashMapInit(map, 0);
 }
 
+void *getEntryPointer(Key* key) {
+    return (void*) key + sizeof(Key);
+}
+
 void adjustCapacity(HashMap *map, u16 capacity) {
 
     void *new = malloc(PACKET_SIZE * capacity);
@@ -100,7 +104,7 @@ bool HashMapSet(HashMap *map, char *key, const void *value) {
 
     if (isNewKey) map->count++;
 
-    void *dest = (void*) entry + sizeof(Key);
+    void *dest = getEntryPointer(entry);
 
     entry->name = key;
     memcpy(dest, value, map->valueSize);
@@ -127,7 +131,7 @@ bool HashMapGet(const HashMap *map, const char *key, void *value) {
     // not in map
     if (entry->name == nullptr) return false;
 
-    void *source = (void*) entry + sizeof(Key);
+    void *source = getEntryPointer(entry);
     memcpy(value, source, map->valueSize);
     return true;
 }
@@ -154,7 +158,7 @@ ArrayList *HashMapAll(HashMap *map) {
         // only copy non-empty values
         if (key->name == nullptr) continue;
 
-        void *source = (void*) key + sizeof(Key);
+        void *source = getEntryPointer(key);
         ArrayListAdd(contents, source);
     }
     return contents;
