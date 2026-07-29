@@ -76,9 +76,3 @@ void synchronise(Parser *parser) {
         advance(parser);
     }
 }
-
-StmtFunction getFunction(Parser *parser, char *name) {
-    StmtFunction function;
-    HashMapGet(&parser->program.functions, name, &function);
-    return function;
-}

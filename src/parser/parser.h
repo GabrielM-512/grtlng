@@ -48,7 +48,7 @@ typedef struct {
 
 typedef struct {
     ExprNode header;
-    char *target;
+    ExprNode *target;
     ArrayList *args;
 } ExprCallNode;
 
@@ -128,7 +128,6 @@ typedef struct {
 typedef struct {
     ArenaAllocator* data;
     ArrayList *tree;
-    HashMap functions;
     ExprCallNode main;
 } ParseResult;
 

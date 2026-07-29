@@ -20,7 +20,6 @@ typedef struct Environment {
 typedef struct {
     Environment *env;
     Environment *global;
-    HashMap functions;
     bool returning;
     Value returnValue;
 } Interpreter;
@@ -99,20 +98,22 @@ static Value getVar(char *name) {
 
 }
 
-f64 evaluate(ExprNode *expr);
+Value evaluate(ExprNode *expr);
 
 
-f64 evaluateCall(ExprCallNode *call) {
+Value evaluateCall(ExprCallNode *call) {
 
-    StmtFunction function;
-    HashMapGet(&interpreter.functions, call->target, &function);
+    Value target = evaluate(call->target);
+    if (!IS_FUNC(target)) {
+        fprintf(stderr, "Tried to call non-function");
+        exit(-1);
+    }
+    StmtFunction function = *AS_FUNC(target);
 
     Value params[call->args->length];
 
     for (u32 i = 0; i < call->args->length; i++) {
-        Value val;
-        val.value = evaluate(ArrayListRead(call->args, i, ExprNode*));
-        params[i] = val;
+        params[i] = evaluate(ArrayListRead(call->args, i, ExprNode*));
     }
 
     Environment *old = interpreter.env;
@@ -136,13 +137,21 @@ f64 evaluateCall(ExprCallNode *call) {
 
     Value returns = interpreter.returnValue;
 
-    interpreter.returnValue.value = NAN;
+    interpreter.returnValue = VALUE_NAN;
 
-    return returns.value;
+    return returns;
 }
 
-bool isTruthy(f64 val) {
-    return val != 0;
+bool isTruthy(Value val) {
+    switch (val.type) {
+        case VAL_NUM:
+            return AS_NUM(val) != 0;
+        case VAL_FUNC:
+            return true;
+        default:
+            // unreachable
+    }
+    return true;
 }
 
 void increment() {
@@ -150,15 +159,15 @@ void increment() {
 }
 
 
-f64 evaluate(ExprNode *expr) {
+Value evaluate(ExprNode *expr) {
     switch (expr->type) {
         case EXPR_UNARY: {
             ExprUnaryNode *node = (ExprUnaryNode*) expr;
             switch (node->operator) {
                 case TOKEN_MINUS:
-                    return -evaluate(node->right);
+                    return VALUE_NUM(- AS_NUM(evaluate(node->right)));
                 case TOKEN_BANG:
-                    return !isTruthy(evaluate(node->right));
+                    return VALUE_BOOL(!isTruthy(evaluate(node->right)));
                 case TOKEN_PLUS:
                     return evaluate(node->right);
                 default:
@@ -169,7 +178,7 @@ f64 evaluate(ExprNode *expr) {
 
         case EXPR_BINARY: {
 
-#define MAKE_OPERATION(type, operator) case type: return evaluate(node->left) operator evaluate(node->right)
+#define MAKE_OPERATION(type, operator) case type: return VALUE_NUM(AS_NUM(evaluate(node->left)) operator AS_NUM(evaluate(node->right)))
 
             ExprBinaryNode *node = (ExprBinaryNode*) expr;
             switch (node->operator) {
@@ -186,11 +195,11 @@ f64 evaluate(ExprNode *expr) {
                 MAKE_OPERATION(TOKEN_BANG_EQUALS, !=);
 
                 case TOKEN_AMP_AMP:
-                    if (!isTruthy(evaluate(node->left))) return false;
-                    return isTruthy(evaluate(node->right));
+                    if (!isTruthy(evaluate(node->left))) return VALUE_FALSE;
+                    return VALUE_BOOL(isTruthy(evaluate(node->right)));
                 case TOKEN_PIPE_PIPE:
-                    if (isTruthy(evaluate(node->left))) return true;
-                    return isTruthy(evaluate(node->right));
+                    if (isTruthy(evaluate(node->left))) return VALUE_TRUE;
+                    return VALUE_BOOL(isTruthy(evaluate(node->right)));
                 default:
                     fprintf(stderr, "Interpreter cannot evaluate Binary Expression Token %s (%d)", getTokenSymbol(node->operator), node->operator);
                     exit(-1);
@@ -199,19 +208,19 @@ f64 evaluate(ExprNode *expr) {
         }
 
         case EXPR_NUMBER:
-            return ((ExprNumberNode*) expr)->value;
+            return VALUE_NUM(((ExprNumberNode*) expr)->value);
 
         case EXPR_VAR:
-            return getVar(((ExprVarNode*) expr)->name).value;
+            return getVar(((ExprVarNode*) expr)->name);
 
         case EXPR_VAR_ASSIGN: {
             ExprVarAssignNode *node = (ExprVarAssignNode*) expr;
             switch (node->target->type) {
                 case EXPR_VAR: {
                     ExprVarNode *target = (ExprVarNode*) node->target;
-                    Value val = {evaluate(node->value)};
+                    Value val = evaluate(node->value);
                     setVar(target->name, &val);
-                    return val.value;
+                    return val;
                 }
                 default:
                     INTERN_ERROR_LOCATION();
@@ -229,7 +238,7 @@ f64 evaluate(ExprNode *expr) {
             exit(-1);
 
     }
-    return NAN;
+    return VALUE_NUM(NAN);
 }
 
 void interpret(StmtNode *stmt) {
@@ -244,10 +253,15 @@ void interpret(StmtNode *stmt) {
             Value val;
 
             if (node->value != nullptr) {
-                val.value = evaluate(node->value);
+                val = evaluate(node->value);
             }
 
             createVar(node->name, &val);
+            break;
+        }
+        case STMT_FUN_DEC: {
+            StmtFunction *node = (StmtFunction*) stmt;
+            createVar(node->name, &VALUE_FUNC(node));
             break;
         }
         case STMT_BLOCK: {
@@ -265,8 +279,8 @@ void interpret(StmtNode *stmt) {
         case STMT_RETURN: {
             StmtReturnNode *node = (StmtReturnNode*) stmt;
 
-            if (node->value != nullptr) interpreter.returnValue.value = evaluate(node->value);
-            else interpreter.returnValue.value = NAN;
+            if (node->value != nullptr) interpreter.returnValue = evaluate(node->value);
+            else interpreter.returnValue = VALUE_NUM(NAN);
 
             interpreter.returning = true;
 
@@ -284,7 +298,7 @@ void interpret(StmtNode *stmt) {
         }
         case STMT_PRINT: {
             StmtPrintNode *node = (StmtPrintNode*) stmt;
-            printf("%f\n", evaluate(node->value));
+            printValue(evaluate(node->value));
             break;
         }
         case STMT_WHILE: {
@@ -307,12 +321,10 @@ i32 interpretProgram(ParseResult program) {
     startEnvironment();
     interpreter.global = interpreter.env;
 
-    interpreter.functions = program.functions;
-
     for (u32 i = 0; i < program.tree->length; i++) {
         interpret(ArrayListRead(program.tree, i, StmtNode*));
     }
 
-    return (i32) evaluateCall(&program.main);
+    return (i32) AS_NUM(evaluateCall(&program.main));
 
 }

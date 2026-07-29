@@ -66,7 +66,7 @@ void printExpr(ExprNode *expr) {
             break;
 
         case EXPR_CALL:
-            printf("%s(", ((ExprCallNode*) expr)->target);
+            printExpr(((ExprCallNode*) expr)->target);
             for (u32 i = 0; i < ((ExprCallNode*) expr)->args->length; i++) {
                 printExpr(ArrayListRead(((ExprCallNode*) expr)->args, i, ExprNode*));
             }
@@ -157,17 +157,36 @@ static void printStmt(StmtNode *stmt) {
 }
 
 void printProgram(ParseResult program) {
-    printf("init:\n");
+    StmtVarDeclNode* vars[program.tree->length];
+    u32 varCount = 0;
+    StmtFunction* funcs[program.tree->length];
+    u32 funcCount = 0;
     for (u32 i = 0; i < program.tree->length; i++) {
-        printStmt(ArrayListRead(program.tree, i, StmtNode*));
-        putchar('\n');
+        StmtNode *node = ArrayListRead(program.tree, i, StmtNode*);
+
+        switch (node->type) {
+            case STMT_VAR_DEC: {
+                vars[varCount++] = (StmtVarDeclNode*) node;
+                break;
+            }
+            case STMT_FUN_DEC: {
+                funcs[funcCount++] = (StmtFunction*) node;
+                break;
+            }
+            default:
+                // unreachable
+        }
     }
 
+    printf("init:\n");
+    for (u32 i = 0; i < varCount; i++) {
+        printStmt((StmtNode*)vars[i]);
+        putchar('\n');
+    }
     putchar('\n');
 
-    ArrayList *functions = HashMapAll(&program.functions);
-    for (u32 i = 0; i < functions->length; i++) {
-        StmtFunction current = ArrayListRead(functions, i, StmtFunction);
+    for (u32 i = 0; i < funcCount; i++) {
+        StmtFunction current = *funcs[i];
         printf("%s:\n", current.name);
         printBlock(current.body);
         printf("\n\n");

@@ -48,8 +48,6 @@ StmtNode *forStmt(Parser *parser) {
      */
     consume(parser, TOKEN_LEFT_PAREN, " after \"for\"");
 
-    beginScope(parser);
-
     StmtNode *initialiser;
 
     if (!match(parser, TOKEN_SEMICOLON)) {
@@ -117,8 +115,6 @@ StmtNode *forStmt(Parser *parser) {
 
     ArrayListAdd(block->content, &loop);
 
-    endScope(parser);
-
     return (StmtNode*) block;
 }
 
@@ -159,9 +155,7 @@ StmtNode *localVarDeclStmt(Parser *parser) {
 
     node->name = parser->previous.data;
 
-    Variable var = {node->varType, false};
-
-    createCurrentScopeVar(parser, node->name, var);
+    Symbol var;
 
     node->value = nullptr;
 
@@ -213,8 +207,6 @@ StmtNode *blockStmt(Parser *parser) {
     node->header.type = STMT_BLOCK;
     node->content = ArrayListNew(sizeof(StmtNode*));
 
-    beginScope(parser);
-
     while (!match(parser, TOKEN_RIGHT_BRACE)) {
 
         if (match(parser, TOKEN_EOF)) {
@@ -225,13 +217,10 @@ StmtNode *blockStmt(Parser *parser) {
         StmtNode *next;
 
         if (matchTypeIdent(parser)) next = localVarDeclStmt(parser);
-        else if (match(parser, TOKEN_RETURN)) next = returnStmt(parser);
         else next = parseStmt(parser);
 
         ArrayListAdd(node->content, &next);
     }
-
-    endScope(parser);
 
     return (StmtNode*) node;
 

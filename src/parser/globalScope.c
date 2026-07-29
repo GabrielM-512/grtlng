@@ -4,6 +4,7 @@
 #include "parseUtils.h"
 #include "scoping.h"
 #include "expressions.h"
+#include "statements.h"
 
 #include "../error.h"
 #include "../debug/debugInfos.h"
@@ -29,12 +30,6 @@ void globalSynchronise(Parser *parser) {
 }
 
 StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) {
-    if (HashMapHas(&parser->program.functions, name)) {
-        parseError(parser, "Function \"%s\" has already been declared", name);
-    }
-    if (varExists(parser, name)) {
-        parseError(parser, "Function \"%s\" has already been declared as a global variable", name);
-    }
 
     ArrayList *parameters = ArrayListNew(sizeof(Parameter));
 
@@ -66,6 +61,10 @@ StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) 
     }
 
     consume(parser, TOKEN_RIGHT_PAREN, " after function parameters");
+    if (!match(parser, TOKEN_LEFT_BRACE)) {
+        parseErrorAtCurrent(parser, "Functions must have a block as their body");
+    }
+    StmtBlockNode *body = (StmtBlockNode*) blockStmt(parser);
 
     StmtFunction *function = ALLOC_NODE(StmtFunction);
 
@@ -74,7 +73,7 @@ StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) 
 
     function->returns = returnType;
 
-    function->body = nullptr;
+    function->body = body;
 
     function->parameters = parameters;
 
@@ -88,18 +87,6 @@ StmtNode *variableDeclaration(Parser *parser, char *name, TokenType dataType) {
     node->name = name;
     node->varType = dataType;
 
-    Variable var = {dataType, false};
-
-    if (HashMapHas(&parser->program.functions, node->name)) {
-        parseError(parser, "Global variable \"%s\" has already been declared as a function", name);
-    }
-
-    if (varInCurrentScope(parser, name)) {
-        parseError(parser, "Global variable \"%s\" has already been declared", name);
-    }
-
-    createVar(parser, node->name, var);
-
     node->value = nullptr;
 
     // if instant assignment
@@ -109,10 +96,6 @@ StmtNode *variableDeclaration(Parser *parser, char *name, TokenType dataType) {
     } else {
         consume(parser, TOKEN_SEMICOLON, " after variable declaration");
     }
-
-    var.initialised = true;
-
-    createVar(parser, node->name, var);
 
     return (StmtNode*) node;
 }
@@ -132,59 +115,13 @@ StmtNode *globalDeclaration(Parser *parser) {
 
     char *name = parser->previous.data;
 
+    if (varExists(parser, name)) {
+        parseError(parser, "Global symbol \"%s\" declared twice", name);
+    }
+
     if (match(parser, TOKEN_LEFT_PAREN)) return functionDeclaration(parser, name, dataType);
 
     // it's a variable
     return variableDeclaration(parser, name, dataType);
 
-}
-
-ArrayList *parseGlobals(Parser *parser) {
-    ArrayList *functions = ArrayListNew(sizeof(FunctionDeclaration));
-
-    while (!match(parser, TOKEN_EOF)) {
-        StmtNode *node = globalDeclaration(parser);
-        if (node == nullptr) {
-            globalSynchronise(parser);
-            continue;
-        }
-        switch (node->type) {
-            case STMT_VAR_DEC:
-                // add to program
-                ArrayListAdd(parser->program.tree, &node);
-                break;
-            case STMT_FUN_DEC: {
-                StmtFunction *funNode = (StmtFunction*) node;
-
-                // subtract 1 because parser->token points to current, not to previous
-                FunctionDeclaration fun = {funNode->name, parser->token - 1, funNode->parameters};
-
-                // add to queue
-                ArrayListAdd(functions, &fun);
-
-                // add to known functions
-                HashMapSet(&parser->program.functions, fun.name, funNode);
-
-
-                // skip function block to be handled later
-                while (!match(parser, TOKEN_LEFT_BRACE)) advance(parser);
-
-                u16 level = 1;
-
-                while (level > 0) {
-                    if (match(parser, TOKEN_EOF)) break; // error will be handled later
-                    if (match(parser, TOKEN_LEFT_BRACE)) level++;
-                    else if (match(parser, TOKEN_RIGHT_BRACE)) level--;
-                    else advance(parser);
-                }
-
-                break;
-            }
-
-            default:
-                break;
-        }
-    }
-
-    return functions;
 }

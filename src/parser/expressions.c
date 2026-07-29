@@ -53,47 +53,26 @@ ExprNode *exprBinary(Parser *parser, ExprNode *left) {
     return (ExprNode*) node;
 }
 
-void parseArgs(Parser *parser, ExprCallNode *call, u32 arity) {
-    u32 paramsPassed = 0;
+void parseArgs(Parser *parser, ExprCallNode *call) {
 
     if (!check(parser, TOKEN_RIGHT_PAREN)) {
         do {
             ExprNode *param = expression(parser);
             ArrayListAdd(call->args, &param);
-            paramsPassed++;
         } while (match(parser, TOKEN_COMMA));
-
     }
-
-    if (arity != paramsPassed)
-        parseError(parser, "Function \"%s\" expects %u arguments, %u were passed instead", call->target, arity, paramsPassed);
-
 }
 
 ExprNode *call(Parser *parser, ExprNode *left) {
-    if (parser->inGlobalPhase) {
-        parseError(parser, "No functions may be called during global variable initialisation");
-    }
+
     ExprCallNode *node = ALLOC_NODE(ExprCallNode);
 
     node->header.type = EXPR_CALL;
     node->args = ArrayListNew(sizeof(ExprNode*));
 
-    u32 functionArity;
+    node->target = left;
 
-    switch (left->type) {
-        case EXPR_VAR:
-            node->target = ((ExprVarNode*) left)->name;
-
-            functionArity = getFunction(parser, node->target).parameters->length;
-
-            break;
-        default:
-            parseError(parser, "Invalid assignment target");
-            functionArity = 0;
-    }
-
-    parseArgs(parser, node, functionArity);
+    parseArgs(parser, node);
 
     consume(parser, TOKEN_RIGHT_PAREN, " after function arguments");
 
@@ -132,16 +111,6 @@ ExprNode *variable(Parser *parser) {
     ExprVarNode *node = ALLOC_NODE(ExprVarNode);
     node->header.type = EXPR_VAR;
     node->name = parser->previous.data;
-
-    if (!varExists(parser, node->name) && !HashMapHas(&parser->program.functions, node->name)) {
-        parseError(parser, "Unknown variable or function identifier \"%s\"", node->name);
-    }
-
-    if (varExists(parser, node->name)) {
-        if (!getVar(parser, node->name).initialised) {
-            parseError(parser, "Variable \"%s\" may not use itself in its own declaration", node->name);
-        }
-    }
 
     return (ExprNode*) node;
 }

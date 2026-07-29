@@ -18,7 +18,7 @@ void beginScope(Parser *parser) {
     Scope *new = malloc(sizeof(Scope));
 
     new->enclosing = parser->currentScope;
-    HashMapInit(&new->variables, sizeof(Variable));
+    HashMapInit(&new->variables, sizeof(Symbol));
 
     parser->currentScope = new;
 }
@@ -53,20 +53,17 @@ bool varInCurrentScope(const Parser *parser, char* name) {
     return HashMapHas(&parser->currentScope->variables, name);
 }
 
-void createVar(Parser *parser, char *name, Variable var) {
+void createVar(Parser *parser, char *name, Symbol var) {
     HashMapSet(&parser->currentScope->variables, name, &var);
 }
 
-void createCurrentScopeVar(Parser *parser, char *name, Variable var) {
+void createCurrentScopeVar(Parser *parser, char *name, Symbol var) {
     if (varInCurrentScope(parser, name)) parseError(parser, "Variable \"%s\" already declared in current scope", name);
     else createVar(parser, name, var);
 }
 
-Variable getVar(Parser *parser, char *name) {
-    Variable var = {
-        TOKEN_ERROR,
-        false
-    };
+Symbol getVar(Parser *parser, char *name) {
+    Symbol var;
 
     Scope *scope = parser->currentScope;
 

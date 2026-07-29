@@ -15,10 +15,25 @@ bool matchTypeIdent(Parser *parser);
 
 void synchronise(Parser *parser);
 
-StmtFunction getFunction(Parser *parser, char *name);
-
+typedef enum {
+    TYPE_VAR,
+    TYPE_FUNC
+} SymbolType;
 
 typedef struct {
-    TokenType type;
+    SymbolType type;
     bool initialised;
-} Variable;
+    union {
+        StmtVarDeclNode *var;
+        StmtFunction *func;
+    } as;
+} Symbol;
+
+#define FUNC_SYMBOL(function) ((Symbol) {.type = TYPE_FUNC, true, {.func = function}})
+#define VAR_SYMBOL(variable) ((Symbol) {.type = TYPE_VAR, false, {.var = variable}})
+
+#define AS_FUNC(symbol) (symbol.as.func)
+#define AS_VAR(symbol) (symbol.as.var)
+
+#define IS_FUNC(symbol) (symbol.type == TYPE_FUNC)
+#define IS_VAR(symbol) (symbol.type == TYPE_VAR)

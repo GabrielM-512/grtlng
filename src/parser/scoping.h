@@ -10,10 +10,10 @@ void endScope(Parser *parser);
 bool varExists(const Parser *parser, char* name);
 bool varInCurrentScope(const Parser *parser, char* name);
 
-void createVar(Parser *parser, char *name, Variable var);
-void createCurrentScopeVar(Parser *parser, char *name, Variable var);
+void createVar(Parser *parser, char *name, Symbol var);
+void createCurrentScopeVar(Parser *parser, char *name, Symbol var);
 
-Variable getVar(Parser *parser, char *name);
+Symbol getVar(Parser *parser, char *name);
 
 typedef struct Scope {
     struct Scope *enclosing;
