@@ -2,7 +2,6 @@
 
 #include "parser.h"
 #include "parseUtils.h"
-#include "scoping.h"
 #include "expressions.h"
 #include "statements.h"
 
@@ -98,10 +97,6 @@ StmtNode *globalDeclaration(Parser *parser) {
     }
 
     char *name = parser->previous.data;
-
-    if (varExists(parser, name)) {
-        parseError(parser, "Global symbol \"%s\" declared twice", name);
-    }
 
     if (match(parser, TOKEN_LEFT_PAREN)) return functionDeclaration(parser, name, dataType);
 

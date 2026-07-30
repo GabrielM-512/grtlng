@@ -5,6 +5,7 @@
 #include "parseUtils.h"
 #include "scoping.h"
 #include "globalScope.h"
+#include "resolving.h"
 
 #include "../error.h"
 #include "../debug/debugInfos.h"
@@ -41,19 +42,10 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
             continue;
         }
 
-        switch (declaration->type) {
-            case STMT_FUN_DEC: {
-                StmtFunction *func = (StmtFunction*) declaration;
-                createVar(parser, func->name, FUNC_SYMBOL(func));
-            }
-            case STMT_VAR_DEC:
-                break;
-            default:
-                // unreachable
-        }
-
         ArrayListAdd(parser->program.tree, &declaration);
     }
+
+    resolve(parser);
 
 
     // call main to finish init segment

@@ -110,6 +110,12 @@ Value evaluateCall(ExprCallNode *call) {
     }
     StmtFunction function = *AS_FUNC(target);
 
+    if (call->args->length != function.parameters->length) {
+        fprintf(stderr, "Fatal Interpreter Error: Function \"%s\" expected %u arguments, got %u instead\n",
+            function.name, function.parameters->length, call->args->length);
+        exit(-1);
+    }
+
     Value params[call->args->length];
 
     for (u32 i = 0; i < call->args->length; i++) {

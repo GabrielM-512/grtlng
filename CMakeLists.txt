@@ -40,6 +40,8 @@ add_executable(grtlng src/main.c
         src/parser/scoping.h
         src/parser/statements.c
         src/parser/statements.h
+        src/parser/resolving.c
+        src/parser/resolving.h
 )
 
 target_compile_options(grtlng
