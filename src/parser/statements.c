@@ -1,7 +1,5 @@
 #include "statements.h"
 
-#include <stdio.h>
-
 #include "expressions.h"
 #include "parser.h"
 #include "parseUtils.h"
@@ -153,7 +151,7 @@ StmtNode *localVarDeclStmt(Parser *parser) {
 
     if (check(parser, TOKEN_LEFT_PAREN)) {
         const char *hint = "Function declarations are only permitted in the global scope";
-        parseErrorHint(parser, hint, "Unexpected '(' in local variable declaration");
+        parseErrorAtCurrentHint(parser, hint, "Unexpected '(' in local variable declaration");
 
         return (StmtNode*) node;
     }
