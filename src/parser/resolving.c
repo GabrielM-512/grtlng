@@ -247,6 +247,8 @@ void resolveStmt(Parser *parser, StmtNode *node) {
 }
 
 void resolveExpr(Parser *parser, ExprNode *node) {
+    // doing this is safe as every return of a nullptr as a node only happens if an error has already been triggered, meaning none of this gets executed
+    if (node == nullptr) return;
     ExprResolveFn fn = exprFunctions[node->type];
     if (fn != nullptr) exprFunctions[node->type](parser, node);
 }

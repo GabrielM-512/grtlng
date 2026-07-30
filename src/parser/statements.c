@@ -143,19 +143,22 @@ StmtNode *localVarDeclStmt(Parser *parser) {
     node->varType = parser->previous.type;
     node->header.type = STMT_VAR_DEC;
 
+    // to make it possible to return properly-initialised node on error
+    node->name =  "";
+    node->value = nullptr;
+
     if (!consume(parser, TOKEN_IDENTIFIER, " after variable type")) {
-        return nullptr;
+        return (StmtNode*) node;
     }
 
-    if (match(parser, TOKEN_LEFT_PAREN)) {
+    if (check(parser, TOKEN_LEFT_PAREN)) {
         const char *hint = "Function declarations are only permitted in the global scope";
         parseErrorHint(parser, hint, "Unexpected '(' in local variable declaration");
-        return nullptr;
+
+        return (StmtNode*) node;
     }
 
     node->name = parser->previous.data;
-
-    node->value = nullptr;
 
     // if instant assignment
     if (match(parser, TOKEN_EQUALS)) {
