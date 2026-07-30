@@ -145,9 +145,4 @@ typedef struct {
 } Parser;
 
 
-typedef struct {
-    TokenType type;
-    char *name;
-} Parameter;
-
 ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source);

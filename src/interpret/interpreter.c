@@ -123,7 +123,7 @@ Value evaluateCall(ExprCallNode *call) {
     startEnvironment();
 
     for (u32 i = 0; i < call->args->length; i++) {
-        createVar(ArrayListRead(function.parameters, i, Parameter).name, &params[i]);
+        createVar(ArrayListRead(function.parameters, i, StmtVarDeclNode*)->name, &params[i]);
     }
 
     StmtBlockNode *body = function.body;
