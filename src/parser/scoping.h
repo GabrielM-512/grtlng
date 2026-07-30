@@ -13,6 +13,8 @@ bool varInCurrentScope(const Parser *parser, char* name);
 void createVar(Parser *parser, char *name, Symbol var);
 void createCurrentScopeVar(Parser *parser, char *name, Symbol var);
 
+void activateVar(Parser *parser, char *name);
+
 Symbol getVar(Parser *parser, char *name);
 
 typedef struct Scope {

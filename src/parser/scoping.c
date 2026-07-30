@@ -32,21 +32,25 @@ void endScope(Parser *parser) {
     parser->currentScope = previous;
 }
 
-bool varExists(const Parser *parser, char* name) {
+Scope *findScope(const Parser *parser, char *name) {
     Scope *scope = parser->currentScope;
 
     while (true) {
         // it exists
-        if (HashMapHas(&scope->variables, name)) return true;
+        if (HashMapHas(&scope->variables, name)) {
+            return scope;
+        }
 
         // it doesnt exist
-        if (scope->enclosing == nullptr) break;
+        if (scope->enclosing == nullptr) return nullptr;
 
         // keep iterating
         scope = scope->enclosing;
     }
+}
 
-    return false;
+bool varExists(const Parser *parser, char* name) {
+    return findScope(parser, name) == nullptr ? false : true;
 }
 
 bool varInCurrentScope(const Parser *parser, char* name) {
@@ -62,25 +66,24 @@ void createCurrentScopeVar(Parser *parser, char *name, Symbol var) {
     else createVar(parser, name, var);
 }
 
+void activateVar(Parser *parser, char *name) {
+    Symbol var = getVar(parser, name);
+    var.initialised = true;
+    Scope *scope = findScope(parser, name);
+
+    HashMapSet(&scope->variables, name, &var);
+}
+
 Symbol getVar(Parser *parser, char *name) {
     Symbol var;
 
-    Scope *scope = parser->currentScope;
+    Scope *scope = findScope(parser, name);
 
-    while (true) {
-        // it exists
-        if (HashMapHas(&scope->variables, name)) {
-            HashMapGet(&scope->variables, name, &var);
-            break;
-        }
-
-        // it doesnt exist
-        if (scope->enclosing == nullptr) break;
-
-        // keep iterating
-        scope = scope->enclosing;
+    if (scope != nullptr) {
+        HashMapGet(&scope->variables, name, &var);
     }
 
-
     return var;
+
+
 }
