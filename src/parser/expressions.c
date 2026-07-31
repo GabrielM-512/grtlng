@@ -31,6 +31,8 @@ typedef struct {
 } ParseRule;
 
 ParseRule getRule(TokenType token);
+ExprNode *parseExprPrec(Parser *parser);
+ExprNode *parseExprPrecRight(Parser *parser);
 
 /*
     EEEEE   X   X   PPPP    RRRR    EEEEE    SSSS    SSSS    III     OOO    N   N    SSSS

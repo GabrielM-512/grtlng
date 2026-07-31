@@ -74,7 +74,7 @@ StmtNode *variableDeclaration(Parser *parser, char *name, TokenType dataType) {
 
     // if instant assignment
     if (match(parser, TOKEN_EQUALS)) {
-        node->value = parseExprPrecRight(parser);
+        node->value = expression(parser);
         consume(parser, TOKEN_SEMICOLON, " after variable assignment");
     } else {
         consume(parser, TOKEN_SEMICOLON, " after variable declaration");
