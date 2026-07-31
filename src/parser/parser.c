@@ -9,7 +9,6 @@
 
 #include "../error.h"
 #include "../debug/debugInfos.h"
-#include "../util/HashMap.h"
 
 void parserInit(Parser *parser) {
     parser->token = 0;

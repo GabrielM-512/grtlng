@@ -2,7 +2,6 @@
 
 #include "../util/ArenaAllocator.h"
 #include "../util/ArrayList.h"
-#include "../util/HashMap.h"
 
 #include "../lexer.h"
 
