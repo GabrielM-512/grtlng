@@ -75,7 +75,11 @@ void activateVar(Parser *parser, char *name) {
 }
 
 Symbol getVar(Parser *parser, char *name) {
-    Symbol var;
+    Symbol var = {
+        .type = TYPE_VAR,
+        .initialised = false,
+        .as = {nullptr}
+    };
 
     Scope *scope = findScope(parser, name);
 

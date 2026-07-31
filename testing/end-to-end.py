@@ -178,7 +178,7 @@ def main():
 
 
     indices = list(range(len(tests)))
-    results : list[Result]
+    results : list[Result] = []
 
     match sys.argv[2]:
         case "single":

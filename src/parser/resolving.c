@@ -18,8 +18,10 @@ void resolveStmt(Parser *parser, StmtNode *node);
 void error(Parser *parser, const char *message, ...) {
     parser->hadError = true;
     va_list args;
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
     va_start(args);
     fprintf(stderr, "[TODO] Encountered Error: ");
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
     vfprintf(stderr, message, args);
     fprintf(stderr, "\n");
     va_end(args);
