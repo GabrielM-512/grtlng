@@ -29,11 +29,11 @@ typedef struct {
     } as;
 } Symbol;
 
-#define FUNC_SYMBOL(function) ((Symbol) {.type = TYPE_FUNC, true, {.func = function}})
-#define VAR_SYMBOL(variable) ((Symbol) {.type = TYPE_VAR, false, {.var = variable}})
+#define FUNC_SYMBOL(symbol) ((Symbol) {.type = TYPE_FUNC, true, {.func = (symbol)}})
+#define VAR_SYMBOL(symbol) ((Symbol) {.type = TYPE_VAR, false, {.var = (symbol)}})
 
-#define AS_FUNC(symbol) (symbol.as.func)
-#define AS_VAR(symbol) (symbol.as.var)
+#define AS_FUNC(symbol) ((symbol).as.func)
+#define AS_VAR(symbol) ((symbol).as.var)
 
-#define IS_FUNC(symbol) (symbol.type == TYPE_FUNC)
-#define IS_VAR(symbol) (symbol.type == TYPE_VAR)
+#define IS_FUNC(symbol) ((symbol).type == TYPE_FUNC)
+#define IS_VAR(symbol) ((symbol).type == TYPE_VAR)
