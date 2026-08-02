@@ -28,7 +28,7 @@ class Test:
                 error(f"Test \"{name}\" has invalid stdout path: \"{self.stdout}\"")
                 data_failed = True
             if not os.path.isfile(self.stderr):
-                error(f"Test \"{name}\" has invalid stderr path: \"{self.stdout}\"")
+                error(f"Test \"{name}\" has invalid stderr path: \"{self.stderr}\"")
                 data_failed = True
         except KeyError as e:
             error(f"Test \"{name}\" was missing attribute {e}")
