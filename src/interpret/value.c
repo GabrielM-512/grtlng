@@ -7,9 +7,12 @@ void printValue(Value val) {
         case VAL_NUM:
             printf("%f", AS_NUM(val));
             break;
-        case VAL_FUNC:
-            printf("<fn \"%s\" at %p>", AS_FUNC(val)->name, AS_FUNC(val));
+        case VAL_FUNC: {
+            StmtFunction *function = AS_FUNC(val);
+            printf("<fn \"%s\" at %p>", function->name, function);
             break;
+        }
+
         default:
     }
     putchar('\n');
