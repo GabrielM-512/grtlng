@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 4.1)
 project(grtlng C)
 
+include(CTest)
+
 set(CMAKE_C_STANDARD 23)
 
-add_executable(grtlng src/main.c
+add_executable(grtlng
+        src/main.c
         src/lexer.c
         src/lexer.h
         src/util/ArrayList.c
@@ -50,3 +53,7 @@ target_compile_options(grtlng
         #PUBLIC -Werror
         #PUBLIC -Ofast
 )
+
+enable_testing()
+
+add_test(NAME End-To-End COMMAND python ../testing/end-to-end.py ../testing/config.json multi)
