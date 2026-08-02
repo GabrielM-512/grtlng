@@ -5,7 +5,6 @@
 #include "parseUtils.h"
 
 #include "../error.h"
-#include "../debug/debugInfos.h"
 
 typedef enum {
     PREC_NONE,
@@ -181,7 +180,7 @@ ExprNode *parseExpr(Parser *parser, ExprPrecedence precedence) {
 
     if (prefixRule == nullptr) {
 
-        parseError(parser, "Tried starting (sub-) expression with invalid token: %s", getTokenSymbol(parser->previous.type));
+        parseError(parser, "Expected expression");
 
         return nullptr;
     }
