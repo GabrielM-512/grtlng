@@ -24,6 +24,9 @@ class Test:
             if data.__contains__("stderr"): self.stderr : str = data["stderr"]
             else:                           self.stderr : str = "/home/gabriel/CLionProjects/language/testing/tests/empty"
 
+            if not os.path.isfile(self.path):
+                error(f"Test \"{name}\" has invalid testfile path: \"{self.path}\"")
+                data_failed = True
             if not os.path.isfile(self.stdout):
                 error(f"Test \"{name}\" has invalid stdout path: \"{self.stdout}\"")
                 data_failed = True
@@ -191,6 +194,8 @@ def main():
             error(f"sys.argv[2] (single / multicore processing) was given unexpected value. Expected \"single\" or \"multi\", got {sys.argv[2]}")
             exit(os.EX_USAGE)
 
+    end = time.time_ns()
+
 
     errors = []
     failed_tests = 0
@@ -208,7 +213,7 @@ def main():
     else:
         print(f"{failed_tests} test(s) failed. See \"{config.log}\" for more info")
 
-    end = time.time_ns()
+
     print("Test duration:", (end - start) / 1e9)
     print("Number of tests:", len(tests))
 
