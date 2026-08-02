@@ -169,7 +169,7 @@ def worker_run(index):
     global _tests, _config
     return run_test(_tests[index], _config)
 
-def main():
+def main() -> int:
     start = time.time_ns()
 
     if len(sys.argv) != 3:
@@ -217,5 +217,9 @@ def main():
     print("Test duration:", (end - start) / 1e9)
     print("Number of tests:", len(tests))
 
+    if failed_tests == 0: return 0
+    else:                 return 1
+
 if __name__ == "__main__":
-    main()
+    exitCode = main()
+    exit(exitCode)
