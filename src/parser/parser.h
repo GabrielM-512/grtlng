@@ -21,6 +21,12 @@ typedef struct {
     ExprNodeType type;
 } ExprNode;
 
+typedef struct {
+    ExprNode *expr;
+    ArrayList prefix;
+    ArrayList suffix;
+} Expr;
+
 
 typedef struct {
     ExprNode header;
@@ -78,12 +84,12 @@ typedef struct {
     StmtNode header;
     TokenType varType;
     char* name;
-    ExprNode *value;
+    Expr *value;
 } StmtVarDeclNode;
 
 typedef struct {
     StmtNode header;
-    ExprNode *expr;
+    Expr *expr;
 } StmtExprNode;
 
 typedef struct {
@@ -93,24 +99,24 @@ typedef struct {
 
 typedef struct {
     StmtNode header;
-    ExprNode *value;
+    Expr *value;
 } StmtReturnNode;
 
 typedef struct {
     StmtNode header;
-    ExprNode *condition;
+    Expr *condition;
     StmtNode *thenBranch;
     StmtNode *elseBranch;
 } StmtIfNode;
 
 typedef struct {
     StmtNode header;
-    ExprNode *value;
+    Expr *value;
 } StmtPrintNode;
 
 typedef struct {
     StmtNode header;
-    ExprNode *condition;
+    Expr *condition;
     StmtNode *body;
 } StmtWhileNode;
 

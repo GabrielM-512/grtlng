@@ -45,6 +45,8 @@ add_executable(grtlng
         src/parser/statements.h
         src/parser/resolving.c
         src/parser/resolving.h
+        src/interpret/environment.c
+        src/interpret/environment.h
 )
 
 target_compile_options(grtlng

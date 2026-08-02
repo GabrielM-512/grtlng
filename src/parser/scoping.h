@@ -7,15 +7,15 @@
 void beginScope(Parser *parser);
 void endScope(Parser *parser);
 
-bool varExists(const Parser *parser, char* name);
-bool varInCurrentScope(const Parser *parser, char* name);
+bool symbolExists(const Parser *parser, char* name);
+bool symbolInCurrentScope(const Parser *parser, char* name);
 
-void createVar(Parser *parser, char *name, Symbol var);
-void createCurrentScopeVar(Parser *parser, char *name, Symbol var);
+void createSymbol(Parser *parser, char *name, Symbol var);
+void createCurrentScopeSymbol(Parser *parser, char *name, Symbol var);
 
-void activateVar(Parser *parser, char *name);
+void activateSymbol(Parser *parser, char *name);
 
-Symbol getVar(Parser *parser, char *name);
+Symbol getSymbol(Parser *parser, char *name);
 
 typedef struct Scope {
     struct Scope *enclosing;

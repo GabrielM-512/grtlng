@@ -17,6 +17,10 @@ typedef struct {
     } as;
 } Value;
 
+Value evaluate(Expr *expr);
+Value evaluateCall(ExprCallNode *call);
+bool isTruthy(Value val);
+
 void printValue(Value val);
 
 #define VALUE_FUNC(value) ((Value) {.type = VAL_FUNC, {.func = (value)}})

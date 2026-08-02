@@ -7,242 +7,20 @@
 
 #include "../parser/parser.h"
 #include "value.h"
-#include "../debug/debugInfos.h"
-#include "../util/HashMap.h"
-
-typedef struct Environment {
-    struct Environment *enclosing;
-    HashMap *vars;
-} Environment;
-
-typedef struct {
-    Environment *env;
-    Environment *global;
-    bool returning;
-    Value returnValue;
-} Interpreter;
 
 Interpreter interpreter;
 
 void interpret(StmtNode *stmt);
 
-void startEnvironment() {
-    Environment *env = malloc(sizeof(Environment));
-
-    env->enclosing = interpreter.env;
-    env->vars = malloc(sizeof(HashMap));
-
-    HashMapInit(env->vars, sizeof(Value));
-
-    interpreter.env = env;
-}
-
-void endEnvironment() {
-    Environment *old = interpreter.env;
-
-    interpreter.env = old->enclosing;
-
-    HashMapFree(old->vars);
-    free(old);
-}
-
-static void createVar(char *name, const Value *value) {
-    if (!HashMapSet(interpreter.env->vars, name, value)) {
-        fprintf(stderr, "Fatal Interpreter Error: Variable \"%s\" already exists on declaration\n", name);
-        exit(-1);
-    }
-}
-
-void setVar(char *name, const Value *value) {
-    Environment *env = interpreter.env;
-    while (true) {
-        if (!HashMapHas(env->vars, name)) {
-            if (env->enclosing == nullptr) break;
-
-            env = env->enclosing;
-            continue;
-        }
-
-        HashMapSet(env->vars, name, value);
-        return;
-
-    }
-
-    fprintf(stderr, "Fatal Interpreter Error: Unknown Variable \"%s\"\n", name);
-    exit(-1);
-
-}
-
-static Value getVar(char *name) {
-    Value val;
-
-    Environment *env = interpreter.env;
-
-    while (true) {
-        if (!HashMapHas(env->vars, name)) {
-            if (env->enclosing == nullptr) break;
-
-            env = env->enclosing;
-            continue;
-        }
-
-        HashMapGet(env->vars, name, &val);
-        return val;
-
-    }
-
-    fprintf(stderr, "Fatal Interpreter Error: Unknown Variable \"%s\"\n", name);
-    exit(-1);
-
-}
-
-Value evaluate(ExprNode *expr);
-
-
-Value evaluateCall(ExprCallNode *call) {
-
-    Value target = evaluate(call->target);
-    if (!IS_FUNC(target)) {
-        fprintf(stderr, "Tried to call non-function");
-        exit(-1);
-    }
-    StmtFunction function = *AS_FUNC(target);
-
-    if (call->args.length != function.parameters.length) {
-        fprintf(stderr, "Fatal Interpreter Error: Function \"%s\" expected %u arguments, got %u instead\n",
-            function.name, function.parameters.length, call->args.length);
-        exit(-1);
-    }
-
-    Value params[call->args.length];
-
-    for (u32 i = 0; i < call->args.length; i++) {
-        params[i] = evaluate(ArrayListRead(&call->args, i, ExprNode*));
-    }
-
-    Environment *old = interpreter.env;
-    interpreter.env = interpreter.global;
-
-
+void interpretBlock(StmtBlockNode *node) {
     startEnvironment();
 
-    for (u32 i = 0; i < call->args.length; i++) {
-        createVar(ArrayListRead(&function.parameters, i, StmtVarDeclNode*)->name, &params[i]);
+    for (u32 i = 0; i < node->content.length; i++) {
+        interpret(ArrayListRead(&node->content, i, StmtNode*));
+        if (interpreter.returning) break;
     }
-
-    StmtBlockNode *body = function.body;
-    interpret((StmtNode*) body);
 
     endEnvironment();
-
-    interpreter.env = old;
-
-    interpreter.returning = false;
-
-    Value returns = interpreter.returnValue;
-
-    interpreter.returnValue = VALUE_NAN;
-
-    return returns;
-}
-
-bool isTruthy(Value val) {
-    switch (val.type) {
-        case VAL_NUM:
-            return AS_NUM(val) != 0;
-        case VAL_FUNC:
-            return true;
-        default:
-            // unreachable
-    }
-    return true;
-}
-
-void increment() {
-
-}
-
-
-Value evaluate(ExprNode *expr) {
-    switch (expr->type) {
-        case EXPR_UNARY: {
-            ExprUnaryNode *node = (ExprUnaryNode*) expr;
-            switch (node->operator) {
-                case TOKEN_MINUS:
-                    return VALUE_NUM(- AS_NUM(evaluate(node->right)));
-                case TOKEN_BANG:
-                    return VALUE_BOOL(!isTruthy(evaluate(node->right)));
-                case TOKEN_PLUS:
-                    return evaluate(node->right);
-                default:
-                    fprintf(stderr, "Interpreter cannot evaluate Unary Expression Token %s (#%d)", getTokenSymbol(node->operator), node->operator);
-                    exit(-1);
-            }
-        }
-
-        case EXPR_BINARY: {
-
-#define MAKE_OPERATION(type, operator) case type: return VALUE_NUM(AS_NUM(evaluate(node->left)) operator AS_NUM(evaluate(node->right)))
-
-            ExprBinaryNode *node = (ExprBinaryNode*) expr;
-            switch (node->operator) {
-                MAKE_OPERATION(TOKEN_PLUS, +);
-                MAKE_OPERATION(TOKEN_MINUS, -);
-                MAKE_OPERATION(TOKEN_STAR, *);
-                MAKE_OPERATION(TOKEN_SLASH, /);
-
-                MAKE_OPERATION(TOKEN_MORE, >);
-                MAKE_OPERATION(TOKEN_LESS, <);
-                MAKE_OPERATION(TOKEN_MORE_EQUALS, >=);
-                MAKE_OPERATION(TOKEN_LESS_EQUALS, <=);
-                MAKE_OPERATION(TOKEN_EQUALS_EQUALS, ==);
-                MAKE_OPERATION(TOKEN_BANG_EQUALS, !=);
-
-                case TOKEN_AMP_AMP:
-                    if (!isTruthy(evaluate(node->left))) return VALUE_FALSE;
-                    return VALUE_BOOL(isTruthy(evaluate(node->right)));
-                case TOKEN_PIPE_PIPE:
-                    if (isTruthy(evaluate(node->left))) return VALUE_TRUE;
-                    return VALUE_BOOL(isTruthy(evaluate(node->right)));
-                default:
-                    fprintf(stderr, "Interpreter cannot evaluate Binary Expression Token %s (%d)", getTokenSymbol(node->operator), node->operator);
-                    exit(-1);
-            }
-#undef MAKE_OPERATION
-        }
-
-        case EXPR_NUMBER:
-            return VALUE_NUM(((ExprNumberNode*) expr)->value);
-
-        case EXPR_VAR:
-            return getVar(((ExprVarNode*) expr)->name);
-
-        case EXPR_VAR_ASSIGN: {
-            ExprVarAssignNode *node = (ExprVarAssignNode*) expr;
-            switch (node->target->type) {
-                case EXPR_VAR: {
-                    ExprVarNode *target = (ExprVarNode*) node->target;
-                    Value val = evaluate(node->value);
-                    setVar(target->name, &val);
-                    return val;
-                }
-                default:
-                    INTERN_ERROR_LOCATION();
-                    fprintf(stderr, "Tried assigning to non-variable: %d", node->target->type);
-                    exit(-1);
-            }
-        }
-
-        case EXPR_CALL:
-            return evaluateCall((ExprCallNode*) expr);
-
-
-        default:
-            fprintf(stderr, "    Unhandled Expression Node type: %d [interpret/interpreter.c]\n", expr->type);
-            exit(-1);
-
-    }
-    return VALUE_NUM(NAN);
 }
 
 void interpret(StmtNode *stmt) {
@@ -269,15 +47,7 @@ void interpret(StmtNode *stmt) {
             break;
         }
         case STMT_BLOCK: {
-            StmtBlockNode *block = (StmtBlockNode*) stmt;
-            startEnvironment();
-
-            for (u32 i = 0; i < block->content.length; i++) {
-                interpret(ArrayListRead(&block->content, i, StmtNode*));
-                if (interpreter.returning) break;
-            }
-
-            endEnvironment();
+            interpretBlock((StmtBlockNode*) stmt);
             break;
         }
         case STMT_RETURN: {

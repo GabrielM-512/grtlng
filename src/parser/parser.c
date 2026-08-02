@@ -49,13 +49,13 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
 
 
     // call main to finish init segment
-    if (!varExists(parser, "main")) {
+    if (!symbolExists(parser, "main")) {
         fprintf(stderr, "Encountered error in program: No main function in program\n");
         parser->hadError = true;
         return parser->program;
     }
 
-    Symbol main = getVar(parser, "main");
+    Symbol main = getSymbol(parser, "main");
 
     if (!IS_FUNC(main)) {
         fprintf(stderr, "Encountered error in program: Symbol \"main\" must be a function");

@@ -86,7 +86,7 @@ void printVarDec(StmtVarDeclNode *stmt) {
     if (stmt->value == nullptr) printf("without value");
     else {
         printf("with value = ");
-        printExpr(stmt->value);
+        printExpr(stmt->value->expr);
     }
 
 }
@@ -101,7 +101,7 @@ void printBlock(StmtBlockNode *block) {
 
 void printIf(StmtIfNode *stmt) {
     printf("    IF ");
-    printExpr(stmt->condition);
+    printExpr(stmt->condition->expr);
     printf(" THEN\n");
     printStmt(stmt->thenBranch);
 
@@ -114,7 +114,7 @@ void printIf(StmtIfNode *stmt) {
 
 void printWhile(StmtWhileNode *stmt) {
     printf("    WHILE ");
-    printExpr(stmt->condition);
+    printExpr(stmt->condition->expr);
     printf(" DO\n");
     printStmt(stmt->body);
     printf("    END");
@@ -124,7 +124,7 @@ static void printStmt(StmtNode *stmt) {
     switch (stmt->type) {
         case STMT_EXPR:
             printf("    [EXPR] ");
-            printExpr(((StmtExprNode*)stmt)->expr);
+            printExpr(((StmtExprNode*)stmt)->expr->expr);
             break;
         case STMT_VAR_DEC:
             printVarDec((StmtVarDeclNode*) stmt);
@@ -137,7 +137,7 @@ static void printStmt(StmtNode *stmt) {
             if (((StmtReturnNode*) stmt)->value == nullptr) printf("without value");
             else {
                 printf("with value ");
-                printExpr(((StmtReturnNode*) stmt)->value);
+                printExpr(((StmtReturnNode*) stmt)->value->expr);
             }
             break;
         case STMT_IF:
@@ -145,7 +145,7 @@ static void printStmt(StmtNode *stmt) {
             break;
         case STMT_PRINT:
             printf("    print ");
-            printExpr(((StmtPrintNode*) stmt)->value);
+            printExpr(((StmtPrintNode*) stmt)->value->expr);
             break;
         case STMT_WHILE:
             printWhile((StmtWhileNode*) stmt);

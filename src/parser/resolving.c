@@ -53,17 +53,17 @@ void globalVarDec(Parser *parser, StmtNode *node) {
             };
     }
 
-    if (varExists(parser, name)) {
+    if (symbolExists(parser, name)) {
         error(parser, "Redeclared global Symbol \"%s\"", name);
     } else {
-        createVar(parser, name, symbol);
+        createSymbol(parser, name, symbol);
     }
 
 
     if (node->type == STMT_VAR_DEC) {
         StmtVarDeclNode *var = (StmtVarDeclNode*) node;
-        if (var->value != nullptr) resolveExpr(parser, var->value);
-        activateVar(parser, name);
+        if (var->value != nullptr) resolveExpr(parser, var->value->expr);
+        activateSymbol(parser, name);
     }
 
 }
@@ -98,15 +98,15 @@ void resolve(Parser *parser) {
 void varDeclaration(Parser *parser, StmtNode *n) {
     StmtVarDeclNode *node = (StmtVarDeclNode*) n;
 
-    if (varInCurrentScope(parser, node->name)) {
+    if (symbolInCurrentScope(parser, node->name)) {
         error(parser, "Redeclared Variable \"%s\" in same scope", node->name);
     } else {
-        createVar(parser, node->name, VAR_SYMBOL(node));
+        createSymbol(parser, node->name, VAR_SYMBOL(node));
     }
 
-    if (node->value != nullptr) resolveExpr(parser, node->value);
+    if (node->value != nullptr) resolveExpr(parser, node->value->expr);
 
-    activateVar(parser, node->name);
+    activateSymbol(parser, node->name);
 }
 
 void func(Parser *parser, StmtNode *n) {
@@ -117,13 +117,13 @@ void func(Parser *parser, StmtNode *n) {
     for (u32 i = 0; i < node->parameters.length; i++) {
         StmtVarDeclNode *parameter = ArrayListRead(&node->parameters, i, StmtVarDeclNode*);
 
-        if (varInCurrentScope(parser, parameter->name)) {
+        if (symbolInCurrentScope(parser, parameter->name)) {
             error(parser, "Redeclared parameter \"%s\" in function \"%s\"", parameter->name, node->name);
             continue;
         }
 
-        createVar(parser, parameter->name, VAR_SYMBOL(parameter));
-        activateVar(parser, parameter->name);
+        createSymbol(parser, parameter->name, VAR_SYMBOL(parameter));
+        activateSymbol(parser, parameter->name);
     }
 
     parser->inGlobalPhase = false;
@@ -137,7 +137,7 @@ void func(Parser *parser, StmtNode *n) {
 
 void expr(Parser *parser, StmtNode *n) {
     StmtExprNode *node = (StmtExprNode*) n;
-    resolveExpr(parser, node->expr);
+    resolveExpr(parser, node->expr->expr);
 }
 
 void block(Parser *parser, StmtNode *n) {
@@ -155,25 +155,25 @@ void block(Parser *parser, StmtNode *n) {
 
 void return_(Parser *parser, StmtNode *n) {
     StmtReturnNode *node = (StmtReturnNode*) n;
-    if (node->value != nullptr) resolveExpr(parser, node->value);
+    if (node->value != nullptr) resolveExpr(parser, node->value->expr);
 }
 
 void if_(Parser *parser, StmtNode *n) {
     StmtIfNode *node = (StmtIfNode*) n;
 
-    resolveExpr(parser, node->condition);
+    resolveExpr(parser, node->condition->expr);
     resolveStmt(parser, node->thenBranch);
     if (node->elseBranch != nullptr) resolveStmt(parser, node->elseBranch);
 }
 
 void print(Parser *parser, StmtNode *n) {
     StmtPrintNode *node = (StmtPrintNode*) n;
-    resolveExpr(parser, node->value);
+    resolveExpr(parser, node->value->expr);
 }
 
 void while_(Parser *parser, StmtNode *n) {
     StmtWhileNode *node = (StmtWhileNode*) n;
-    resolveExpr(parser, node->condition);
+    resolveExpr(parser, node->condition->expr);
     resolveStmt(parser, node->body);
 }
 
@@ -198,7 +198,7 @@ void unary(Parser *parser, ExprNode *n) {
 
 void var(Parser *parser, ExprNode *n) {
     ExprVarNode *node = (ExprVarNode*) n;
-    if (!varExists(parser, node->name)) {
+    if (!symbolExists(parser, node->name)) {
         error(parser, "Couldn't resolve symbol \"%s\"", node->name);
     }
 }
@@ -218,8 +218,8 @@ static void call(Parser *parser, ExprNode *n) {
     resolveExpr(parser, node->target);
 
     for (u32 i = 0; i < node->args.length; i++) {
-        ExprNode *arg = ArrayListRead(&node->args, i, ExprNode*);
-        resolveExpr(parser, arg);
+        Expr *arg = ArrayListRead(&node->args, i, Expr*);
+        resolveExpr(parser, arg->expr);
     }
 }
 

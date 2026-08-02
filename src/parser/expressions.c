@@ -32,6 +32,7 @@ typedef struct {
 ParseRule getRule(TokenType token);
 ExprNode *parseExprPrec(Parser *parser);
 ExprNode *parseExprPrecRight(Parser *parser);
+ExprNode *parseExprNode(Parser *parser);
 
 /*
     EEEEE   X   X   PPPP    RRRR    EEEEE    SSSS    SSSS    III     OOO    N   N    SSSS
@@ -58,7 +59,7 @@ void parseArgs(Parser *parser, ExprCallNode *call) {
 
     if (!check(parser, TOKEN_RIGHT_PAREN)) {
         do {
-            ExprNode *param = expression(parser);
+            Expr *param = expression(parser);
             ArrayListAdd(&call->args, &param);
         } while (match(parser, TOKEN_COMMA));
     }
@@ -69,7 +70,7 @@ ExprNode *call(Parser *parser, ExprNode *left) {
     ExprCallNode *node = ALLOC_NODE(ExprCallNode);
 
     node->header.type = EXPR_CALL;
-    ArrayListInit(&node->args, sizeof(ExprNode*));
+    ArrayListInit(&node->args, sizeof(Expr*));
 
     node->target = left;
 
@@ -102,7 +103,7 @@ static ExprNode *number(Parser *parser) {
 }
 
 ExprNode *grouping(Parser *parser) {
-    ExprNode *node = expression(parser);
+    ExprNode *node = parseExprNode(parser);
     consume(parser, TOKEN_RIGHT_PAREN, "");
     return node;
 }
@@ -205,8 +206,16 @@ ExprNode *parseExprPrecRight(Parser *parser) {
     return parseExpr(parser, getRule(parser->previous.type).precedence - 1);
 }
 
-ExprNode *expression(Parser *parser) {
+ExprNode *parseExprNode(Parser *parser) {
     return parseExpr(parser, PREC_LIMIT);
+}
+
+Expr *expression(Parser *parser) {
+    Expr *expr = ALLOC_NODE(Expr);
+    expr->expr = parseExprNode(parser);
+    ArrayListInit(&expr->prefix, sizeof(ExprNode*));
+    ArrayListInit(&expr->suffix, sizeof(ExprNode*));
+    return expr;
 }
 
 // TODO: bitwise

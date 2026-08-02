@@ -55,22 +55,24 @@ StmtNode *forStmt(Parser *parser) {
         initialiser = nullptr;
     }
 
-    ExprNode *condition;
+    Expr *condition;
 
     if (!check(parser, TOKEN_SEMICOLON)) {
         condition = expression(parser);
     } else {
-        ExprNumberNode *temp = ALLOC_NODE(ExprNumberNode);
+        ExprNumberNode *value = ALLOC_NODE(ExprNumberNode);
+        *value = (ExprNumberNode) {{EXPR_NUMBER}, 1};
 
-        *temp = (ExprNumberNode) {{EXPR_NUMBER}, 1};
+        Expr *temp = ALLOC_NODE(Expr);
+        temp->expr = (ExprNode*) value;
 
-        condition = (ExprNode*) temp;
+        condition = temp;
     }
 
     consume(parser, TOKEN_SEMICOLON, " after loop condition");
 
 
-    ExprNode *incrementer;
+    Expr *incrementer;
 
     if (!check(parser, TOKEN_RIGHT_PAREN)) incrementer = expression(parser);
     else                                        incrementer = nullptr;

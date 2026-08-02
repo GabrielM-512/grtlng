@@ -49,32 +49,32 @@ Scope *findScope(const Parser *parser, char *name) {
     }
 }
 
-bool varExists(const Parser *parser, char* name) {
+bool symbolExists(const Parser *parser, char* name) {
     return findScope(parser, name) == nullptr ? false : true;
 }
 
-bool varInCurrentScope(const Parser *parser, char* name) {
+bool symbolInCurrentScope(const Parser *parser, char* name) {
     return HashMapHas(&parser->currentScope->variables, name);
 }
 
-void createVar(Parser *parser, char *name, Symbol var) {
+void createSymbol(Parser *parser, char *name, Symbol var) {
     HashMapSet(&parser->currentScope->variables, name, &var);
 }
 
-void createCurrentScopeVar(Parser *parser, char *name, Symbol var) {
-    if (varInCurrentScope(parser, name)) parseError(parser, "Variable \"%s\" already declared in current scope", name);
-    else createVar(parser, name, var);
+void createCurrentScopeSymbol(Parser *parser, char *name, Symbol var) {
+    if (symbolInCurrentScope(parser, name)) parseError(parser, "Variable \"%s\" already declared in current scope", name);
+    else createSymbol(parser, name, var);
 }
 
-void activateVar(Parser *parser, char *name) {
-    Symbol var = getVar(parser, name);
+void activateSymbol(Parser *parser, char *name) {
+    Symbol var = getSymbol(parser, name);
     var.initialised = true;
     Scope *scope = findScope(parser, name);
 
     HashMapSet(&scope->variables, name, &var);
 }
 
-Symbol getVar(Parser *parser, char *name) {
+Symbol getSymbol(Parser *parser, char *name) {
     Symbol var = {
         .type = TYPE_VAR,
         .initialised = false,
@@ -88,6 +88,5 @@ Symbol getVar(Parser *parser, char *name) {
     }
 
     return var;
-
 
 }
