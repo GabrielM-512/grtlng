@@ -24,15 +24,16 @@ void lexerInit(Lexer* lexer, const char *source, ArenaAllocator *tokenData) {
 }
 
 
-ArrayList *scanAll(Lexer* lexer) {
-    ArrayList *tokens = ArrayListNew(sizeof(Token));
+ArrayList scanAll(Lexer* lexer) {
+    ArrayList tokens;
+    ArrayListInit(&tokens, sizeof(Token));
 
     Token token = {TOKEN_LAST, 1, 0, nullptr};
     skipWhitespace(lexer);
 
     while (token.type != TOKEN_EOF) {
         token = scanToken(lexer);
-        ArrayListAdd(tokens, &token);
+        ArrayListAdd(&tokens, &token);
     }
 
     return tokens;

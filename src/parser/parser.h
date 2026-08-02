@@ -48,7 +48,7 @@ typedef struct {
 typedef struct {
     ExprNode header;
     ExprNode *target;
-    ArrayList *args;
+    ArrayList args;
 } ExprCallNode;
 
 typedef struct {
@@ -88,7 +88,7 @@ typedef struct {
 
 typedef struct {
     StmtNode header;
-    ArrayList *content;
+    ArrayList content;
 } StmtBlockNode;
 
 typedef struct {
@@ -120,13 +120,13 @@ typedef struct {
     TokenType returns;
     char *name;
     StmtBlockNode *body;
-    ArrayList *parameters;
+    ArrayList parameters;
 } StmtFunction;
 
 
 typedef struct {
     ArenaAllocator* data;
-    ArrayList *tree;
+    ArrayList tree;
     ExprCallNode main;
 } ParseResult;
 

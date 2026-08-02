@@ -102,4 +102,4 @@ typedef struct {
 
 void lexerInit(Lexer* lexer, const char *source, ArenaAllocator *tokenData);
 
-ArrayList *scanAll(Lexer* lexer);
+ArrayList scanAll(Lexer* lexer);

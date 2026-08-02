@@ -60,7 +60,7 @@ void parseArgs(Parser *parser, ExprCallNode *call) {
     if (!check(parser, TOKEN_RIGHT_PAREN)) {
         do {
             ExprNode *param = expression(parser);
-            ArrayListAdd(call->args, &param);
+            ArrayListAdd(&call->args, &param);
         } while (match(parser, TOKEN_COMMA));
     }
 }
@@ -70,7 +70,7 @@ ExprNode *call(Parser *parser, ExprNode *left) {
     ExprCallNode *node = ALLOC_NODE(ExprCallNode);
 
     node->header.type = EXPR_CALL;
-    node->args = ArrayListNew(sizeof(ExprNode*));
+    ArrayListInit(&node->args, sizeof(ExprNode*));
 
     node->target = left;
 

@@ -108,16 +108,16 @@ Value evaluateCall(ExprCallNode *call) {
     }
     StmtFunction function = *AS_FUNC(target);
 
-    if (call->args->length != function.parameters->length) {
+    if (call->args.length != function.parameters.length) {
         fprintf(stderr, "Fatal Interpreter Error: Function \"%s\" expected %u arguments, got %u instead\n",
-            function.name, function.parameters->length, call->args->length);
+            function.name, function.parameters.length, call->args.length);
         exit(-1);
     }
 
-    Value params[call->args->length];
+    Value params[call->args.length];
 
-    for (u32 i = 0; i < call->args->length; i++) {
-        params[i] = evaluate(ArrayListRead(call->args, i, ExprNode*));
+    for (u32 i = 0; i < call->args.length; i++) {
+        params[i] = evaluate(ArrayListRead(&call->args, i, ExprNode*));
     }
 
     Environment *old = interpreter.env;
@@ -126,8 +126,8 @@ Value evaluateCall(ExprCallNode *call) {
 
     startEnvironment();
 
-    for (u32 i = 0; i < call->args->length; i++) {
-        createVar(ArrayListRead(function.parameters, i, StmtVarDeclNode*)->name, &params[i]);
+    for (u32 i = 0; i < call->args.length; i++) {
+        createVar(ArrayListRead(&function.parameters, i, StmtVarDeclNode*)->name, &params[i]);
     }
 
     StmtBlockNode *body = function.body;
@@ -272,8 +272,8 @@ void interpret(StmtNode *stmt) {
             StmtBlockNode *block = (StmtBlockNode*) stmt;
             startEnvironment();
 
-            for (u32 i = 0; i < block->content->length; i++) {
-                interpret(ArrayListRead(block->content, i, StmtNode*));
+            for (u32 i = 0; i < block->content.length; i++) {
+                interpret(ArrayListRead(&block->content, i, StmtNode*));
                 if (interpreter.returning) break;
             }
 
@@ -325,8 +325,8 @@ i32 interpretProgram(ParseResult program) {
     startEnvironment();
     interpreter.global = interpreter.env;
 
-    for (u32 i = 0; i < program.tree->length; i++) {
-        interpret(ArrayListRead(program.tree, i, StmtNode*));
+    for (u32 i = 0; i < program.tree.length; i++) {
+        interpret(ArrayListRead(&program.tree, i, StmtNode*));
     }
 
     return (i32) AS_NUM(evaluateCall(&program.main));

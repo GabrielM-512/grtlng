@@ -13,7 +13,8 @@
 void parserInit(Parser *parser) {
     parser->token = 0;
 
-    parser->program.tree = ArrayListNew(sizeof(StmtNode*));
+
+    ArrayListInit(&parser->program.tree, sizeof(StmtNode*));
     parser->program.data = ArenaNew();
 
     parser->hadError = false;
@@ -41,7 +42,7 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
             continue;
         }
 
-        ArrayListAdd(parser->program.tree, &declaration);
+        ArrayListAdd(&parser->program.tree, &declaration);
     }
 
     resolve(parser);
@@ -87,7 +88,7 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
 
     mainCall.target = (ExprNode*) target;
 
-    mainCall.args = ArrayListNew(sizeof(ExprNode*));
+    ArrayListInit(&mainCall.args, sizeof(ExprNode*));
 
     parser->program.main = mainCall;
 

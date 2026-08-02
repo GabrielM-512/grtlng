@@ -83,9 +83,9 @@ StmtNode *forStmt(Parser *parser) {
     StmtBlockNode *block = ALLOC_NODE(StmtBlockNode);
 
     block->header.type = STMT_BLOCK;
-    block->content = ArrayListNew(sizeof(StmtNode*));
+    ArrayListInit(&block->content, sizeof(StmtNode*));
 
-    if (initialiser != nullptr) ArrayListAdd(block->content, &initialiser);
+    if (initialiser != nullptr) ArrayListAdd(&block->content, &initialiser);
 
 
     StmtWhileNode *loop = ALLOC_NODE(StmtWhileNode);
@@ -99,19 +99,19 @@ StmtNode *forStmt(Parser *parser) {
         StmtBlockNode *newBody = ALLOC_NODE(StmtBlockNode);
 
         newBody->header.type = STMT_BLOCK;
-        newBody->content = ArrayListNew(sizeof(StmtNode*));
+        ArrayListInit(&newBody->content, sizeof(StmtNode*));
 
-        ArrayListAdd(newBody->content, &body);
+        ArrayListAdd(&newBody->content, &body);
 
         StmtExprNode *incExpr = ALLOC_NODE(StmtExprNode);
         incExpr->header.type = STMT_EXPR;
         incExpr->expr = incrementer;
 
-        ArrayListAdd(newBody->content, &incExpr);
+        ArrayListAdd(&newBody->content, &incExpr);
         loop->body = (StmtNode*) newBody;
     }
 
-    ArrayListAdd(block->content, &loop);
+    ArrayListAdd(&block->content, &loop);
 
     return (StmtNode*) block;
 }
@@ -200,7 +200,7 @@ StmtNode *blockStmt(Parser *parser) {
     StmtBlockNode *node = ALLOC_NODE(StmtBlockNode);
 
     node->header.type = STMT_BLOCK;
-    node->content = ArrayListNew(sizeof(StmtNode*));
+    ArrayListInit(&node->content, sizeof(StmtNode*));
 
     while (!match(parser, TOKEN_RIGHT_BRACE)) {
 
@@ -214,7 +214,7 @@ StmtNode *blockStmt(Parser *parser) {
         if (matchTypeIdent(parser)) next = localVarDeclStmt(parser);
         else next = parseStmt(parser);
 
-        ArrayListAdd(node->content, &next);
+        ArrayListAdd(&node->content, &next);
     }
 
     return (StmtNode*) node;

@@ -11,7 +11,8 @@
 
 StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) {
 
-    ArrayList *parameters = ArrayListNew(sizeof(StmtVarDeclNode*));
+    ArrayList parameters;
+    ArrayListInit(&parameters, sizeof(StmtVarDeclNode*));
 
     // left parenthesis has already been consumed
 
@@ -38,7 +39,7 @@ StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) 
             parameter->value = nullptr;
             parameter->varType = type;
 
-            ArrayListAdd(parameters, &parameter);
+            ArrayListAdd(&parameters, &parameter);
 
         } while (match(parser, TOKEN_COMMA));
     }

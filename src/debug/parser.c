@@ -67,8 +67,8 @@ void printExpr(ExprNode *expr) {
 
         case EXPR_CALL:
             printExpr(((ExprCallNode*) expr)->target);
-            for (u32 i = 0; i < ((ExprCallNode*) expr)->args->length; i++) {
-                printExpr(ArrayListRead(((ExprCallNode*) expr)->args, i, ExprNode*));
+            for (u32 i = 0; i < ((ExprCallNode*) expr)->args.length; i++) {
+                printExpr(ArrayListRead(&((ExprCallNode*) expr)->args, i, ExprNode*));
             }
 
             printf(")");
@@ -93,8 +93,8 @@ void printVarDec(StmtVarDeclNode *stmt) {
 
 void printBlock(StmtBlockNode *block) {
     printf("    Begin block\n");
-    for (u32 i = 0; i < block->content->length; i++) {
-        printStmt(ArrayListRead(block->content, i, StmtNode*));
+    for (u32 i = 0; i < block->content.length; i++) {
+        printStmt(ArrayListRead(&block->content, i, StmtNode*));
     }
     printf("    End block");
 }
@@ -157,12 +157,14 @@ static void printStmt(StmtNode *stmt) {
 }
 
 void printProgram(ParseResult program) {
-    StmtVarDeclNode* vars[program.tree->length];
+    StmtVarDeclNode* vars[program.tree.length];
     u32 varCount = 0;
-    StmtFunction* funcs[program.tree->length];
+
+    StmtFunction* funcs[program.tree.length];
     u32 funcCount = 0;
-    for (u32 i = 0; i < program.tree->length; i++) {
-        StmtNode *node = ArrayListRead(program.tree, i, StmtNode*);
+
+    for (u32 i = 0; i < program.tree.length; i++) {
+        StmtNode *node = ArrayListRead(&program.tree, i, StmtNode*);
 
         switch (node->type) {
             case STMT_VAR_DEC: {

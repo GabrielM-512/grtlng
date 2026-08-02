@@ -10,8 +10,9 @@ typedef struct {
     void* elements;
 } ArrayList;
 
-ArrayList *ArrayListNew(size_t elementSize);
+void ArrayListInit(ArrayList *list, size_t elementSize);
 
+ArrayList *ArrayListNew(size_t elementSize);
 void ArrayListFree(ArrayList *list);
 
 void ArrayListAdd(ArrayList *list, const void *element);

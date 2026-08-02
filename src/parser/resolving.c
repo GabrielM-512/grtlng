@@ -69,10 +69,10 @@ void globalVarDec(Parser *parser, StmtNode *node) {
 }
 
 void resolve(Parser *parser) {
-    StmtNode *funcs [parser->program.tree->length];
+    StmtNode *funcs [parser->program.tree.length];
     u32 funcCount = 0;
-    for (u32 i = 0; i < parser->program.tree->length; i++) {
-        StmtNode *node = ArrayListRead(parser->program.tree, i, StmtNode*);
+    for (u32 i = 0; i < parser->program.tree.length; i++) {
+        StmtNode *node = ArrayListRead(&parser->program.tree, i, StmtNode*);
 
         globalVarDec(parser, node);
 
@@ -114,8 +114,8 @@ void func(Parser *parser, StmtNode *n) {
 
     beginScope(parser);
 
-    for (u32 i = 0; i < node->parameters->length; i++) {
-        StmtVarDeclNode *parameter = ArrayListRead(node->parameters, i, StmtVarDeclNode*);
+    for (u32 i = 0; i < node->parameters.length; i++) {
+        StmtVarDeclNode *parameter = ArrayListRead(&node->parameters, i, StmtVarDeclNode*);
 
         if (varInCurrentScope(parser, parameter->name)) {
             error(parser, "Redeclared parameter \"%s\" in function \"%s\"", parameter->name, node->name);
@@ -145,8 +145,8 @@ void block(Parser *parser, StmtNode *n) {
 
     beginScope(parser);
 
-    for (u32 i = 0; i < node->content->length; i++) {
-        StmtNode *stmt = ArrayListRead(node->content, i, StmtNode*);
+    for (u32 i = 0; i < node->content.length; i++) {
+        StmtNode *stmt = ArrayListRead(&node->content, i, StmtNode*);
         resolveStmt(parser, stmt);
     }
 
@@ -217,8 +217,8 @@ static void call(Parser *parser, ExprNode *n) {
     }
     resolveExpr(parser, node->target);
 
-    for (u32 i = 0; i < node->args->length; i++) {
-        ExprNode *arg = ArrayListRead(node->args, i, ExprNode*);
+    for (u32 i = 0; i < node->args.length; i++) {
+        ExprNode *arg = ArrayListRead(&node->args, i, ExprNode*);
         resolveExpr(parser, arg);
     }
 }

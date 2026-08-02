@@ -57,7 +57,7 @@ int main(const int argc, char* argv[]) {
     ArenaAllocator *tokenData = ArenaNew();
     Lexer lexer;
     lexerInit(&lexer, compileFlags.sourcefile, tokenData);
-    ArrayList *tokens = scanAll(&lexer);
+    ArrayList tokens = scanAll(&lexer);
 
 #ifdef DEBUG_PRINT_TOKENS
 
@@ -80,7 +80,7 @@ int main(const int argc, char* argv[]) {
 #endif
 
     Parser parser;
-    const ParseResult ast = parseAll(&parser, tokens, lexer.source);
+    const ParseResult ast = parseAll(&parser, &tokens, lexer.source);
 
     if (parser.hadError) {
         printErrors();
