@@ -45,8 +45,10 @@ StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) 
     }
 
     consume(parser, TOKEN_RIGHT_PAREN, " after function parameters");
+
     if (!match(parser, TOKEN_LEFT_BRACE)) {
         parseErrorAtCurrent(parser, "Functions must have a block as their body");
+        return nullptr;
     }
     StmtBlockNode *body = (StmtBlockNode*) blockStmt(parser);
 
