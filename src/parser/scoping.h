@@ -18,6 +18,6 @@ void activateSymbol(Parser *parser, char *name);
 Symbol getSymbol(Parser *parser, char *name);
 
 typedef struct Scope {
-    struct Scope *enclosing;
+    Scope *enclosing;
     HashMap variables;
 } Scope;
