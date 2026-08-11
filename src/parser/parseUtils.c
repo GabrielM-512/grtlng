@@ -81,6 +81,7 @@ void synchronise(Parser *parser) {
             case TOKEN_WHILE:
             case TOKEN_RETURN:
             case TOKEN_PRINT:
+            case TOKEN_LEFT_BRACE:
                 return;
             default:
         }
