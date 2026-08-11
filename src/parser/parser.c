@@ -10,6 +10,52 @@
 #include "../error.h"
 #include "../debug/debugInfos.h"
 
+void incDecExpr(ExprNode *node, void *e) {
+    if (node == nullptr) return;
+
+    Expr *expr = e;
+
+    switch (node->type) {
+        // keep recursing
+        case EXPR_BINARY:
+        case EXPR_UNARY:
+        case EXPR_VAR_ASSIGN: // checking for assignability happens later, so we dont concern ourselves with that here
+            recurseExpr(node, incDecExpr, expr);
+            break;
+
+            // end
+        case EXPR_VAR:
+        case EXPR_NUMBER:
+            break;
+
+            // do stuff
+        case EXPR_CALL: { // each argument is a separate expression
+            const ExprCallNode *call = (ExprCallNode *) node;
+            incDecExpr(call->target, expr);
+
+            for (u32 i = 0; i < call->args.length; i++) {
+                Expr *arg = ArrayListRead(&call->args, i, Expr*);
+                incDecExpr(arg->expr, arg);
+            }
+            break;
+        }
+        case EXPR_INC_DEC: {
+            ExprIncDecNode *inc = (ExprIncDecNode*) node;
+            ArrayList *time = inc->time ? &expr->prefix : &expr->suffix;
+            ArrayListAdd(time, &inc);
+            break;
+        }
+    }
+}
+
+void incDec(Parser*, Expr *expr) {
+    incDecExpr(expr->expr, expr);
+}
+
+void handleIncDec(Parser *parser) {
+    reachExpr(parser, incDec);
+}
+
 void parserInit(Parser *parser) {
     parser->token = 0;
 
@@ -46,6 +92,7 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
     }
 
     resolve(parser);
+    handleIncDec(parser);
 
 
     // call main to finish init segment

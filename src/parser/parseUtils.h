@@ -4,6 +4,9 @@
 
 #define ALLOC_NODE(type) (ArenaAlloc(parser->program.data, sizeof(type)))
 
+typedef void (*exprFn)(Parser*, Expr*);
+typedef void (*ExprNodeFn)(ExprNode*, void*);
+
 void advance(Parser* parser);
 
 bool consume(Parser *parser, TokenType type, const char *message);
@@ -14,6 +17,9 @@ bool isTypeIdent(Parser *parser);
 bool matchTypeIdent(Parser *parser);
 
 void synchronise(Parser *parser);
+
+void reachExpr(Parser *parser, exprFn fn);
+void recurseExpr(ExprNode* n, ExprNodeFn fn, void *data);
 
 typedef enum {
     TYPE_VAR,

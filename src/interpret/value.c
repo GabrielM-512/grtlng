@@ -159,6 +159,10 @@ Value evaluateExpr(ExprNode *expr) {
         case EXPR_CALL:
             return evaluateCall((ExprCallNode*) expr);
 
+        case EXPR_INC_DEC: {
+            ExprIncDecNode *node = (ExprIncDecNode*) expr;
+            return evaluateExpr(node->target);
+        }
 
         default:
             fprintf(stderr, "    Unhandled Expression Node type: %d [interpret/value.c]\n", expr->type);
@@ -168,6 +172,47 @@ Value evaluateExpr(ExprNode *expr) {
     return VALUE_NUM(NAN);
 }
 
+void increment(ExprIncDecNode *node) {
+    ExprNode *target = node->target;
+    // true = inc, false = dec
+
+    switch (target->type) {
+
+        case EXPR_VAR: {
+            ExprVarNode *var = (ExprVarNode*) target;
+                Value val = getVar(var->name);
+
+                if (!IS_NUM(val)) {
+                    INTERN_ERROR_LOCATION();
+                    fprintf(stderr, "Tried assigning to non-variable Value %s", var->name);
+                    exit(-1);
+                }
+
+                val.as.num += node->dir ? 1 : -1;
+                setVar(var->name, &val);
+
+                break;
+            }
+            default:
+                INTERN_ERROR_LOCATION();
+                fprintf(stderr, "Tried assigning to non-variable Value");
+                exit(-1);
+    }
+}
+
+
 Value evaluate(Expr *expr) {
-    return evaluateExpr(expr->expr);
+    for (u32 i = 0; i < expr->prefix.length; i++) {
+        ExprIncDecNode *node = ArrayListRead(&expr->prefix, i, ExprIncDecNode*);
+        increment(node);
+    }
+
+    Value val =  evaluateExpr(expr->expr);
+
+    for (u32 i = 0; i < expr->suffix.length; i++) {
+        ExprIncDecNode *node = ArrayListRead(&expr->suffix, i, ExprIncDecNode*);
+        increment(node);
+    }
+
+    return val;
 }

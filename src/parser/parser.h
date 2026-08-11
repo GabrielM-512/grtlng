@@ -14,6 +14,7 @@ typedef enum {
     EXPR_CALL,
 
     EXPR_VAR_ASSIGN,
+    EXPR_INC_DEC,
 
 } ExprNodeType;
 
@@ -62,6 +63,13 @@ typedef struct {
     ExprNode *target;
     ExprNode *value;
 } ExprVarAssignNode;
+
+typedef struct {
+    ExprNode header;
+    ExprNode *target;
+    bool dir; // true = increment, false = decrement
+    bool time; // true = before, false = after
+} ExprIncDecNode;
 
 
 typedef enum {

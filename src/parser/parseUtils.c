@@ -1,5 +1,7 @@
 #include "parseUtils.h"
 
+#include <stdio.h>
+
 #include "../error.h"
 
 /*
@@ -84,5 +86,96 @@ void synchronise(Parser *parser) {
         }
 
         advance(parser);
+    }
+}
+
+void traverseStmt(Parser *parser, exprFn fn, StmtNode* node) {
+    switch (node->type) {
+        case STMT_EXPR:
+            fn(parser, ((StmtExprNode*) node)->expr);
+            break;
+        case STMT_BLOCK: {
+            StmtBlockNode *block = (StmtBlockNode*) node;
+            for (u32 i = 0; i < block->content.length; i++) {
+                StmtNode *current = ArrayListRead(&block->content, i, StmtNode*);
+                traverseStmt(parser, fn, current);
+            }
+            break;
+        }
+        case STMT_FUN_DEC: {
+            StmtFunction *func = (StmtFunction*) node;
+            traverseStmt(parser, fn, (StmtNode*) func->body);
+            break;
+        }
+        case STMT_IF: {
+            StmtIfNode *ifNode = (StmtIfNode*) node;
+            fn(parser, ifNode->condition);
+            traverseStmt(parser, fn, ifNode->thenBranch);
+            if (ifNode->elseBranch != nullptr) traverseStmt(parser, fn, ifNode->elseBranch);
+            break;
+        }
+        case STMT_PRINT: {
+            fn(parser, ((StmtPrintNode*) node)->value);
+            break;
+        }
+        case STMT_RETURN: {
+            fn(parser, ((StmtReturnNode*) node)->value);
+            break;
+        }
+        case STMT_VAR_DEC: {
+            StmtVarDeclNode *dec = (StmtVarDeclNode*) node;
+            if (dec->value != nullptr) fn(parser, dec->value);
+            break;
+        }
+        case STMT_WHILE: {
+            StmtWhileNode *whileNode = (StmtWhileNode*) node;
+            fn(parser, whileNode->condition);
+            traverseStmt(parser, fn, whileNode->body);
+            break;
+        }
+    }
+}
+
+void reachExpr(Parser *parser, exprFn fn) {
+    for (u32 i = 0; i < parser->program.tree.length; i++) {
+        StmtNode *node = ArrayListRead(&parser->program.tree, i, StmtNode*);
+        traverseStmt(parser, fn, node);
+    }
+}
+
+void recurseExpr(ExprNode* n, ExprNodeFn fn, void *data) {
+    switch (n->type) {
+        case EXPR_BINARY: {
+            ExprBinaryNode *node = (ExprBinaryNode*) n;
+            fn(node->left, data);
+            fn(node->right, data);
+            break;
+        }
+        case EXPR_CALL: {
+            break;
+            INTERN_ERROR_LOCATION();
+            fprintf(stderr, "Called recurseExpr() on a call expression\n");
+        }
+        case EXPR_VAR:
+        case EXPR_NUMBER: {
+            // nothing to recurse to
+            break;
+        }
+        case EXPR_UNARY: {
+            ExprUnaryNode *node = (ExprUnaryNode*) n;
+            fn(node->right, data);
+            break;
+        }
+        case EXPR_VAR_ASSIGN: {
+            ExprVarAssignNode *node = (ExprVarAssignNode*) n;
+            fn(node->target, data);
+            fn(node->value, data);
+            break;
+        }
+        case EXPR_INC_DEC: {
+            ExprIncDecNode *node = (ExprIncDecNode*) n;
+            fn(node->target, data);
+            break;
+        }
     }
 }
