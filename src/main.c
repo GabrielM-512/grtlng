@@ -61,8 +61,8 @@ int main(const int argc, char* argv[]) {
 
 #ifdef DEBUG_PRINT_TOKENS
 
-    for (u32 i = 0; i < tokens->length; i++) {
-        const Token tok = ArrayListRead(tokens, i, Token); // get data
+    for (u32 i = 0; i < tokens.length; i++) {
+        const Token tok = ArrayListRead(&tokens, i, Token); // get data
         printToken(tok);
     }
 
@@ -75,7 +75,7 @@ int main(const int argc, char* argv[]) {
     char actualPath[PATH_MAX + 1];
     realpath(compileFlags.sourcefile, actualPath);
 
-    printf("%d Tokens in %s\n\n", tokens->length, actualPath);
+    printf("%d Tokens in %s\n\n", tokens.length, actualPath);
 
 #endif
 
