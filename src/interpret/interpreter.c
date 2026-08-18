@@ -79,6 +79,7 @@ void interpret(StmtNode *stmt) {
             StmtWhileNode *node = (StmtWhileNode*) stmt;
             while (isTruthy(evaluate(node->condition))) {
                 interpret(node->body);
+                if (interpreter.returning) break;
             }
             break;
         }
