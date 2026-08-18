@@ -9,19 +9,18 @@ void printExpr(ExprNode* expr);
 static void printStmt(StmtNode *stmt);
 
 void printUnary(ExprUnaryNode* expr) {
+    char *operatorName = getTokenSymbol(expr->operator);
+
     switch (expr->operator) {
         case TOKEN_MINUS:
-            printf(" - ");
-            break;
         case TOKEN_BANG:
-            printf(" ! ");
-            break;
         case TOKEN_TILDE:
-            printf(" ~ ");
             break;
         default:
-            printf("???");
+            fprintf(stderr, "Invalid unary expression operator %s", operatorName);
     }
+
+    printf("%.*s", (int) strlen(operatorName) - 2, operatorName + 1);
 
     printExpr(expr->right);
 }
@@ -29,7 +28,8 @@ void printUnary(ExprUnaryNode* expr) {
 void printBinary(ExprBinaryNode *expr) {
     printExpr(expr->left);
 
-    printf(" %.*s ", (int) strlen(getTokenSymbol(expr->operator)) - 2, getTokenSymbol(expr->operator) + 1);
+    char *operatorName = getTokenSymbol(expr->operator);
+    printf(" %.*s ", (int) strlen(operatorName) - 2, operatorName + 1);
 
     printExpr(expr->right);
 }
