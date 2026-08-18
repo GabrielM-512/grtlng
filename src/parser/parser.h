@@ -6,7 +6,7 @@
 #include "../lexer.h"
 
 
-typedef enum {
+typedef enum : u8 {
     EXPR_BINARY,
     EXPR_UNARY,
     EXPR_NUMBER,
@@ -72,7 +72,7 @@ typedef struct {
 } ExprIncDecNode;
 
 
-typedef enum {
+typedef enum : u8 {
     STMT_VAR_DEC,
     STMT_FUN_DEC,
     STMT_EXPR,
