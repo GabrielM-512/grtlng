@@ -1,0 +1,3 @@
+Encountered error on line 1: Unterminated block
+[1]   i16 main() {
+                  ^ Here

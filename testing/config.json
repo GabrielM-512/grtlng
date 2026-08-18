@@ -3,36 +3,60 @@
   "log": "/home/gabriel/CLionProjects/language/testing/log.txt",
   "tests": {
     "assignment.associativity": {
-      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/assignment/associativity.gl",
-      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/assignment/associativity_stdout"
+      "testfile": "assignment/associativity.gl",
+      "stdout": "assignment/associativity_stdout"
     },
     "assignment.global": {
-      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/assignment/global.gl",
-      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/assignment/global_stdout"
+      "testfile": "assignment/global.gl",
+      "stdout": "assignment/global_stdout"
     },
     "assignment.infix": {
-      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/assignment/infix_operator.gl",
-      "stderr": "/home/gabriel/CLionProjects/language/testing/tests/assignment/infix_operator_stderr"
+      "testfile": "assignment/infix_operator.gl",
+      "stderr": "assignment/infix_operator_stderr"
     },
     "assignment.local": {
-      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/assignment/local.gl",
-      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/assignment/global_stdout"
+      "testfile": "assignment/local.gl",
+      "stdout": "assignment/global_stdout"
     },
     "assignment.prefix": {
-      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/assignment/prefix_operator.gl",
-      "stderr": "/home/gabriel/CLionProjects/language/testing/tests/assignment/prefix_operator_stderr"
+      "testfile": "assignment/prefix_operator.gl",
+      "stderr": "assignment/prefix_operator_stderr"
     },
     "block.empty": {
-      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/block/empty.gl",
-      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/block/empty_stdout"
+      "testfile": "block/empty.gl",
+      "stdout": "block/empty_stdout"
     },
     "block.scope": {
-      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/block/scope.gl",
-      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/block/scope_stdout"
+      "testfile": "block/scope.gl",
+      "stdout": "block/scope_stdout"
+    },
+    "block.unterminated": {
+      "testfile": "block/unterminated.gl",
+      "stderr": "block/unterminated_stderr"
+    },
+    "call.num": {
+      "testfile": "call/num.gl",
+      "stderr": "call/num_stderr"
     },
     "expressions.evaluate": {
-      "testfile": "/home/gabriel/CLionProjects/language/testing/tests/expressions/evaluate.gl",
-      "stdout": "/home/gabriel/CLionProjects/language/testing/tests/expressions/evaluate_stdout"
+      "testfile": "expressions/evaluate.gl",
+      "stdout": "expressions/evaluate_stdout"
+    },
+    "for.return_inside": {
+      "testfile": "for/return_inside.gl",
+      "stdout": "for/return_inside_stdout"
+    },
+    "function.body_block": {
+      "testfile": "function/body_must_be_block.gl",
+      "stderr": "function/body_must_be_block_stderr"
+    },
+    "print.missing_argument": {
+      "testfile": "print/missing_argument.gl",
+      "stderr": "print/missing_argument_stderr"
+    },
+    "print.numbers": {
+      "testfile": "print/numbers.gl",
+      "stdout": "print/numbers_stdout"
     }
   }
 

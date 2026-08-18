@@ -1,0 +1,7 @@
+void main() {
+    print f();
+}
+
+i16 f() {
+    for (;;) return 1;
+}

@@ -1,0 +1,3 @@
+Encountered error on line 3: Functions must have a block as their body
+[3]   i16 f() 123;
+              ^ Here
