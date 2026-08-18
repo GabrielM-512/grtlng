@@ -68,11 +68,21 @@ void printExpr(ExprNode *expr) {
         case EXPR_CALL:
             printExpr(((ExprCallNode*) expr)->target);
             for (u32 i = 0; i < ((ExprCallNode*) expr)->args.length; i++) {
-                printExpr(ArrayListRead(&((ExprCallNode*) expr)->args, i, ExprNode*));
+                printExpr(ArrayListRead(&((ExprCallNode*) expr)->args, i, Expr*)->expr);
             }
 
             printf(")");
             break;
+
+        case EXPR_INC_DEC: {
+#define PRINT_INC_DEC() (printf(node->dir ? "++" : "--"))
+            ExprIncDecNode *node = (ExprIncDecNode*) expr;
+            if (node->time) PRINT_INC_DEC();
+            printExpr(node->target);
+            if (!node->time) PRINT_INC_DEC();
+#undef PRINT_INC_DEC
+        }
+        break;
 
         default:
             fprintf(stderr, "    Unhandled Expression Node type: %hhu [debug/parser.c]\n", expr->type);
