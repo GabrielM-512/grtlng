@@ -184,7 +184,7 @@ void increment(ExprIncDecNode *node) {
 
                 if (!IS_NUM(val)) {
                     INTERN_ERROR_LOCATION();
-                    fprintf(stderr, "Tried assigning to non-variable Value %s", var->name);
+                    fprintf(stderr, "Tried assigning to non-numeric Value \"%s\"", var->name);
                     exit(-1);
                 }
 
