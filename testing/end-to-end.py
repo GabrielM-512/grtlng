@@ -5,6 +5,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from subprocess import TimeoutExpired
 
 data_failed = False
 
@@ -132,6 +133,28 @@ def expected_got_format(expected : str, got : str) -> list[str]:
 
     return returns
 
+def make_error_message(test : Test, time_start, timed_out : bool,  stdout = None, stdout_cap = None, stderr = None, stderr_cap = None) -> list[str]:
+    timestamp = time.strftime("%d:%m:%Y %H:%M:%S", time_start)
+
+    err_string = f"{timestamp}: Failed test \"{test.name}\" ({test.path}):\n"
+
+    errs = [err_string]
+
+    if timed_out:
+        errs += "                       Timed out\n"
+        return errs
+
+    if stdout != stdout_cap:
+        errs += f"                       Mismatched stdout:\n"
+        lines = expected_got_format(stdout, stdout_cap)
+        errs.extend(lines)
+    if stderr != stderr_cap:
+        errs += f"                       Mismatched stderr:\n"
+        lines = expected_got_format(stderr, stderr_cap)
+        errs.extend(lines)
+
+    return errs
+
 def run_test(test : Test, config : Config) -> Result:
 
     with open(test.stdout, "r") as f:
@@ -141,31 +164,16 @@ def run_test(test : Test, config : Config) -> Result:
         stderr = f.read().strip()
 
     time_start = time.localtime()
-
-    finished_test = subprocess.run([config.interpreter, "-i", test.path], capture_output=True)
+    try:
+        finished_test = subprocess.run([config.interpreter, "-i", test.path], capture_output=True, timeout=3)
+    except TimeoutExpired:
+        return Result(False, make_error_message(test, time_start, True))
 
     stdout_cap = finished_test.stdout.decode("UTF-8").strip()
     stderr_cap = finished_test.stderr.decode("UTF-8").strip()
 
     if not (stderr == stderr_cap and stdout == stdout_cap):
-        timestamp = time.strftime("%d:%m:%Y %H:%M:%S", time_start)
-
-        err_string = f"{timestamp}: Failed test \"{test.name}\" ({test.path}):\n"
-
-        errs = [err_string]
-
-        if stdout != stdout_cap:
-            errs += f"                       Mismatched stdout:\n"
-            lines = expected_got_format(stdout, stdout_cap)
-            errs.extend(lines)
-        if stderr != stderr_cap:
-            errs += f"                       Mismatched stderr:\n"
-            lines = expected_got_format(stderr, stderr_cap)
-            errs.extend(lines)
-
-        #errs.append("\n")
-
-        return Result(False, errs)
+        return Result(False, make_error_message(test, time_start, False, stdout, stdout_cap, stderr, stderr_cap))
 
     return Result(True, [])
 
