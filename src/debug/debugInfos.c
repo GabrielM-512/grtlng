@@ -8,10 +8,10 @@
 ArenaAllocator *text = nullptr;
 
 char* lookup[TOKEN_LAST];
-bool bHasFailed = false;
+bool hasFailed = false;
 
 void populateTable() {
-    if (bHasFailed) return;
+    if (hasFailed) return;
 
     const TextFile file = textfileRead("/home/gabriel/CLionProjects/language/src/lexer.h");
 
@@ -20,7 +20,7 @@ void populateTable() {
     for (u32 i = 0;; i++) {
         if (i + 9 > file.fileSize) {
             fprintf(stderr, "[DEBUG ERROR] %s: Couldnt locate enum start\n", __FILE__);
-            bHasFailed = true;
+            hasFailed = true;
             free(file.source);
             return;
         }
@@ -62,19 +62,15 @@ void populateTable() {
     free(file.source);
 }
 
-bool hasFailed() {
-    return bHasFailed;
-}
-
 char *getTokenName(TokenType type) {
     if (text == nullptr) populateTable();
-    if (bHasFailed) return "TOKEN NAME LOOKUP FAILED";
+    if (hasFailed) return "TOKEN NAME LOOKUP FAILED";
     return lookup[type];
 }
 
 char *getTokenType(TokenType type) {
     if (text == nullptr) populateTable();
-    if (bHasFailed) return "TOKEN NAME LOOKUP FAILED";
+    if (hasFailed) return "TOKEN NAME LOOKUP FAILED";
     return lookup[type] + 6; // cut off "TOKEN_"
 }
 
