@@ -12,16 +12,25 @@ def error(*args, **kwargs):
     print("Error:", *args, file=sys.stderr, **kwargs)
 
 class Test:
+    TEST_DIR : str = "/home/gabriel/CLionProjects/language/testing/tests/"
     def __init__(self, name : str, data : dict[str, str]):
         global data_failed
         self.name : str = name
         try:
             self.path: str = data["testfile"]
 
-            if data.__contains__("stdout"): self.stdout: str = data["stdout"]
+            if self.path[0] != "/":
+                self.path = Test.TEST_DIR + self.path
+
+            if data.__contains__("stdout"):
+                self.stdout: str = data["stdout"]
+                if self.stdout[0] != "/": self.stdout = Test.TEST_DIR + self.stdout
+
             else:                           self.stdout: str = "/home/gabriel/CLionProjects/language/testing/tests/empty"
 
-            if data.__contains__("stderr"): self.stderr : str = data["stderr"]
+            if data.__contains__("stderr"):
+                self.stderr : str = data["stderr"]
+                if self.stderr[0] != "/": self.stderr = Test.TEST_DIR + self.stderr
             else:                           self.stderr : str = "/home/gabriel/CLionProjects/language/testing/tests/empty"
 
             if not os.path.isfile(self.path):
@@ -179,15 +188,15 @@ def main() -> int:
     config = read_config(sys.argv[1])
     tests = make_tests(config)
 
-
-    indices = list(range(len(tests)))
-    results : list[Result] = []
+    results: list[Result] = []
 
     match sys.argv[2]:
         case "single":
             print("Warning: single-threaded mode has been selected. Testing will be a lot slower than usual.")
             results = [run_test(i, config) for i in tests]
         case "multi":
+            indices = list(range(len(tests)))
+
             with multiprocessing.Pool(multiprocessing.cpu_count(), initializer=init_worker, initargs=(config, tests)) as pool:
                 results = pool.map(worker_run, indices)
         case _:
