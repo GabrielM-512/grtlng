@@ -28,9 +28,9 @@ StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) 
 
             TokenType type = parser->previous.type;
 
-            consume(parser, TOKEN_IDENTIFIER, " after parameter type");
-
-            char *paramName = parser->previous.data;
+            // parameter name is optional to allow set function signatures (e.g. for function pointer) without cluttering namespace
+            char *paramName = "";
+            if (match(parser, TOKEN_IDENTIFIER)) paramName = parser->previous.data;
 
             StmtVarDeclNode *parameter = ALLOC_NODE(StmtVarDeclNode);
 
