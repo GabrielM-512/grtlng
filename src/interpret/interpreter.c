@@ -89,7 +89,6 @@ void interpret(StmtNode *stmt) {
 }
 
 i32 interpretProgram(ParseResult program) {
-    usleep(100000);
 
     // create starting environment
     startEnvironment();
