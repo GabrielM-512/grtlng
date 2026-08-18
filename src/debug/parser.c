@@ -65,14 +65,15 @@ void printExpr(ExprNode *expr) {
             printAssignment((ExprVarAssignNode*) expr);
             break;
 
-        case EXPR_CALL:
-            printExpr(((ExprCallNode*) expr)->target);
-            for (u32 i = 0; i < ((ExprCallNode*) expr)->args.length; i++) {
-                printExpr(ArrayListRead(&((ExprCallNode*) expr)->args, i, Expr*)->expr);
-            }
+        case EXPR_CALL: {
+            ExprCallNode *node = (ExprCallNode*) expr;
+            printExpr(node->target);
 
-            printf(")");
-            break;
+            for (u32 i = 0; i < node->args.length; i++) {
+                printExpr(ArrayListRead(&node->args, i, Expr*)->expr);
+            }
+        }
+        break;
 
         case EXPR_INC_DEC: {
 #define PRINT_INC_DEC() (printf(node->dir ? "++" : "--"))
