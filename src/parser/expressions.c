@@ -82,12 +82,20 @@ ExprNode *call(Parser *parser, ExprNode *left) {
 }
 
 ExprNode *exprUnary(Parser *parser) {
+    TokenType operator = parser->previous.type;
+    ExprNode *operand = parseExprPrecRight(parser);
+
+    if (operator == TOKEN_MINUS && operand->type == EXPR_NUMBER) {
+        ExprNumberNode *number = (ExprNumberNode*) operand;
+        number->value = -number->value;
+        return (ExprNode*) number;
+    }
+
     ExprUnaryNode *node = ALLOC_NODE(ExprUnaryNode);
 
     node->header.type = EXPR_UNARY;
-    node->operator = parser->previous.type;
-
-    node->right = parseExprPrec(parser);
+    node->operator = operator;
+    node->right = operand;
 
     return (ExprNode*) node;
 }
@@ -245,7 +253,6 @@ Expr *expression(Parser *parser) {
 }
 
 // TODO: bitwise
-// TODO: check if unary precedence may remain this (refer to craftinginterpeters?)
 ParseRule rules [TOKEN_LAST] = {
     [TOKEN_EOF]           = {.prefix = nullptr,      .infix = nullptr,            .precedence = PREC_NONE       },
     [TOKEN_ERROR]         = {.prefix = nullptr,      .infix = nullptr,            .precedence = PREC_NONE       },
