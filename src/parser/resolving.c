@@ -186,6 +186,9 @@ void var(Parser *parser, ExprNode *n) {
     if (!symbolExists(parser, node->name)) {
         parseErrorAtToken(parser, node->header.token, "Couldn't resolve symbol \"%s\"", node->name);
     }
+    if (!getSymbol(parser, node->name).initialised) {
+        parseErrorAtToken(parser, node->header.token, "Symbol \"%s\" used in its own initialiser", node->name);
+    }
 }
 
 void varAssign(Parser *parser, ExprNode *n) {
