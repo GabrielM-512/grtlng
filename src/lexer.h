@@ -4,7 +4,7 @@
 #include "util/ArrayList.h"
 #include "util/ArenaAllocator.h"
 
-typedef enum {
+typedef enum : u16 {
     TOKEN_EOF, // End of source file
     TOKEN_ERROR,
 
