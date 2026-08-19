@@ -9,6 +9,33 @@
 #include "../debug/debugInfos.h"
 #include "../util/ArrayList.h"
 
+void parseParams(Parser *parser, ArrayList *parameters) {
+    do {
+        if (!matchTypeIdent(parser)) {
+            parseErrorAtCurrent(parser, "Expected type identifier after comma, got %s instead", getTokenSymbol(parser->current.type));
+            // skip remaining parameters
+            while (!check(parser, TOKEN_RIGHT_PAREN) && !check(parser, TOKEN_EOF)) advance(parser);
+            break;
+        }
+
+        const TokenType type = parser->previous.type;
+
+        // parameter name is optional to allow set function signatures (e.g. for function pointer) without cluttering namespace
+        char *paramName = "";
+        if (match(parser, TOKEN_IDENTIFIER)) paramName = parser->previous.data;
+
+        StmtVarDeclNode *parameter = ALLOC_NODE(StmtVarDeclNode);
+
+        parameter->header.type = STMT_VAR_DEC;
+        parameter->name = paramName;
+        parameter->value = nullptr;
+        parameter->varType = type;
+
+        ArrayListAdd(parameters, &parameter);
+
+    } while (match(parser, TOKEN_COMMA));
+}
+
 StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType, u32 position) {
 
     ArrayList parameters;
@@ -16,33 +43,9 @@ StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType, 
 
     // left parenthesis has already been consumed
 
-    if (isTypeIdent(parser)) {
-        // parse parameters
-        do {
-            if (!matchTypeIdent(parser)) {
-                parseErrorAtCurrent(parser, "Expected type identifier after comma, got %s instead", getTokenSymbol(parser->current.type));
-                // skip remaining parameters
-                while (!check(parser, TOKEN_RIGHT_PAREN) && !check(parser, TOKEN_EOF)) advance(parser);
-                break;
-            }
+    if (isTypeIdent(parser))
+        parseParams(parser, &parameters);
 
-            TokenType type = parser->previous.type;
-
-            // parameter name is optional to allow set function signatures (e.g. for function pointer) without cluttering namespace
-            char *paramName = "";
-            if (match(parser, TOKEN_IDENTIFIER)) paramName = parser->previous.data;
-
-            StmtVarDeclNode *parameter = ALLOC_NODE(StmtVarDeclNode);
-
-            parameter->header.type = STMT_VAR_DEC;
-            parameter->name = paramName;
-            parameter->value = nullptr;
-            parameter->varType = type;
-
-            ArrayListAdd(&parameters, &parameter);
-
-        } while (match(parser, TOKEN_COMMA));
-    }
 
     consume(parser, TOKEN_RIGHT_PAREN, " after function parameters");
 
