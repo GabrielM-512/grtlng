@@ -46,6 +46,7 @@ ExprNode *exprBinary(Parser *parser, ExprNode *left) {
     ExprBinaryNode *node = ALLOC_NODE(ExprBinaryNode);
 
     node->header.type = EXPR_BINARY;
+    node->header.token = parser->token - 1;
 
     node->operator = parser->previous.type;
     node->left = left;
@@ -70,10 +71,11 @@ ExprNode *call(Parser *parser, ExprNode *left) {
     ExprCallNode *node = ALLOC_NODE(ExprCallNode);
 
     node->header.type = EXPR_CALL;
-    ArrayListInit(&node->args, sizeof(Expr*));
+    node->header.token = parser->token - 1;;
 
     node->target = left;
 
+    ArrayListInit(&node->args, sizeof(Expr*));
     parseArgs(parser, node);
 
     consume(parser, TOKEN_RIGHT_PAREN, " after function arguments");
@@ -82,11 +84,13 @@ ExprNode *call(Parser *parser, ExprNode *left) {
 }
 
 ExprNode *exprUnary(Parser *parser) {
-    TokenType operator = parser->previous.type;
+    Token operator = parser->previous;
+    u32 position = parser->token - 1;
     ExprNode *operand = parseExprPrecRight(parser);
 
-    if (operator == TOKEN_MINUS && operand->type == EXPR_NUMBER) {
+    if (operator.type == TOKEN_MINUS && operand->type == EXPR_NUMBER) {
         ExprNumberNode *number = (ExprNumberNode*) operand;
+        number->header.token = position;
         number->value = -number->value;
         return (ExprNode*) number;
     }
@@ -94,7 +98,8 @@ ExprNode *exprUnary(Parser *parser) {
     ExprUnaryNode *node = ALLOC_NODE(ExprUnaryNode);
 
     node->header.type = EXPR_UNARY;
-    node->operator = operator;
+    node->header.token = position;
+    node->operator = operator.type;
     node->right = operand;
 
     return (ExprNode*) node;
@@ -105,6 +110,7 @@ static ExprNode *number(Parser *parser) {
     ExprNumberNode *node = ALLOC_NODE(ExprNumberNode);
 
     node->header.type = EXPR_NUMBER;
+    node->header.token = parser->token - 1;
     node->value = * (double*) parser->previous.data;
 
     return (ExprNode*) node;
@@ -120,6 +126,7 @@ ExprNode *grouping(Parser *parser) {
 ExprNode *variable(Parser *parser) {
     ExprVarNode *node = ALLOC_NODE(ExprVarNode);
     node->header.type = EXPR_VAR;
+    node->header.token = parser->token - 1;
     node->name = parser->previous.data;
 
     return (ExprNode*) node;
@@ -136,6 +143,7 @@ ExprNode *assignment(Parser *parser, ExprNode *left) {
     ExprVarAssignNode *node = ALLOC_NODE(ExprVarAssignNode);
 
     node->header.type = EXPR_VAR_ASSIGN;
+    node->header.token = parser->token - 1;
 
     if (left->type != EXPR_VAR) {
         parseError(parser, "Invalid assignment target");
@@ -151,6 +159,7 @@ ExprNode *relativeAssignment(Parser *parser, ExprNode *left) {
     // desugar to regular assignment
     ExprVarAssignNode *node = ALLOC_NODE(ExprVarAssignNode);
     node->header.type = EXPR_VAR_ASSIGN;
+    node->header.token = parser->token - 1;
     node->target = left;
 
     ExprBinaryNode *calculation = ALLOC_NODE(ExprBinaryNode);
@@ -181,9 +190,10 @@ ExprNode *relativeAssignment(Parser *parser, ExprNode *left) {
     return (ExprNode*) node;
 }
 
-ExprNode *incrementDecrement(Parser *parser, ExprNode *target, bool dir) {
+ExprNode *incrementDecrement(Parser *parser, ExprNode *target, bool dir, u32 position) {
     ExprIncDecNode *node = ALLOC_NODE(ExprIncDecNode);
     node->header.type = EXPR_INC_DEC;
+    node->header.token = position;
 
     const bool postfix = parser->previous.type == TOKEN_PLUS_PLUS || parser->previous.type == TOKEN_MINUS_MINUS;
 
@@ -196,15 +206,17 @@ ExprNode *incrementDecrement(Parser *parser, ExprNode *target, bool dir) {
 
 ExprNode *prefixIncDec(Parser *parser) {
     const bool dir = parser->previous.type == TOKEN_PLUS_PLUS;
+    const u32 position = parser->token - 1;
+
     ExprNode *target = parseExprPrec(parser);
 
-    return incrementDecrement(parser, target, dir);
+    return incrementDecrement(parser, target, dir, position);
 }
 
 ExprNode *postfixIncDec(Parser *parser, ExprNode *target) {
     const bool dir = parser->previous.type == TOKEN_PLUS_PLUS;
 
-    return incrementDecrement(parser, target, dir);
+    return incrementDecrement(parser, target, dir, parser->token - 1);
 }
 
 
@@ -246,6 +258,7 @@ ExprNode *parseExprNode(Parser *parser) {
 
 Expr *expression(Parser *parser) {
     Expr *expr = ALLOC_NODE(Expr);
+    expr->token = parser->token;
     expr->expr = parseExprNode(parser);
     ArrayListInit(&expr->prefix, sizeof(ExprNode*));
     ArrayListInit(&expr->suffix, sizeof(ExprNode*));

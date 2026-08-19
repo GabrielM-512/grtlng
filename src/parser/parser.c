@@ -134,6 +134,7 @@ ParseResult parseAll(Parser *parser, ArrayList *tokens, const char* source) {
     target->name = "main";
 
     mainCall.target = (ExprNode*) target;
+    mainCall.header.token = AS_FUNC(main)->header.token;
 
     ArrayListInit(&mainCall.args, sizeof(ExprNode*));
 

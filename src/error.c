@@ -166,6 +166,27 @@ void parseError(Parser *parser, const char* message, ...) {
     va_end(args);
 }
 
+void parseErrorAtToken(Parser *parser, u32 tokenPos, const char *message, ...) {
+    va_list args;
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
+    va_start(args);
+    Token errorToken = ArrayListRead(parser->Tokens, tokenPos, Token);
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
+    parseErrorAt(parser, errorToken, nullptr, message, args);
+    parser->panicMode = false;
+}
+
+void parseErrorAtTokenHint(Parser *parser, u32 tokenPos, const char *hint, const char *message, ...) {
+    va_list args;
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
+    va_start(args);
+    Token errorToken = ArrayListRead(parser->Tokens, tokenPos, Token);
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
+    parseErrorAt(parser, errorToken, hint, message, args);
+    parser->panicMode = false; // this is only called after we have created an AST and can't get confused about where we are anymore
+    // so panic mode would only stop us from sending all error messages
+}
+
 void expectedGotInstead(Parser *parser, const char* location, TokenType expected, TokenType got) {
     parseErrorAtCurrent(parser, "Expected %s%s, got %s instead", getTokenSymbol(expected), location, getTokenSymbol(got));
 }

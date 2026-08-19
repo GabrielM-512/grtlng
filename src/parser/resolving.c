@@ -1,9 +1,7 @@
 #include "resolving.h"
 
-#include <stdarg.h>
-#include <stdio.h>
-
 #include "scoping.h"
+#include "../error.h"
 
 // todo: make proper error reporting possible here -> include pointer to relevant token with each stmt/expression?
 // todo: check the arity on call expressions
@@ -13,19 +11,6 @@ typedef void (*ExprResolveFn)(Parser*, ExprNode*);
 
 void resolveExpr(Parser *parser, ExprNode *node);
 void resolveStmt(Parser *parser, StmtNode *node);
-
-
-void error(Parser *parser, const char *message, ...) {
-    parser->hadError = true;
-    va_list args;
-    // ReSharper disable once CppLocalVariableMightNotBeInitialized
-    va_start(args);
-    fprintf(stderr, "[TODO] Encountered Error: ");
-    // ReSharper disable once CppLocalVariableMightNotBeInitialized
-    vfprintf(stderr, message, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-}
 
 
 void globalVarDec(Parser *parser, StmtNode *node) {
@@ -54,7 +39,7 @@ void globalVarDec(Parser *parser, StmtNode *node) {
     }
 
     if (symbolExists(parser, name)) {
-        error(parser, "Redeclared global Symbol \"%s\"", name);
+        parseErrorAtToken(parser, node->token, "Redeclared global Symbol \"%s\"", name);
     } else {
         createSymbol(parser, name, symbol);
     }
@@ -99,7 +84,7 @@ void varDeclaration(Parser *parser, StmtNode *n) {
     StmtVarDeclNode *node = (StmtVarDeclNode*) n;
 
     if (symbolInCurrentScope(parser, node->name)) {
-        error(parser, "Redeclared Variable \"%s\" in same scope", node->name);
+        parseErrorAtToken(parser, node->header.token, "Redeclared Variable \"%s\" in same scope", node->name);
     } else {
         createSymbol(parser, node->name, VAR_SYMBOL(node));
     }
@@ -118,7 +103,7 @@ void func(Parser *parser, StmtNode *n) {
         StmtVarDeclNode *parameter = ArrayListRead(&node->parameters, i, StmtVarDeclNode*);
 
         if (symbolInCurrentScope(parser, parameter->name)) {
-            error(parser, "Redeclared parameter \"%s\" in function \"%s\"", parameter->name, node->name);
+            parseErrorAtToken(parser, parameter->header.token, "Redeclared parameter \"%s\" in function \"%s\"", parameter->name, node->name);
             continue;
         }
 
@@ -199,7 +184,7 @@ void unary(Parser *parser, ExprNode *n) {
 void var(Parser *parser, ExprNode *n) {
     ExprVarNode *node = (ExprVarNode*) n;
     if (!symbolExists(parser, node->name)) {
-        error(parser, "Couldn't resolve symbol \"%s\"", node->name);
+        parseErrorAtToken(parser, node->header.token, "Couldn't resolve symbol \"%s\"", node->name);
     }
 }
 
@@ -212,7 +197,7 @@ void varAssign(Parser *parser, ExprNode *n) {
 static void call(Parser *parser, ExprNode *n) {
     ExprCallNode *node = (ExprCallNode*) n;
     if (parser->inGlobalPhase) {
-        error(parser, "Tried using a function call to initialise a global variable");
+        parseErrorAtToken(parser, node->header.token, "Tried using a function call to initialise a global variable");
         return;
     }
     resolveExpr(parser, node->target);

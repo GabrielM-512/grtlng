@@ -20,10 +20,12 @@ typedef enum : u8 {
 
 typedef struct {
     ExprNodeType type;
+    u32 token;
 } ExprNode;
 
 typedef struct {
     ExprNode *expr;
+    u32 token;
     ArrayList prefix;
     ArrayList suffix;
 } Expr;
@@ -85,6 +87,7 @@ typedef enum : u8 {
 
 typedef struct {
     StmtNodeType type;
+    u32 token;
 } StmtNode;
 
 
@@ -149,7 +152,7 @@ typedef struct Scope Scope;
 typedef struct {
     ParseResult program;
     ArrayList *Tokens;
-    u32 token;
+    u32 token; // always points to current
     Token current, previous;
     bool inGlobalPhase;
     bool hadError, panicMode;

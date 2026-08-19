@@ -22,6 +22,7 @@ StmtNode *whileStmt(Parser *parser) {
     StmtWhileNode *node = ALLOC_NODE(StmtWhileNode);
 
     node->header.type = STMT_WHILE;
+    node->header.token = parser->token - 1;
 
     consume(parser, TOKEN_LEFT_PAREN, " after \"while\"");
 
@@ -44,6 +45,7 @@ StmtNode *forStmt(Parser *parser) {
      *
      * so we turn the first into the second
      */
+    u32 pos = parser->token - 1;
     consume(parser, TOKEN_LEFT_PAREN, " after \"for\"");
 
     StmtNode *initialiser;
@@ -61,12 +63,11 @@ StmtNode *forStmt(Parser *parser) {
         condition = expression(parser);
     } else {
         ExprNumberNode *value = ALLOC_NODE(ExprNumberNode);
-        *value = (ExprNumberNode) {{EXPR_NUMBER}, 1};
+        *value = (ExprNumberNode) {.header = {.type = EXPR_NUMBER, .token = parser->token - 1}, .value = 1};
 
-        Expr *temp = ALLOC_NODE(Expr);
-        temp->expr = (ExprNode*) value;
-
-        condition = temp;
+        condition = ALLOC_NODE(Expr);
+        condition->token = parser->token - 1;
+        condition->expr = (ExprNode*) value;
     }
 
     consume(parser, TOKEN_SEMICOLON, " after loop condition");
@@ -85,6 +86,7 @@ StmtNode *forStmt(Parser *parser) {
     StmtBlockNode *block = ALLOC_NODE(StmtBlockNode);
 
     block->header.type = STMT_BLOCK;
+    block->header.token = pos;
     ArrayListInit(&block->content, sizeof(StmtNode*));
 
     if (initialiser != nullptr) ArrayListAdd(&block->content, &initialiser);
@@ -92,6 +94,7 @@ StmtNode *forStmt(Parser *parser) {
 
     StmtWhileNode *loop = ALLOC_NODE(StmtWhileNode);
     loop->header.type = STMT_WHILE;
+    loop->header.token = pos;
 
     loop->condition = condition;
     loop->body = body;
@@ -101,6 +104,7 @@ StmtNode *forStmt(Parser *parser) {
         StmtBlockNode *newBody = ALLOC_NODE(StmtBlockNode);
 
         newBody->header.type = STMT_BLOCK;
+        newBody->header.token = body->token;
         ArrayListInit(&newBody->content, sizeof(StmtNode*));
 
         ArrayListAdd(&newBody->content, &body);
@@ -122,6 +126,7 @@ StmtNode *ifStmt(Parser *parser) {
     StmtIfNode *node = ALLOC_NODE(StmtIfNode);
 
     node->header.type = STMT_IF;
+    node->header.token = parser->token - 1;
 
     consume(parser, TOKEN_LEFT_PAREN, " after if");
 
@@ -140,8 +145,10 @@ StmtNode *ifStmt(Parser *parser) {
 StmtNode *localVarDeclStmt(Parser *parser) {
     StmtVarDeclNode *node = ALLOC_NODE(StmtVarDeclNode);
 
-    node->varType = parser->previous.type;
     node->header.type = STMT_VAR_DEC;
+    node->header.token = parser->token; // to point to the name instead of the keyword
+
+    node->varType = parser->previous.type;
 
     // to make it possible to return properly-initialised node on error
     node->name =  "";
@@ -176,6 +183,8 @@ StmtNode *exprStmt(Parser *parser) {
     node->header.type = STMT_EXPR;
 
     node->expr = expression(parser);
+    node->header.token = node->expr->token;
+
     consume(parser, TOKEN_SEMICOLON, " after Expression");
 
     return (StmtNode*) node;
@@ -187,6 +196,7 @@ StmtNode *returnStmt(Parser *parser) {
     StmtReturnNode *node = ALLOC_NODE(StmtReturnNode);
 
     node->header.type = STMT_RETURN;
+    node->header.token = parser->token - 1;
 
     node->value = nullptr;
 
@@ -202,6 +212,8 @@ StmtNode *blockStmt(Parser *parser) {
     StmtBlockNode *node = ALLOC_NODE(StmtBlockNode);
 
     node->header.type = STMT_BLOCK;
+    node->header.token = parser->token - 1;
+
     ArrayListInit(&node->content, sizeof(StmtNode*));
 
     while (!match(parser, TOKEN_RIGHT_BRACE)) {
@@ -226,6 +238,7 @@ StmtNode *blockStmt(Parser *parser) {
 static StmtNode *printStmt(Parser *parser) {
     StmtPrintNode *node = ALLOC_NODE(StmtPrintNode);
     node->header.type = STMT_PRINT;
+    node->header.token = parser->token - 1;
 
     node->value = expression(parser);
 

@@ -9,7 +9,7 @@
 #include "../debug/debugInfos.h"
 #include "../util/ArrayList.h"
 
-StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) {
+StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType, u32 position) {
 
     ArrayList parameters;
     ArrayListInit(&parameters, sizeof(StmtVarDeclNode*));
@@ -55,6 +55,7 @@ StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) 
     StmtFunction *function = ALLOC_NODE(StmtFunction);
 
     function->header.type = STMT_FUN_DEC;
+    function->header.token = position;
     function->name = name;
 
     function->returns = returnType;
@@ -66,10 +67,11 @@ StmtNode *functionDeclaration(Parser *parser, char *name, TokenType returnType) 
     return (StmtNode*) function;
 }
 
-StmtNode *variableDeclaration(Parser *parser, char *name, TokenType dataType) {
+StmtNode *variableDeclaration(Parser *parser, char *name, TokenType dataType, u32 position) {
     StmtVarDeclNode *node = ALLOC_NODE(StmtVarDeclNode);
 
     node->header.type = STMT_VAR_DEC;
+    node->header.token = position;
     node->name = name;
     node->varType = dataType;
 
@@ -87,6 +89,7 @@ StmtNode *variableDeclaration(Parser *parser, char *name, TokenType dataType) {
 }
 
 StmtNode *globalDeclaration(Parser *parser) {
+    u32 position = parser->token;
 
     if (!matchTypeIdent(parser)) {
         parseErrorAtCurrent(parser, "Expected Function or Variable declaration");
@@ -101,9 +104,9 @@ StmtNode *globalDeclaration(Parser *parser) {
 
     char *name = parser->previous.data;
 
-    if (match(parser, TOKEN_LEFT_PAREN)) return functionDeclaration(parser, name, dataType);
+    if (match(parser, TOKEN_LEFT_PAREN)) return functionDeclaration(parser, name, dataType, position);
 
     // it's a variable
-    return variableDeclaration(parser, name, dataType);
+    return variableDeclaration(parser, name, dataType, position);
 
 }
