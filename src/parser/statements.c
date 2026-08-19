@@ -162,6 +162,20 @@ StmtNode *localVarDeclStmt(Parser *parser) {
         const char *hint = "Function declarations are only permitted in the global scope";
         parseErrorAtCurrentHint(parser, hint, "Unexpected '(' in local variable declaration");
 
+        while (!match(parser, TOKEN_RIGHT_PAREN) && !match(parser, TOKEN_EOF)) advance(parser);
+        if (match(parser, TOKEN_LEFT_BRACE)) {
+            u16 level = 1;
+            while (level > 0) {
+                switch (parser->current.type) {
+                    case TOKEN_LEFT_BRACE: level++; break;
+                    case TOKEN_RIGHT_BRACE: level--; break;
+                    case TOKEN_EOF: level = 0; break;
+                    default:
+                }
+                advance(parser);
+            }
+        }
+
         return (StmtNode*) node;
     }
 
