@@ -121,6 +121,7 @@ void printIf(StmtIfNode *stmt) {
         printf("    ELSE\n");
         printStmt(stmt->elseBranch);
     }
+    printf("    END IF\n");
 }
 
 void printWhile(StmtWhileNode *stmt) {
@@ -128,7 +129,7 @@ void printWhile(StmtWhileNode *stmt) {
     printExpr(stmt->condition->expr);
     printf(" DO\n");
     printStmt(stmt->body);
-    printf("    END");
+    printf("    END WHILE");
 }
 
 static void printStmt(StmtNode *stmt) {
