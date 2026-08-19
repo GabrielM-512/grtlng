@@ -152,7 +152,7 @@ typedef struct Scope Scope;
 typedef struct {
     ParseResult program;
     ArrayList *Tokens;
-    u32 token; // always points to current
+    u32 token; // points to the next token after current
     Token current, previous;
     bool inGlobalPhase;
     bool hadError, panicMode;

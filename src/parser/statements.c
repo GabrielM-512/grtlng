@@ -22,7 +22,7 @@ StmtNode *whileStmt(Parser *parser) {
     StmtWhileNode *node = ALLOC_NODE(StmtWhileNode);
 
     node->header.type = STMT_WHILE;
-    node->header.token = parser->token - 1;
+    node->header.token = parser->token - 2;
 
     consume(parser, TOKEN_LEFT_PAREN, " after \"while\"");
 
@@ -45,7 +45,7 @@ StmtNode *forStmt(Parser *parser) {
      *
      * so we turn the first into the second
      */
-    u32 pos = parser->token - 1;
+    u32 pos = parser->token - 2;
     consume(parser, TOKEN_LEFT_PAREN, " after \"for\"");
 
     StmtNode *initialiser;
@@ -66,7 +66,7 @@ StmtNode *forStmt(Parser *parser) {
         *value = (ExprNumberNode) {.header = {.type = EXPR_NUMBER, .token = parser->token - 1}, .value = 1};
 
         condition = ALLOC_NODE(Expr);
-        condition->token = parser->token - 1;
+        condition->token = parser->token - 2;
         condition->expr = (ExprNode*) value;
     }
 
@@ -126,7 +126,7 @@ StmtNode *ifStmt(Parser *parser) {
     StmtIfNode *node = ALLOC_NODE(StmtIfNode);
 
     node->header.type = STMT_IF;
-    node->header.token = parser->token - 1;
+    node->header.token = parser->token - 2;
 
     consume(parser, TOKEN_LEFT_PAREN, " after if");
 
@@ -146,7 +146,7 @@ StmtNode *localVarDeclStmt(Parser *parser) {
     StmtVarDeclNode *node = ALLOC_NODE(StmtVarDeclNode);
 
     node->header.type = STMT_VAR_DEC;
-    node->header.token = parser->token; // to point to the name instead of the keyword
+    node->header.token = parser->token - 1; // to point to the name instead of the keyword
 
     node->varType = parser->previous.type;
 
@@ -196,7 +196,7 @@ StmtNode *returnStmt(Parser *parser) {
     StmtReturnNode *node = ALLOC_NODE(StmtReturnNode);
 
     node->header.type = STMT_RETURN;
-    node->header.token = parser->token - 1;
+    node->header.token = parser->token - 2;
 
     node->value = nullptr;
 
@@ -212,7 +212,7 @@ StmtNode *blockStmt(Parser *parser) {
     StmtBlockNode *node = ALLOC_NODE(StmtBlockNode);
 
     node->header.type = STMT_BLOCK;
-    node->header.token = parser->token - 1;
+    node->header.token = parser->token - 2;
 
     ArrayListInit(&node->content, sizeof(StmtNode*));
 
@@ -238,7 +238,7 @@ StmtNode *blockStmt(Parser *parser) {
 static StmtNode *printStmt(Parser *parser) {
     StmtPrintNode *node = ALLOC_NODE(StmtPrintNode);
     node->header.type = STMT_PRINT;
-    node->header.token = parser->token - 1;
+    node->header.token = parser->token - 2;
 
     node->value = expression(parser);
 
