@@ -1,5 +1,7 @@
 #include "resolving.h"
 
+#include <string.h>
+
 #include "scoping.h"
 #include "../error.h"
 
@@ -102,7 +104,7 @@ void func(Parser *parser, StmtNode *n) {
     for (u32 i = 0; i < node->parameters.length; i++) {
         StmtVarDeclNode *parameter = ArrayListRead(&node->parameters, i, StmtVarDeclNode*);
 
-        if (symbolInCurrentScope(parser, parameter->name)) {
+        if (strlen(parameter->name) > 0 && symbolInCurrentScope(parser, parameter->name)) {
             parseErrorAtToken(parser, parameter->header.token + 1, "Redeclared parameter \"%s\" in function \"%s\"", parameter->name, node->name);
             continue;
         }
