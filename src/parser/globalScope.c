@@ -11,6 +11,7 @@
 
 void parseParams(Parser *parser, ArrayList *parameters) {
     do {
+        u32 position = parser->token - 1;
         if (!matchTypeIdent(parser)) {
             parseErrorAtCurrent(parser, "Expected type identifier after comma, got %s instead", getTokenSymbol(parser->current.type));
             // skip remaining parameters
@@ -27,6 +28,7 @@ void parseParams(Parser *parser, ArrayList *parameters) {
         StmtVarDeclNode *parameter = ALLOC_NODE(StmtVarDeclNode);
 
         parameter->header.type = STMT_VAR_DEC;
+        parameter->header.token = position;
         parameter->name = paramName;
         parameter->value = nullptr;
         parameter->varType = type;

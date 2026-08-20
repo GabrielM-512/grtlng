@@ -103,7 +103,7 @@ void func(Parser *parser, StmtNode *n) {
         StmtVarDeclNode *parameter = ArrayListRead(&node->parameters, i, StmtVarDeclNode*);
 
         if (symbolInCurrentScope(parser, parameter->name)) {
-            parseErrorAtToken(parser, parameter->header.token, "Redeclared parameter \"%s\" in function \"%s\"", parameter->name, node->name);
+            parseErrorAtToken(parser, parameter->header.token + 1, "Redeclared parameter \"%s\" in function \"%s\"", parameter->name, node->name);
             continue;
         }
 
