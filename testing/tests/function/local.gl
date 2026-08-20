@@ -1,0 +1,7 @@
+i16 main() {
+    i64 fib(i64 num) {
+        if (num < 2) return num;
+
+        return fib(num - 1) + fib(num - 2);
+    }
+}

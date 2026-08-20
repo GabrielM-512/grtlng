@@ -1,0 +1,5 @@
+Encountered error on line 2: Unexpected '(' in local variable declaration
+[2]       i64 fib(i64 num) {
+                 ^ Here
+
+Hint: Function declarations are only permitted in the global scope

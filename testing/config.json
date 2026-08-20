@@ -38,6 +38,14 @@
       "testfile": "call/num.gl",
       "stderr": "call/num_stderr"
     },
+    "call.extra_arguments": {
+      "testfile": "call/extra_arguments.gl",
+      "stderr": "call/extra_arguments_stderr"
+    },
+    "call.missing_arguments": {
+      "testfile": "call/missing_arguments.gl",
+      "stderr": "call/missing_arguments_stderr"
+    },
     "expressions.evaluate": {
       "testfile": "expressions/evaluate.gl",
       "stdout": "expressions/evaluate_stdout"
@@ -50,6 +58,14 @@
       "testfile": "function/body_must_be_block.gl",
       "stderr": "function/body_must_be_block_stderr"
     },
+    "function.duplicate_parameter": {
+      "testfile": "function/duplicate_parameter.gl",
+      "stderr": "function/duplicate_parameter_stderr"
+    },
+    "function.local": {
+      "testfile": "function/local.gl",
+      "stderr": "function/local_stderr"
+    },
     "print.missing_argument": {
       "testfile": "print/missing_argument.gl",
       "stderr": "print/missing_argument_stderr"
@@ -57,6 +73,10 @@
     "print.numbers": {
       "testfile": "print/numbers.gl",
       "stdout": "print/numbers_stdout"
+    },
+    "variable.own_initialiser": {
+      "testfile": "variable/own_initialiser.gl",
+      "stderr": "variable/own_initialiser_stderr"
     }
   }
 
