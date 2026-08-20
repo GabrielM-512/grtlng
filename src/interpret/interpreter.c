@@ -54,7 +54,7 @@ void interpret(StmtNode *stmt) {
             StmtReturnNode *node = (StmtReturnNode*) stmt;
 
             if (node->value != nullptr) interpreter.returnValue = evaluate(node->value);
-            else interpreter.returnValue = VALUE_NUM(NAN);
+            else interpreter.returnValue = VALUE_NULL;
 
             interpreter.returning = true;
 

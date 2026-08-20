@@ -6,6 +6,7 @@
 typedef enum {
     VAL_NUM,
     VAL_FUNC,
+    VAL_NULL
 } ValueType;
 
 typedef struct {
@@ -29,6 +30,7 @@ void printValue(Value val);
 #define VALUE_BOOL(value) (VALUE_NUM((value) ? 1 : 0))
 #define VALUE_TRUE (VALUE_BOOL(true))
 #define VALUE_FALSE (VALUE_BOOL(false))
+#define VALUE_NULL ((Value) {.type = VAL_NULL, {.num = 0}})
 
 #define AS_FUNC(value) ((value).as.func)
 #define AS_NUM(value) ((value).as.num)

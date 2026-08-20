@@ -20,8 +20,9 @@ void printValue(Value val) {
             printf("<fn \"%s\" at %p>", function->name, function);
             break;
         }
-
-        default:
+        case VAL_NULL:
+            printf("null\n");
+            break;
     }
     putchar('\n');
 }
@@ -32,14 +33,15 @@ bool isTruthy(Value val) {
             return AS_NUM(val) != 0;
         case VAL_FUNC:
             return true;
-        default:
-            // unreachable
+        case VAL_NULL:
+            return false;
     }
     return true;
 }
 
 
 Value evaluateCall(ExprCallNode *call) {
+    interpreter.returnValue = VALUE_NULL;
 
     Value target = evaluateExpr(call->target);
     if (!IS_FUNC(target)) {
@@ -76,14 +78,9 @@ Value evaluateCall(ExprCallNode *call) {
     endEnvironment();
 
     interpreter.env = old;
-
     interpreter.returning = false;
 
-    Value returns = interpreter.returnValue;
-
-    interpreter.returnValue = VALUE_NAN;
-
-    return returns;
+    return interpreter.returnValue;
 }
 
 Value evaluateExpr(ExprNode *expr) {
