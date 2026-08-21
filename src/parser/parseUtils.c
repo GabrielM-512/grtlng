@@ -90,6 +90,19 @@ void synchronise(Parser *parser) {
     }
 }
 
+void skipBlock(Parser *parser) {
+    u16 level = 1;
+    while (level > 0) {
+        switch (parser->current.type) {
+            case TOKEN_LEFT_BRACE: level++; break;
+            case TOKEN_RIGHT_BRACE: level--; break;
+            case TOKEN_EOF: level = 0; break;
+            default:
+        }
+        advance(parser);
+    }
+}
+
 void traverseStmt(Parser *parser, exprFn fn, StmtNode* node) {
     switch (node->type) {
         case STMT_EXPR:

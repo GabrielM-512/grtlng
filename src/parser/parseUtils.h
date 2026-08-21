@@ -18,6 +18,8 @@ bool matchTypeIdent(Parser *parser);
 
 void synchronise(Parser *parser);
 
+void skipBlock(Parser *parser);
+
 void reachExpr(Parser *parser, exprFn fn);
 void recurseExpr(ExprNode* n, ExprNodeFn fn, void *data);
 
